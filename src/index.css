@@ -1,0 +1,17 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+html, body, #root {
+  margin: 0;
+  padding: 0;
+  width: 100%;
+  /* Jangan pakai height: 100% */
+}
+
+body {
+  min-width: 320px;
+  font-family: system-ui, Avenir, Helvetica, Arial, sans-serif;
+  background-color: #ffffff;
+  color: #213547;
+}
