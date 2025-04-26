@@ -1,41 +1,18 @@
-import PageWrapper from '../components/PageWrapper'
-import Card from '../components/Card'
-import Button from '../components/Button'
-import BackButton from '../components/BackButton'
-import Stepper from '../components/Stepper'
-import { useNavigate } from 'react-router-dom'
-import { useMPJHD } from '../context/MPJHDContext'
-import { useEffect, useState } from 'react'
+import PageWrapper from '../components/PageWrapper';
+import Card from '../components/Card';
+import Button from '../components/Button';
+import BackButton from '../components/BackButton';
+import Stepper from '../components/Stepper';
+import { useNavigate } from 'react-router-dom';
+import { useMPJHD } from '../context/MPJHDContext';
 
 export default function Step9_GradeHukuman() {
-  const navigate = useNavigate()
-  const { state, dispatch } = useMPJHD()
-  const [grade, setGrade] = useState('')
-  const [jenisHukuman, setJenisHukuman] = useState('')
-
-  useEffect(() => {
-    const konversiGrade = (nilai) => {
-      if (nilai <= 20) return { grade: 'Ringan 1', hukuman: 'Teguran Lisan' }
-      if (nilai <= 40) return { grade: 'Ringan 2', hukuman: 'Teguran Tertulis' }
-      if (nilai <= 60) return { grade: 'Sedang 1', hukuman: 'Potongan Tunjangan 25% selama 3 bulan' }
-      if (nilai <= 80) return { grade: 'Sedang 2', hukuman: 'Potongan Tunjangan 25% selama 6 bulan' }
-      if (nilai <= 100) return { grade: 'Sedang 3', hukuman: 'Potongan Tunjangan 25% selama 9 bulan' }
-      if (nilai <= 120) return { grade: 'Berat 1', hukuman: 'Penurunan Jabatan' }
-      if (nilai <= 140) return { grade: 'Berat 2', hukuman: 'Pembebasan dari Jabatan' }
-      return { grade: 'Berat 3', hukuman: 'Pemberhentian Tidak atas Permintaan Sendiri' }
-    }
-
-    const hasil = konversiGrade(state.nilaiAkhir)
-    setGrade(hasil.grade)
-    setJenisHukuman(hasil.hukuman)
-
-    dispatch({ type: 'SET', key: 'grade', value: hasil.grade })
-    dispatch({ type: 'SET', key: 'jenisHukuman', value: hasil.hukuman })
-  }, [state.nilaiAkhir, dispatch])
+  const navigate = useNavigate();
+  const { state } = useMPJHD();
 
   const handleNext = () => {
-    navigate('/step/10')
-  }
+    navigate('/step/10');
+  };
 
   return (
     <PageWrapper>
@@ -50,11 +27,11 @@ export default function Step9_GradeHukuman() {
           </p>
 
           <p className="text-3xl font-bold text-primary dark:text-primary-dark">
-            {grade}
+            {state.grade || '-'}
           </p>
 
           <p className="text-lg font-medium text-gray-600 dark:text-gray-300">
-            {jenisHukuman}
+            {state.jenisHukuman || '-'}
           </p>
 
           <div className="flex justify-between gap-4 mt-6">
@@ -66,7 +43,7 @@ export default function Step9_GradeHukuman() {
         </div>
       </Card>
 
-      <Stepper />
+      <Stepper currentStep={9} />
     </PageWrapper>
-  )
+  );
 }

@@ -5,21 +5,27 @@ import BackButton from '../components/BackButton'
 import Stepper from '../components/Stepper'
 import { useNavigate } from 'react-router-dom'
 import { useMPJHD } from '../context/MPJHDContext'
-import { useState } from 'react'
+import { useEffect, useState } from 'react'
 
 export default function Step4_PertanyaanTambahan() {
   const navigate = useNavigate()
-  const { dispatch } = useMPJHD()
-  
-  const [denganDampak, setDenganDampak] = useState('')
+  const { state, dispatch } = useMPJHD()
+  const [dampak, setDampak] = useState('')
+
+  useEffect(() => {
+    // Kalau kelompok bukan II, langsung skip ke Step5
+    if (state.kelompok !== 'II') {
+      navigate('/step/5')
+    }
+  }, [state.kelompok, navigate])
 
   const handleNext = () => {
-    if (!denganDampak) {
-      alert('Silakan jawab pertanyaan terlebih dahulu.')
+    if (!dampak) {
+      alert('Silakan pilih dampak pelanggaran terlebih dahulu.')
       return
     }
 
-    dispatch({ type: 'SET', key: 'denganDampak', value: denganDampak })
+    dispatch({ type: 'SET', key: 'dampak', value: dampak })
     navigate('/step/5')
   }
 
@@ -30,37 +36,30 @@ export default function Step4_PertanyaanTambahan() {
       </h1>
 
       <Card>
-        <div className="flex flex-col gap-6">
-          <p className="text-gray-700 dark:text-gray-200 text-center">
-            Apakah pelanggaran berdampak terhadap unit kerja atau instansi?
-          </p>
-
+        <div className="flex flex-col gap-8">
+          {/* Pertanyaan Dampak */}
           <div className="flex flex-col gap-4">
-            <label className="flex items-center gap-2">
-              <input
-                type="radio"
-                name="dampak"
-                value="ya"
-                checked={denganDampak === 'ya'}
-                onChange={(e) => setDenganDampak(e.target.value)}
-                className="accent-primary"
-              />
-              Ya, berdampak
-            </label>
-
-            <label className="flex items-center gap-2">
-              <input
-                type="radio"
-                name="dampak"
-                value="tidak"
-                checked={denganDampak === 'tidak'}
-                onChange={(e) => setDenganDampak(e.target.value)}
-                className="accent-primary"
-              />
-              Tidak berdampak
-            </label>
+            <p className="text-gray-700 dark:text-gray-200 text-center">
+              Sebutkan dampak pelanggaran!
+            </p>
+            <div className="flex flex-col gap-2">
+              {['Unit Kerja', 'Instansi', 'Negara'].map((item) => (
+                <label key={item} className="flex items-center gap-2">
+                  <input
+                    type="radio"
+                    name="dampak"
+                    value={item}
+                    checked={dampak === item}
+                    onChange={(e) => setDampak(e.target.value)}
+                    className="accent-primary"
+                  />
+                  {item}
+                </label>
+              ))}
+            </div>
           </div>
 
+          {/* Tombol Navigasi */}
           <div className="flex justify-between gap-4 mt-6">
             <BackButton className="flex-1" />
             <Button onClick={handleNext} className="flex-1">
@@ -70,7 +69,7 @@ export default function Step4_PertanyaanTambahan() {
         </div>
       </Card>
 
-      <Stepper />
+      <Stepper currentStep={4} />
     </PageWrapper>
   )
 }

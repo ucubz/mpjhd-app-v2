@@ -1,27 +1,58 @@
-import PageWrapper from '../components/PageWrapper'
-import Card from '../components/Card'
-import Button from '../components/Button'
-import BackButton from '../components/BackButton'
-import Stepper from '../components/Stepper'
-import { useNavigate } from 'react-router-dom'
-import { useMPJHD } from '../context/MPJHDContext'
-import { useEffect, useState } from 'react'
-import { determineKelompok } from '../utils/determineKelompok'
+import PageWrapper from '../components/PageWrapper';
+import Card from '../components/Card';
+import Button from '../components/Button';
+import BackButton from '../components/BackButton';
+import Stepper from '../components/Stepper';
+import { useNavigate } from 'react-router-dom';
+import { useMPJHD } from '../context/MPJHDContext';
+import { useEffect, useState } from 'react';
+import { determineKelompok } from '../utils/determineKelompok';
 
 export default function Step3_KelompokOtomatis() {
-  const navigate = useNavigate()
-  const { state, dispatch } = useMPJHD()
-  const [kelompok, setKelompok] = useState('')
+  const navigate = useNavigate();
+  const { state, dispatch } = useMPJHD();
+  const [kelompok, setKelompok] = useState('');
 
   useEffect(() => {
-    const hasilKelompok = determineKelompok(state.pasalUtama)
-    setKelompok(hasilKelompok)
-    dispatch({ type: 'SET', key: 'kelompok', value: hasilKelompok })
-  }, [state.pasalUtama, dispatch])
+    if (!state.pasalUtama) {
+      return;
+    }
+  
+    let hasilKelompok = determineKelompok(state.pasalUtama);
+  
+   
+  
+    setKelompok(hasilKelompok);
+    dispatch({ type: 'SET', key: 'kelompok', value: hasilKelompok });
+  }, [state.pasalUtama, dispatch]);
+  
 
   const handleNext = () => {
-    navigate('/step/4')
-  }
+    if (!kelompok) {
+      alert('Kelompok belum ditentukan.');
+      return;
+    }
+  
+    if (kelompok === 'I') {
+      navigate('/step/kelompok-i');
+    } else if (kelompok === 'II') {
+      navigate('/step/4');
+    } else if (kelompok === 'III') {
+      navigate('/step/kelompok-iii-check'); // 🔥 Tambahan baru
+    } else if (
+      kelompok === 'III Khusus Individual' ||
+      kelompok === 'III Khusus Bersama' ||
+      kelompok === 'IV' ||
+      kelompok === 'VI'
+    ) {
+      navigate('/step/5');
+    } else if (kelompok === 'III Umum' || kelompok === 'V') {
+      navigate('/step/6');
+    } else {
+      alert('Kelompok tidak dikenali.');
+    }
+  };
+  
 
   return (
     <PageWrapper>
@@ -36,19 +67,23 @@ export default function Step3_KelompokOtomatis() {
           </p>
 
           <p className="text-xl font-bold text-primary dark:text-primary-dark">
-            {kelompok || 'Sedang menentukan...'}
+            {kelompok ? kelompok : 'Sedang menentukan kelompok...'}
           </p>
 
           <div className="flex justify-between gap-4 mt-6">
             <BackButton className="flex-1" />
-            <Button onClick={handleNext} className="flex-1">
+            <Button 
+              onClick={handleNext} 
+              className="flex-1"
+              disabled={!kelompok}  // Tombol nonaktif kalau belum ada kelompok
+            >
               Lanjut
             </Button>
           </div>
         </div>
       </Card>
 
-      <Stepper />
+      <Stepper currentStep={3} />
     </PageWrapper>
-  )
+  );
 }

@@ -17,7 +17,7 @@ export default function Step1_PilihKategori() {
       return
     }
 
-    dispatch({ type: 'SET', key: 'kategori', value: kategori })
+    dispatch({ type: 'SET', key: 'kategori', value: kategori.toUpperCase() })
     navigate('/step/2')
   }
 
@@ -34,8 +34,8 @@ export default function Step1_PilihKategori() {
               <input
                 type="radio"
                 name="kategori"
-                value="kewajiban"
-                checked={kategori === 'kewajiban'}
+                value="KEWAJIBAN"
+                checked={kategori === 'KEWAJIBAN'}
                 onChange={(e) => setKategori(e.target.value)}
                 className="accent-primary"
               />
@@ -46,8 +46,8 @@ export default function Step1_PilihKategori() {
               <input
                 type="radio"
                 name="kategori"
-                value="larangan"
-                checked={kategori === 'larangan'}
+                value="LARANGAN"
+                checked={kategori === 'LARANGAN'}
                 onChange={(e) => setKategori(e.target.value)}
                 className="accent-primary"
               />
@@ -61,7 +61,7 @@ export default function Step1_PilihKategori() {
         </div>
       </Card>
 
-      <Stepper />
+      <Stepper currentStep={1} />
     </PageWrapper>
   )
 }

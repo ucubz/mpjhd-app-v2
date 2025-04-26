@@ -47,7 +47,7 @@ export default function Step2_PilihPasalUtama() {
         </div>
       </Card>
 
-      <Stepper />
+      <Stepper currentStep={2} />
     </PageWrapper>
   )
 }

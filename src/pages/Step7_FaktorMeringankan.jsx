@@ -1,29 +1,27 @@
-import PageWrapper from '../components/PageWrapper'
-import Card from '../components/Card'
-import Button from '../components/Button'
-import BackButton from '../components/BackButton'
-import Stepper from '../components/Stepper'
-import { useNavigate } from 'react-router-dom'
-import { useMPJHD } from '../context/MPJHDContext'
+import PageWrapper from '../components/PageWrapper';
+import Card from '../components/Card';
+import Button from '../components/Button';
+import BackButton from '../components/BackButton';
+import Stepper from '../components/Stepper';
+import InputRadio from '../components/InputRadio'; // 🔥 pakai komponen InputRadio
+import { useNavigate } from 'react-router-dom';
+import { useMPJHD } from '../context/MPJHDContext';
 
 export default function Step7_FaktorMeringankan() {
-  const navigate = useNavigate()
-  const { state, dispatch } = useMPJHD()
+  const navigate = useNavigate();
+  const { state, dispatch } = useMPJHD();
 
-  const meringankan = state.meringankan || {
-    kooperatif: false,
-    mengakui: false,
-    menyesal: false,
-    tekanan: false,
-  }
+  const pembobotan = state.faktorPembobotan || {
+    meringankan: '',
+  };
 
-  const toggle = (key) => {
-    dispatch({ type: 'SET_MERINGANKAN', key, value: !meringankan[key] })
-  }
+  const handleChange = (key, value) => {
+    dispatch({ type: 'SET_FAKTOR_PEMBOBOTAN', key, value });
+  };
 
   const handleNext = () => {
-    navigate('/step/8')
-  }
+    navigate('/step/8');
+  };
 
   return (
     <PageWrapper>
@@ -35,49 +33,21 @@ export default function Step7_FaktorMeringankan() {
         <div className="flex flex-col gap-6">
 
           <p className="text-gray-700 dark:text-gray-200 text-center">
-            Centang faktor-faktor meringankan berikut jika ada:
+            Pilih faktor meringankan yang sesuai:
           </p>
 
           <div className="flex flex-col gap-4">
-            <label className="flex items-center gap-2">
-              <input
-                type="checkbox"
-                checked={meringankan.kooperatif}
-                onChange={() => toggle('kooperatif')}
-                className="accent-primary"
-              />
-              Kooperatif selama pemeriksaan
-            </label>
-
-            <label className="flex items-center gap-2">
-              <input
-                type="checkbox"
-                checked={meringankan.mengakui}
-                onChange={() => toggle('mengakui')}
-                className="accent-primary"
-              />
-              Mengakui kesalahan secara jujur
-            </label>
-
-            <label className="flex items-center gap-2">
-              <input
-                type="checkbox"
-                checked={meringankan.menyesal}
-                onChange={() => toggle('menyesal')}
-                className="accent-primary"
-              />
-              Menunjukkan rasa penyesalan
-            </label>
-
-            <label className="flex items-center gap-2">
-              <input
-                type="checkbox"
-                checked={meringankan.tekanan}
-                onChange={() => toggle('tekanan')}
-                className="accent-primary"
-              />
-              Ada tekanan psikis atau kondisi khusus
-            </label>
+            <InputRadio
+              label="Faktor Meringankan:"
+              name="faktorMeringankan"
+              value={pembobotan.meringankan}
+              onChange={(val) => handleChange('meringankan', val)}
+              options={[
+                { value: 'tidakAda', label: 'Tidak ada faktor meringankan' },
+                { value: 'kooperatif', label: 'Berperilaku baik / kooperatif selama pemeriksaan' },
+                { value: 'inisiator', label: 'Sebagai inisiator pengungkapan pelanggaran' },
+              ]}
+            />
           </div>
 
           <div className="flex justify-between gap-4 mt-6">
@@ -90,7 +60,7 @@ export default function Step7_FaktorMeringankan() {
         </div>
       </Card>
 
-      <Stepper />
+      <Stepper currentStep={7} />
     </PageWrapper>
-  )
+  );
 }
