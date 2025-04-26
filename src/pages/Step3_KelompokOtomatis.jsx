@@ -17,42 +17,27 @@ export default function Step3_KelompokOtomatis() {
     if (!state.pasalUtama) {
       return;
     }
-  
-    let hasilKelompok = determineKelompok(state.pasalUtama);
-  
-   
-  
+
+    const hasilKelompok = determineKelompok(state.pasalUtama);
     setKelompok(hasilKelompok);
     dispatch({ type: 'SET', key: 'kelompok', value: hasilKelompok });
   }, [state.pasalUtama, dispatch]);
-  
 
   const handleNext = () => {
     if (!kelompok) {
       alert('Kelompok belum ditentukan.');
       return;
     }
-  
+
     if (kelompok === 'I') {
       navigate('/step/kelompok-i');
-    } else if (kelompok === 'II') {
-      navigate('/step/4');
     } else if (kelompok === 'III') {
-      navigate('/step/kelompok-iii-check'); // 🔥 Tambahan baru
-    } else if (
-      kelompok === 'III Khusus Individual' ||
-      kelompok === 'III Khusus Bersama' ||
-      kelompok === 'IV' ||
-      kelompok === 'VI'
-    ) {
-      navigate('/step/5');
-    } else if (kelompok === 'III Umum' || kelompok === 'V') {
-      navigate('/step/6');
+      navigate('/step/kelompok-iii-check');
     } else {
-      alert('Kelompok tidak dikenali.');
+      // Kelompok II, IV, V, VI langsung ke Step4
+      navigate('/step/4');
     }
   };
-  
 
   return (
     <PageWrapper>
@@ -73,9 +58,9 @@ export default function Step3_KelompokOtomatis() {
           <div className="flex justify-between gap-4 mt-6">
             <BackButton className="flex-1" />
             <Button 
-              onClick={handleNext} 
+              onClick={handleNext}
               className="flex-1"
-              disabled={!kelompok}  // Tombol nonaktif kalau belum ada kelompok
+              disabled={!kelompok}
             >
               Lanjut
             </Button>

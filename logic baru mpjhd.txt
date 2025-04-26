@@ -7,7 +7,7 @@ mantap. nah untuk logic baru akan seperti ini
 	b. Kelompok II, setelah pasal ditentukan, perlu menentukan Dampak, nah dampak ini ada 3 variasi, yaitu dampak ke Unit Kerja, Instansi, atau negara. pasal yang masuk di kelompok II 
 		1) pasal 3 huruf a, dampak unit kerja/instansi/negara, nilai pokok 60
 		2) pasal 3 huruf b, dampak unit kerja/instansi, nilai pokok 30
-		3) pasal 3 huruf b, dampak negara, nilai pokok 30
+		3) pasal 3 huruf b, dampak negara, nilai pokok 60
 		4) pasal 3 huruf c huruf d huruf e huruf f, pasal 4 huruf c huruf d huruf g huruf h, pasal 5 huruf f huruf g huruf h huruf i huruf j. jika dampak unit kerja maka nilai pokok adalah 0, jika dampak adalah instansi maka nilai pokok adalah 30, jika dampak adalah negara maka nilai pokok 60
 	c. kelompok III, ada daftar pasalnya dan tidak mempertimbangkan dampak tapi ada dibagi dua jenis, yaitu Kelompok III umum yaitu yang tidak terkait penerimaan uang dan/atau kerugian negara/pihak lain dan Kelompok III khusus yaitu yang disertai dengan penerimaan uang dan/atau kerugian negara/pihak lain. Kelompok III khusus dibagi enjadi Kelompok III khusus yang dilakukan bersama-sama dan Kelompok III khusus yang dilakukan secara individual
 		1) pasal 4 huruf a dan huruf b, nilai pokok 30

@@ -4,7 +4,6 @@ import { useMemo } from 'react';
 
 // Komponen utama
 export default function HasilTabelAngka({ kelompok, hasilState }) {
-  // Buat tabel sesuai kelompok
   const tabelHTML = useMemo(() => {
     switch (kelompok) {
       case 'II':
@@ -34,21 +33,42 @@ export default function HasilTabelAngka({ kelompok, hasilState }) {
   );
 }
 
-// =============================================
-// Bagian bawah ini: fungsi render tabel per kelompok
-// =============================================
+// =============================
+// Helper Functions
+// =============================
 
-// Tabel format kelompok II, III Umum, V (struktur sederhana)
+// Format faktor meringankan (objek ke string)
+function formatFaktorMeringankan(obj) {
+  if (!obj) return '-';
+  const faktorList = [];
+  if (obj.kooperatif) faktorList.push('Kooperatif');
+  if (obj.mengakui) faktorList.push('Mengakui Kesalahan');
+  if (obj.menyesal) faktorList.push('Menunjukkan Penyesalan');
+  if (obj.tekanan) faktorList.push('Ada Tekanan Psikis');
+  return faktorList.length > 0 ? faktorList.join(', ') : 'Tidak ada';
+}
+
+// Hitung total faktor tambahan
+function totalFaktorTambahan(faktorTambahan) {
+  if (!Array.isArray(faktorTambahan)) return 0;
+  return faktorTambahan.reduce((acc, item) => acc + (item.nilai || 0), 0);
+}
+
+// =============================
+// Fungsi render tabel per kelompok
+// =============================
+
+// Kelompok II, III Umum, V (struktur sederhana)
 function renderKelompokII(hasil) {
   return (
     <Table>
       <Row no="1" unsur="Nilai Pokok" jumlah={hasil.nilaiPokok} />
       <Row no="2" unsur="Nilai Tambahan" jumlah={hasil.nilaiTambahan} />
-      <Row no="2.1" unsur="Faktor Pembobotan Tambahan" />
-      {hasil.faktorTambahan.map((f, i) => (
-        <Row key={i} unsur={f.nama} jumlah={f.nilai} />
+      <Row no="2.1" unsur="Faktor Pembobotan Tambahan" jumlah={totalFaktorTambahan(hasil.faktorTambahan)} />
+      {Array.isArray(hasil.faktorTambahan) && hasil.faktorTambahan.map((f, i) => (
+        <Row key={`tambahan-${i}`} unsur={f.nama} jumlah={f.nilai} />
       ))}
-      <Row no="2.2" unsur="Faktor Pembobotan yang Meringankan" jumlah={hasil.faktorMeringankan} />
+      <Row no="2.2" unsur="Faktor Pembobotan yang Meringankan" jumlah={formatFaktorMeringankan(hasil.faktorMeringankan)} />
       <Row no="3" unsur="Nilai Akhir" jumlah={hasil.nilaiAkhir} />
     </Table>
   );
@@ -62,51 +82,53 @@ function renderKelompokV(hasil) {
   return renderKelompokII(hasil);
 }
 
-// Tabel format kelompok III Khusus Individual, IV, VI (ada faktor utama)
+// Kelompok III Khusus Individual
 function renderKelompokIIIKhususIndividual(hasil) {
   return (
     <Table>
       <Row no="1" unsur="Nilai Pokok" jumlah={hasil.nilaiPokok} />
       <Row no="2" unsur="Nilai Tambahan" jumlah={hasil.nilaiTambahan} />
       <Row no="2.1" unsur="Faktor Pembobotan Utama" jumlah={hasil.faktorUtama} />
-      <Row no="2.2" unsur="Faktor Pembobotan Tambahan" />
-      {hasil.faktorTambahan.map((f, i) => (
-        <Row key={i} unsur={f.nama} jumlah={f.nilai} />
+      <Row no="2.2" unsur="Faktor Pembobotan Tambahan" jumlah={totalFaktorTambahan(hasil.faktorTambahan)} />
+      {Array.isArray(hasil.faktorTambahan) && hasil.faktorTambahan.map((f, i) => (
+        <Row key={`tambahan-iiikhusus-${i}`} unsur={f.nama} jumlah={f.nilai} />
       ))}
-      <Row no="2.3" unsur="Faktor Pembobotan yang Meringankan" jumlah={hasil.faktorMeringankan} />
+      <Row no="2.3" unsur="Faktor Pembobotan yang Meringankan" jumlah={formatFaktorMeringankan(hasil.faktorMeringankan)} />
       <Row no="3" unsur="Nilai Akhir" jumlah={hasil.nilaiAkhir} />
     </Table>
   );
 }
 
-function renderKelompokIV(hasil) {
-  return renderKelompokIIIKhususIndividual(hasil);
-}
-
-function renderKelompokVI(hasil) {
-  return renderKelompokIIIKhususIndividual(hasil);
-}
-
-// Tabel format kelompok III Khusus Bersama (faktor peran + tambahan)
+// Kelompok III Khusus Bersama
 function renderKelompokIIIKhususBersama(hasil) {
   return (
     <Table>
       <Row no="1" unsur="Nilai Pokok" jumlah={hasil.nilaiPokok} />
       <Row no="2" unsur="Nilai Tambahan" jumlah={hasil.nilaiTambahan} />
       <Row no="2.1" unsur="Faktor Pembobotan Peran" jumlah={hasil.faktorPeran} />
-      <Row no="2.2" unsur="Faktor Pembobotan Tambahan" />
-      {hasil.faktorTambahan.map((f, i) => (
-        <Row key={i} unsur={f.nama} jumlah={f.nilai} />
+      <Row no="2.2" unsur="Faktor Pembobotan Tambahan" jumlah={totalFaktorTambahan(hasil.faktorTambahan)} />
+      {Array.isArray(hasil.faktorTambahan) && hasil.faktorTambahan.map((f, i) => (
+        <Row key={`tambahan-bersama-${i}`} unsur={f.nama} jumlah={f.nilai} />
       ))}
-      <Row no="2.3" unsur="Faktor Pembobotan yang Meringankan" jumlah={hasil.faktorMeringankan} />
+      <Row no="2.3" unsur="Faktor Pembobotan yang Meringankan" jumlah={formatFaktorMeringankan(hasil.faktorMeringankan)} />
       <Row no="3" unsur="Nilai Akhir" jumlah={hasil.nilaiAkhir} />
     </Table>
   );
 }
 
-// =============================================
-// Komponen bantu: Table dan Row
-// =============================================
+// Kelompok IV
+function renderKelompokIV(hasil) {
+  return renderKelompokIIIKhususIndividual(hasil);
+}
+
+// Kelompok VI
+function renderKelompokVI(hasil) {
+  return renderKelompokIIIKhususIndividual(hasil);
+}
+
+// =============================
+// Komponen Table dan Row
+// =============================
 
 function Table({ children }) {
   return (
