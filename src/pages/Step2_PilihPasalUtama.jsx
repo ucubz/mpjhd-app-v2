@@ -23,27 +23,23 @@ export default function Step2_PilihPasalUtama() {
   }
 
   return (
-    <PageWrapper>
-      <h1 className="text-2xl font-bold text-center mb-8">
+    <PageWrapper className="min-h-screen flex flex-col justify-center">
+      <h1 className="text-2xl font-bold text-center mb-8 sm:text-xl md:text-3xl">
         Pilih Pasal Utama
       </h1>
 
-      <Card>
-        <div className="flex flex-col gap-6">
+      <Card className="flex flex-col gap-6 p-4 sm:p-6">
+        <PasalSelector
+          kategori={state.kategori}
+          selected={pasal}
+          onChange={setPasal}
+        />
 
-          <PasalSelector
-            kategori={state.kategori}
-            selected={pasal}
-            onChange={setPasal}
-          />
-
-          <div className="flex justify-between gap-4 mt-6">
-            <BackButton className="flex-1" />
-            <Button onClick={handleNext} className="flex-1">
-              Lanjut
-            </Button>
-          </div>
-
+        <div className="flex justify-between gap-4 mt-6">
+          <BackButton className="flex-1" />
+          <Button onClick={handleNext} className="flex-1">
+            Lanjut
+          </Button>
         </div>
       </Card>
 

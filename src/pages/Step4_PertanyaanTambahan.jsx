@@ -63,14 +63,13 @@ export default function Step4_PertanyaanTambahan() {
   };
 
   return (
-    <PageWrapper>
-      <h1 className="text-2xl font-bold text-center mb-8">
+    <PageWrapper className="min-h-screen flex flex-col justify-center">
+      <h1 className="text-2xl font-bold text-center mb-8 sm:text-xl md:text-3xl">
         Pertanyaan Tambahan
       </h1>
 
-      <Card>
-        <div className="flex flex-col gap-6">
-
+      <Card className="flex flex-col gap-6 p-4 sm:p-6">
+        <div className="text-center">
           {/* Form Input Dampak */}
           <div className="flex flex-col gap-2">
             <label className="text-sm text-gray-700 dark:text-gray-200">
@@ -129,7 +128,6 @@ export default function Step4_PertanyaanTambahan() {
               Lanjut
             </Button>
           </div>
-
         </div>
       </Card>
 
