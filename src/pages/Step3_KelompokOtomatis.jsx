@@ -40,28 +40,24 @@ export default function Step3_KelompokOtomatis() {
   };
 
   return (
-    <PageWrapper className="min-h-screen flex flex-col justify-center">
+    <PageWrapper>
       <h1 className="text-2xl font-bold text-center mb-8 sm:text-xl md:text-3xl">
-        Kelompokkan Pelanggaran (Otomatis)
+        Kelompok Pelanggaran
       </h1>
 
       <Card className="flex flex-col gap-6 p-4 sm:p-6">
         <div className="text-center">
           <p className="text-gray-700 dark:text-gray-200">
-            Berdasarkan pasal utama, pelanggaran dikelompokkan ke:
+            Berdasarkan Pasal Utama, pelanggaran masuk ke:
           </p>
 
-          <p className="text-xl font-bold text-primary dark:text-primary-dark mt-2">
-            {kelompok ? kelompok : 'Sedang menentukan kelompok...'}
+          <p className="text-4xl font-bold py-7 text-primary dark:text-primary-dark mt-2">
+            Kelompok {kelompok ? kelompok : 'Sedang menentukan kelompok...'}
           </p>
 
           <div className="flex justify-between gap-4 mt-6">
-            <BackButton className="flex-1" />
-            <Button
-              onClick={handleNext}
-              className="flex-1"
-              disabled={!kelompok}
-            >
+            <BackButton />
+            <Button onClick={handleNext} disabled={!kelompok}>
               Lanjut
             </Button>
           </div>

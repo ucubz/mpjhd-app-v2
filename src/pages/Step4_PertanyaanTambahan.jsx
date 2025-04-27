@@ -1,4 +1,4 @@
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { useMPJHD } from '../context/MPJHDContext';
 import { tentukanNilaiPokok } from '../utils/tentukanNilaiPokok';
@@ -6,8 +6,8 @@ import { tentukanNilaiPokok } from '../utils/tentukanNilaiPokok';
 import PageWrapper from '../components/PageWrapper';
 import Card from '../components/Card';
 import Button from '../components/Button';
-import Stepper from '../components/Stepper';
 import BackButton from '../components/BackButton';
+import Stepper from '../components/Stepper';
 
 export default function Step4_PertanyaanTambahan() {
   const { state, dispatch } = useMPJHD();
@@ -18,7 +18,7 @@ export default function Step4_PertanyaanTambahan() {
 
   const perluTanyaJabatan = state.pasalUtama?.includes('Pasal 4 huruf e');
 
-  // Hitung nilai pokok real-time untuk preview (rekap tampilan saja)
+  // Hitung nilai pokok preview
   const nilaiPokok = tentukanNilaiPokok({
     pasal: state.pasalUtama,
     kelompok: state.kelompok,
@@ -44,19 +44,12 @@ export default function Step4_PertanyaanTambahan() {
       dispatch({ type: 'SET', key: 'jabatan', value: jabatan });
     }
 
-    // Hanya hitung dan simpan nilai pokok jika BUKAN Kelompok III Khusus
+    // Simpan nilai pokok kalau bukan Kelompok III Khusus
     if (
       state.kelompok !== 'III Khusus Individual' &&
       state.kelompok !== 'III Khusus Bersama'
     ) {
-      const nilaiPokokBaru = tentukanNilaiPokok({
-        pasal: state.pasalUtama,
-        kelompok: state.kelompok,
-        dampak: dampak,
-        jabatan: jabatan,
-        tipeKelompokIII: state.tipeKelompokIII,
-      });
-      dispatch({ type: 'SET', key: 'nilaiPokok', value: nilaiPokokBaru });
+      dispatch({ type: 'SET', key: 'nilaiPokok', value: nilaiPokok });
     }
 
     navigate('/step/5');
@@ -64,19 +57,19 @@ export default function Step4_PertanyaanTambahan() {
 
   return (
     <PageWrapper className="min-h-screen flex flex-col justify-center">
-      <h1 className="text-2xl font-bold text-center mb-8 sm:text-xl md:text-3xl">
+      <h1 className="text-center text-2xl font-bold mb-8 md:text-3xl">
         Pertanyaan Tambahan
       </h1>
 
-      <Card className="flex flex-col gap-6 p-4 sm:p-6">
-        <div className="text-center">
-          {/* Form Input Dampak */}
+      <Card className="flex flex-col gap-6 p-6">
+        <div className="space-y-6">
+          {/* Input Dampak */}
           <div className="flex flex-col gap-2">
-            <label className="text-sm text-gray-700 dark:text-gray-200">
+            <label className="text-sm font-medium text-gray-700 dark:text-gray-200">
               Dampak pelanggaran terhadap:
             </label>
             <select
-              className="w-full p-2 border rounded-lg dark:bg-gray-800 dark:border-gray-600 dark:text-white"
+              className="w-full rounded-md border-gray-300 dark:border-gray-600 dark:bg-gray-800 dark:text-white p-2 text-sm focus:ring-primary focus:border-primary"
               value={dampak}
               onChange={(e) => setDampak(e.target.value)}
             >
@@ -87,14 +80,14 @@ export default function Step4_PertanyaanTambahan() {
             </select>
           </div>
 
-          {/* Form Input Jabatan (hanya kalau pasal 4 huruf e) */}
+          {/* Input Jabatan (khusus Pasal 4 huruf e) */}
           {perluTanyaJabatan && (
             <div className="flex flex-col gap-2">
-              <label className="text-sm text-gray-700 dark:text-gray-200">
+              <label className="text-sm font-medium text-gray-700 dark:text-gray-200">
                 Jenis Jabatan:
               </label>
               <select
-                className="w-full p-2 border rounded-lg dark:bg-gray-800 dark:border-gray-600 dark:text-white"
+                className="w-full rounded-md border-gray-300 dark:border-gray-600 dark:bg-gray-800 dark:text-white p-2 text-sm focus:ring-primary focus:border-primary"
                 value={jabatan}
                 onChange={(e) => setJabatan(e.target.value)}
               >
@@ -105,25 +98,25 @@ export default function Step4_PertanyaanTambahan() {
             </div>
           )}
 
-          {/* Visual Rekap */}
+          {/* Rekap Visual */}
           {(dampak && (!perluTanyaJabatan || jabatan)) && (
-            <div className="border rounded-lg p-4 bg-gray-100 dark:bg-gray-700 text-sm text-gray-800 dark:text-gray-200 space-y-2">
+            <div className="border rounded-md p-4 bg-gray-50 dark:bg-gray-700 text-sm text-gray-700 dark:text-gray-200 space-y-1">
               <p><strong>Rekap Input:</strong></p>
-              <p>• Pasal yang dilanggar: {state.pasalUtama || '-'}</p>
-              <p>• Kelompok Pelanggaran: {state.kelompok || '-'}</p>
+              <p>• Pasal Utama: {state.pasalUtama || '-'}</p>
+              <p>• Kelompok: {state.kelompok || '-'}</p>
               <p>• Dampak: {dampak}</p>
               {perluTanyaJabatan && <p>• Jabatan: {jabatan}</p>}
               <p>• Nilai Pokok (preview): {nilaiPokok}</p>
             </div>
           )}
 
-          {/* Tombol Navigasi */}
-          <div className="flex justify-between gap-4 mt-6">
-            <BackButton className="flex-1" />
+          {/* Navigasi Tombol */}
+          <div className="flex flex-col-reverse sm:flex-row gap-4 pt-4">
+            <BackButton className="w-full sm:w-auto" />
             <Button
               onClick={handleNext}
-              className="flex-1"
-              disabled={!dampak}
+              disabled={!dampak || (perluTanyaJabatan && !jabatan)}
+              className="w-full sm:w-auto"
             >
               Lanjut
             </Button>

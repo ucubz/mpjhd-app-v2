@@ -1,12 +1,23 @@
+// src/components/BackButton.jsx
+
 import { useNavigate } from 'react-router-dom'
 
-export default function BackButton({ label = "Kembali" }) {
+export default function BackButton({ label = "Kembali", className = "" }) {
   const navigate = useNavigate()
 
   return (
     <button
+      type="button"
       onClick={() => navigate(-1)}
-      className="px-4 py-2 border border-gray-300 dark:border-gray-600 rounded-xl text-gray-700 dark:text-gray-100 hover:bg-gray-100 dark:hover:bg-gray-700 transition-all text-sm md:text-base"
+      className={`
+        w-24 inline-flex items-center gap-2
+        rounded-md justify-center
+        px-3 py-1.5 text-sm font-semibold
+        shadow-inner shadow-white/10
+        transition-all focus:outline-none focus-visible:ring-2 focus-visible:ring-white
+        bg-gray-500 hover:bg-gray-600 dark:bg-gray-600 dark:hover:bg-gray-700 text-white
+        ${className}
+      `}
     >
       {label}
     </button>
