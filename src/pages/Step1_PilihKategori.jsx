@@ -12,19 +12,29 @@ const options = [
     label: 'Kewajiban',
     description: 'Pasal 3',
     kategori: 'KEWAJIBAN',
-    pasalGroup: '3'
+    pasalGroup: '3',
+    isSpecial: false
   },
   {
     label: 'Larangan',
     description: 'Pasal 4',
     kategori: 'LARANGAN',
-    pasalGroup: '4'
+    pasalGroup: '4',
+    isSpecial: false
   },
   {
     label: 'Larangan',
     description: 'Pasal 5',
     kategori: 'LARANGAN',
-    pasalGroup: '5'
+    pasalGroup: '5',
+    isSpecial: false
+  },
+  {
+    label: 'Izin Perkawinan/Perceraian',
+    description: 'Khusus (Langsung Kelompok VI)',
+    kategori: 'IZIN_PERKAWINAN',
+    pasalGroup: null,
+    isSpecial: true
   }
 ]
 
@@ -35,12 +45,23 @@ export default function Step1_PilihKategori() {
 
   const handleSelect = (value) => {
     if (!value) return
+
     setSelected(value)
-    dispatch({ type: 'SET', key: 'kategori', value: value.kategori })
-    dispatch({ type: 'SET', key: 'pasalGroup', value: value.pasalGroup })
-    setTimeout(() => {
-      navigate('/step/2')
-    }, 400) // kasih delay 200ms untuk transisi lebih smooth
+
+    if (value.isSpecial) {
+      dispatch({ type: 'SET', key: 'kategori', value: value.kategori })
+      dispatch({ type: 'SET', key: 'kelompok', value: 'VI' })
+      dispatch({ type: 'SET', key: 'nilaiPokok', value: 60 })
+      setTimeout(() => {
+        navigate('/step/5')
+      }, 400)
+    } else {
+      dispatch({ type: 'SET', key: 'kategori', value: value.kategori })
+      dispatch({ type: 'SET', key: 'pasalGroup', value: value.pasalGroup })
+      setTimeout(() => {
+        navigate('/step/2')
+      }, 400)
+    }
   }
 
   return (
@@ -53,7 +74,7 @@ export default function Step1_PilihKategori() {
         <div className="flex flex-col gap-6">
           <RadioGroup value={selected} onChange={handleSelect} className="space-y-2">
             {options.map((opt) => (
-              <RadioGroup.Option key={`${opt.label}-${opt.pasalGroup}`} value={opt}>
+              <RadioGroup.Option key={`${opt.label}-${opt.pasalGroup ?? 'special'}`} value={opt}>
                 {({ active, checked }) => (
                   <div
                     className={`
