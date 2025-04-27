@@ -40,7 +40,7 @@ export default function Step1_PilihKategori() {
     dispatch({ type: 'SET', key: 'pasalGroup', value: value.pasalGroup })
     setTimeout(() => {
       navigate('/step/2')
-    }, 200) // kasih delay 200ms untuk transisi lebih smooth
+    }, 400) // kasih delay 200ms untuk transisi lebih smooth
   }
 
   return (
