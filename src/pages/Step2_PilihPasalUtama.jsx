@@ -2,12 +2,11 @@ import { RadioGroup } from '@headlessui/react'
 import { CheckCircleIcon } from '@heroicons/react/24/solid'
 import PageWrapper from '../components/PageWrapper'
 import Card from '../components/Card'
-import Button from '../components/Button'
 import Stepper from '../components/Stepper'
 import BackButton from '../components/BackButton'
 import { useNavigate } from 'react-router-dom'
 import { useMPJHD } from '../context/MPJHDContext'
-import { useState, useMemo } from 'react'
+import { useState } from 'react'
 
 // Deskripsi lengkap huruf pasal
 const pasalOptionsMap = {
@@ -58,15 +57,14 @@ export default function Step2_PilihPasalUtama() {
   // ambil opsi sesuai pasalGroup dari step1
   const options = pasalOptionsMap[state.pasalGroup] || []
 
-  const handleNext = () => {
-    if (!selected) {
-      alert('Silakan pilih huruf pasal terlebih dahulu.')
-      return
-    }
-    // gabungkan 'Pasal X huruf Y'
-    const fullPasal = `Pasal ${state.pasalGroup} huruf ${selected.letter}`
+  const handleSelect = (value) => {
+    if (!value) return
+    setSelected(value)
+    const fullPasal = `Pasal ${state.pasalGroup} huruf ${value.letter}`
     dispatch({ type: 'SET', key: 'pasalUtama', value: fullPasal })
-    navigate('/step/3')
+    setTimeout(() => {
+      navigate('/step/3')
+    }, 400) // delay 400ms untuk transisi smooth
   }
 
   return (
@@ -76,7 +74,7 @@ export default function Step2_PilihPasalUtama() {
       </h1>
 
       <Card className="flex flex-col gap-6 p-4 sm:p-6">
-        <RadioGroup value={selected} onChange={setSelected} className="space-y-2">
+        <RadioGroup value={selected} onChange={handleSelect} className="space-y-2">
           {options.map((opt) => (
             <RadioGroup.Option key={opt.letter} value={opt}>
               {({ active, checked }) => (
@@ -100,11 +98,8 @@ export default function Step2_PilihPasalUtama() {
           ))}
         </RadioGroup>
 
-        <div className="flex justify-between gap-4 mt-6">
+        <div className="flex justify-start mt-6">
           <BackButton className="w-24" />
-          <Button onClick={handleNext}  disabled={!selected}>
-            Lanjut
-          </Button>
         </div>
       </Card>
 
