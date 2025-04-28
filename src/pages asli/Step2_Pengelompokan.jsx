@@ -52,8 +52,8 @@ const Step2_Pengelompokan = () => {
           </div>
 
           <div className="flex justify-between gap-4 mt-6">
-            <BackButton className="flex-1" />
-            <Button onClick={handleNext} className="flex-1">
+            <BackButton />
+            <Button onClick={handleNext} >
               Lanjut
             </Button>
           </div>

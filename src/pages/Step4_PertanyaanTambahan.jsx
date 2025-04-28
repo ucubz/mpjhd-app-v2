@@ -1,5 +1,6 @@
-import { useState, useEffect } from 'react';
+import { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
+import { RadioGroup } from '@headlessui/react';
 import { useMPJHD } from '../context/MPJHDContext';
 import { tentukanNilaiPokok } from '../utils/tentukanNilaiPokok';
 
@@ -17,8 +18,8 @@ export default function Step4_PertanyaanTambahan() {
   const [jabatan, setJabatan] = useState(state.jabatan || '');
 
   const perluTanyaJabatan = state.pasalUtama?.includes('Pasal 4 huruf e');
+  const tampilkanInputJabatan = perluTanyaJabatan || state.kelompok === 'V';
 
-  // Hitung nilai pokok preview
   const nilaiPokok = tentukanNilaiPokok({
     pasal: state.pasalUtama,
     kelompok: state.kelompok,
@@ -27,24 +28,16 @@ export default function Step4_PertanyaanTambahan() {
     tipeKelompokIII: state.tipeKelompokIII
   });
 
+  const dampakOptions = ['Unit Kerja', 'Instansi', 'Negara'];
+  const jabatanOptions = ['Pejabat Administrator', 'Pejabat Pimpinan Tinggi'];
+
   const handleNext = () => {
-    if (!dampak) {
-      alert('Silakan pilih dampak pelanggaran.');
-      return;
-    }
-
-    if (perluTanyaJabatan && !jabatan) {
-      alert('Silakan pilih jenis jabatan.');
-      return;
-    }
-
     dispatch({ type: 'SET', key: 'dampak', value: dampak });
 
-    if (perluTanyaJabatan) {
+    if (perluTanyaJabatan || state.kelompok === 'V') {
       dispatch({ type: 'SET', key: 'jabatan', value: jabatan });
     }
 
-    // Simpan nilai pokok kalau bukan Kelompok III Khusus
     if (
       state.kelompok !== 'III Khusus Individual' &&
       state.kelompok !== 'III Khusus Bersama'
@@ -63,64 +56,84 @@ export default function Step4_PertanyaanTambahan() {
 
       <Card className="flex flex-col gap-6 p-6">
         <div className="space-y-6">
-          {/* Input Dampak */}
+
+          {/* Pilih Dampak pakai RadioGroup */}
           <div className="flex flex-col gap-2">
             <label className="text-sm font-medium text-gray-700 dark:text-gray-200">
               Dampak pelanggaran terhadap:
             </label>
-            <select
-              className="w-full rounded-md border-gray-300 dark:border-gray-600 dark:bg-gray-800 dark:text-white p-2 text-sm focus:ring-primary focus:border-primary"
-              value={dampak}
-              onChange={(e) => setDampak(e.target.value)}
-            >
-              <option value="">-- Pilih Dampak --</option>
-              <option value="Unit Kerja">Unit Kerja</option>
-              <option value="Instansi">Instansi</option>
-              <option value="Negara">Negara</option>
-            </select>
+            <RadioGroup value={dampak} onChange={setDampak}>
+              <div className="flex flex-col gap-2 mt-2">
+                {dampakOptions.map((item) => (
+                  <RadioGroup.Option
+                    key={item}
+                    value={item}
+                    className={({ checked }) =>
+                      `cursor-pointer p-3 rounded-md border text-sm ${
+                        checked
+                          ? 'bg-primary text-white'
+                          : 'bg-white dark:bg-gray-800 text-gray-700 dark:text-white border-gray-300 dark:border-gray-600'
+                      }`
+                    }
+                  >
+                    {item}
+                  </RadioGroup.Option>
+                ))}
+              </div>
+            </RadioGroup>
           </div>
 
-          {/* Input Jabatan (khusus Pasal 4 huruf e) */}
-          {perluTanyaJabatan && (
+          {/* Pilih Jabatan kalau perlu */}
+          {tampilkanInputJabatan && (
             <div className="flex flex-col gap-2">
               <label className="text-sm font-medium text-gray-700 dark:text-gray-200">
                 Jenis Jabatan:
               </label>
-              <select
-                className="w-full rounded-md border-gray-300 dark:border-gray-600 dark:bg-gray-800 dark:text-white p-2 text-sm focus:ring-primary focus:border-primary"
-                value={jabatan}
-                onChange={(e) => setJabatan(e.target.value)}
-              >
-                <option value="">-- Pilih Jabatan --</option>
-                <option value="Pejabat Administrator">Pejabat Administrator / Fungsional</option>
-                <option value="Pejabat Pimpinan Tinggi">Pejabat Pimpinan Tinggi / Lainnya</option>
-              </select>
+              <RadioGroup value={jabatan} onChange={setJabatan}>
+                <div className="flex flex-col gap-2 mt-2">
+                  {jabatanOptions.map((item) => (
+                    <RadioGroup.Option
+                      key={item}
+                      value={item}
+                      className={({ checked }) =>
+                        `cursor-pointer p-3 rounded-md border text-sm ${
+                          checked
+                            ? 'bg-primary text-white'
+                            : 'bg-white dark:bg-gray-800 text-gray-700 dark:text-white border-gray-300 dark:border-gray-600'
+                        }`
+                      }
+                    >
+                      {item}
+                    </RadioGroup.Option>
+                  ))}
+                </div>
+              </RadioGroup>
             </div>
           )}
 
           {/* Rekap Visual */}
-          {(dampak && (!perluTanyaJabatan || jabatan)) && (
+          {(dampak && (!tampilkanInputJabatan || jabatan)) && (
             <div className="border rounded-md p-4 bg-gray-50 dark:bg-gray-700 text-sm text-gray-700 dark:text-gray-200 space-y-1">
               <p><strong>Rekap Input:</strong></p>
               <p>• Pasal Utama: {state.pasalUtama || '-'}</p>
               <p>• Kelompok: {state.kelompok || '-'}</p>
               <p>• Dampak: {dampak}</p>
-              {perluTanyaJabatan && <p>• Jabatan: {jabatan}</p>}
+              {tampilkanInputJabatan && <p>• Jabatan: {jabatan}</p>}
               <p>• Nilai Pokok (preview): {nilaiPokok}</p>
             </div>
           )}
 
-          {/* Navigasi Tombol */}
-          <div className="flex flex-col-reverse sm:flex-row gap-4 pt-4">
-            <BackButton className="w-full sm:w-auto" />
+          {/* Tombol Navigasi */}
+          <div className="flex justify-between gap-4 mt-6">
+            <BackButton />
             <Button
               onClick={handleNext}
-              disabled={!dampak || (perluTanyaJabatan && !jabatan)}
-              className="w-full sm:w-auto"
+              disabled={!dampak || (tampilkanInputJabatan && !jabatan)}
             >
               Lanjut
             </Button>
           </div>
+
         </div>
       </Card>
 

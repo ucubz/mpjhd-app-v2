@@ -64,7 +64,7 @@ export default function Step2_PilihPasalUtama() {
     dispatch({ type: 'SET', key: 'pasalUtama', value: fullPasal })
     setTimeout(() => {
       navigate('/step/3')
-    }, 400) // delay 400ms untuk transisi smooth
+    }, 200) // delay 400ms untuk transisi smooth
   }
 
   return (
@@ -81,14 +81,14 @@ export default function Step2_PilihPasalUtama() {
                 <div
                   className={`
                     ${active ? 'ring-2 ring-primary' : ''}
-                    ${checked ? 'bg-primary text-white' : 'bg-white/10'}
+                    ${checked ? 'bg-primary text-stone-800' : 'bg-white/10'}
                     group relative flex cursor-pointer rounded-lg px-3 py-2 shadow-md transition
                   `}
                 >
                   <div className="flex w-full items-center justify-between">
                     <div>
                       <p className="text-sm font-semibold">Pasal {state.pasalGroup} huruf {opt.letter}</p>
-                      <p className="text-xs text-gray-300">{opt.description}</p>
+                      <p className="text-xs text-stone-800">{opt.description}</p>
                     </div>
                     {checked && <CheckCircleIcon className="h-6 w-6 text-white" />}
                   </div>

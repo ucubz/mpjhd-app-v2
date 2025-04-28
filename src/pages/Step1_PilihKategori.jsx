@@ -54,13 +54,13 @@ export default function Step1_PilihKategori() {
       dispatch({ type: 'SET', key: 'nilaiPokok', value: 60 })
       setTimeout(() => {
         navigate('/step/5')
-      }, 400)
+      }, 200)
     } else {
       dispatch({ type: 'SET', key: 'kategori', value: value.kategori })
       dispatch({ type: 'SET', key: 'pasalGroup', value: value.pasalGroup })
       setTimeout(() => {
         navigate('/step/2')
-      }, 400)
+      }, 200)
     }
   }
 
@@ -79,7 +79,7 @@ export default function Step1_PilihKategori() {
                   <div
                     className={`
                       ${active ? 'ring-2 ring-primary' : ''}
-                      ${checked ? 'bg-primary text-white' : 'bg-white/10'}
+                      ${checked ? 'bg-primary text-stone-800' : 'bg-white/10'}
                       group relative flex cursor-pointer rounded-lg px-3 py-2 shadow-md transition
                     `}
                   >

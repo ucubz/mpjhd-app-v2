@@ -1,9 +1,10 @@
 import { useNavigate } from 'react-router-dom';
 import { useMPJHD } from '../context/MPJHDContext';
-import { useState, useEffect } from 'react';
+import { useState } from 'react';
+import { RadioGroup } from '@headlessui/react';
+
 import PageWrapper from '../components/PageWrapper';
 import Card from '../components/Card';
-import Button from '../components/Button';
 import BackButton from '../components/BackButton';
 import Stepper from '../components/Stepper';
 
@@ -19,39 +20,15 @@ export default function Step5_FaktorUtama() {
   const navigate = useNavigate();
 
   const [inputKerugian, setInputKerugian] = useState('');
-  const [inputPeran, setInputPeran] = useState('');
 
-  useEffect(() => {
-    // Jika kelompok tidak perlu input faktor utama ➔ langsung lompat
-    if (
-      state.kelompok === 'II' ||
-      state.kelompok === 'III Umum' ||
-      state.kelompok === 'V'
-    ) {
-      navigate('/step/6');
-    }
-  }, [state.kelompok, navigate]);
-
-  const handleSubmit = () => {
-    if (state.kelompok === 'III Khusus Bersama') {
-      if (!inputPeran || !inputKerugian) {
-        alert('Silakan isi peran dan jumlah kerugian.');
-        return;
-      }
-    } else {
-      if (!inputKerugian) {
-        alert('Silakan isi jumlah kerugian atau faktor utama.');
-        return;
-      }
-    }
-
+  const handleSubmit = (extraAction = null) => {
     if (state.kelompok === 'III Khusus Individual') {
       const faktorUtama = hitungNilaiPokokIIIKhususIndividual(parseInt(inputKerugian));
       dispatch({ type: 'SET', key: 'faktorUtama', value: faktorUtama });
     }
 
     if (state.kelompok === 'III Khusus Bersama') {
-      const faktorPeran = hitungNilaiPokokIIIKhususBersama(inputPeran);
+      const faktorPeran = hitungNilaiPokokIIIKhususBersama(extraAction);
       dispatch({ type: 'SET', key: 'faktorPeran', value: faktorPeran });
 
       const jumlahKerugian = parseInt(inputKerugian);
@@ -70,7 +47,7 @@ export default function Step5_FaktorUtama() {
     }
 
     if (state.kelompok === 'VI') {
-      const faktorUtama = hitungNilaiPokokVI(inputKerugian);
+      const faktorUtama = hitungNilaiPokokVI(extraAction);
       dispatch({ type: 'SET', key: 'faktorUtama', value: faktorUtama });
     }
 
@@ -79,42 +56,30 @@ export default function Step5_FaktorUtama() {
 
   const renderInput = () => {
     switch (state.kelompok) {
-      case 'III Khusus Individual':
-      case 'IV':
+      case 'II':
+      case 'III Umum':
+      case 'V':
         return (
-          <div className="flex flex-col gap-2">
-            <label className="text-sm text-gray-700 dark:text-gray-200">
-              Jumlah Kerugian (Rp)
-            </label>
-            <input
-              type="number"
-              value={inputKerugian}
-              onChange={(e) => setInputKerugian(e.target.value)}
-              className="p-2 border rounded-lg dark:bg-gray-800 dark:border-gray-600 dark:text-white"
-              placeholder="Masukkan jumlah kerugian"
-            />
+          <div className="flex flex-col gap-6">
+            <p className="text-gray-700 dark:text-gray-200 text-center">
+              Tidak ada faktor utama yang perlu diisi untuk kelompok ini.
+            </p>
+            <div className="flex justify-between gap-4 mt-6">
+              <BackButton />
+              <button
+                onClick={() => navigate('/step/6')}
+                className="w-24 p-2 rounded-md bg-primary text-white hover:bg-primary/90"
+              >
+                Lanjut
+              </button>
+            </div>
           </div>
         );
 
-      case 'III Khusus Bersama':
+      case 'III Khusus Individual':
+      case 'IV':
         return (
-          <div className="flex flex-col gap-6">
-            <div className="flex flex-col gap-2">
-              <label className="text-sm text-gray-700 dark:text-gray-200">
-                Pilih Peran Pelaku
-              </label>
-              <select
-                value={inputPeran}
-                onChange={(e) => setInputPeran(e.target.value)}
-                className="p-2 border rounded-lg dark:bg-gray-800 dark:border-gray-600 dark:text-white"
-              >
-                <option value="">-- Pilih Peran --</option>
-                <option value="Pasif">Pasif</option>
-                <option value="Aktif">Aktif</option>
-                <option value="Inisiator">Inisiator</option>
-              </select>
-            </div>
-
+          <>
             <div className="flex flex-col gap-2">
               <label className="text-sm text-gray-700 dark:text-gray-200">
                 Jumlah Kerugian (Rp)
@@ -127,26 +92,110 @@ export default function Step5_FaktorUtama() {
                 placeholder="Masukkan jumlah kerugian"
               />
             </div>
-          </div>
+
+            {/* Tombol navigasi */}
+            <div className="flex justify-between gap-4 mt-6">
+              <BackButton />
+              <button
+                onClick={() => handleSubmit()}
+                disabled={!inputKerugian}
+                className={`w-24 p-2 rounded-md text-white ${
+                  inputKerugian
+                    ? 'bg-primary hover:bg-primary/90'
+                    : 'bg-gray-400 cursor-not-allowed'
+                }`}
+              >
+                Lanjut
+              </button>
+            </div>
+          </>
+        );
+
+      case 'III Khusus Bersama':
+        return (
+          <>
+            <div className="flex flex-col gap-2">
+              <label className="text-sm text-gray-700 dark:text-gray-200">
+                Pilih Peran Pelaku:
+              </label>
+              <RadioGroup onChange={(val) => handleSubmit(val)}>
+                <div className="flex flex-col gap-2 mt-2">
+                  {['Pasif', 'Aktif', 'Inisiator'].map((item) => (
+                    <RadioGroup.Option
+                      key={item}
+                      value={item}
+                      className={({ checked }) =>
+                        `cursor-pointer p-3 rounded-md border text-sm ${
+                          checked
+                            ? 'bg-primary text-white'
+                            : 'bg-white dark:bg-gray-800 text-gray-700 dark:text-white border-gray-300 dark:border-gray-600'
+                        }`
+                      }
+                    >
+                      {item}
+                    </RadioGroup.Option>
+                  ))}
+                </div>
+              </RadioGroup>
+            </div>
+
+            <div className="flex flex-col gap-2 mt-6">
+              <label className="text-sm text-gray-700 dark:text-gray-200">
+                Jumlah Kerugian (Rp)
+              </label>
+              <input
+                type="number"
+                value={inputKerugian}
+                onChange={(e) => setInputKerugian(e.target.value)}
+                className="p-2 border rounded-lg dark:bg-gray-800 dark:border-gray-600 dark:text-white"
+                placeholder="Masukkan jumlah kerugian"
+              />
+            </div>
+
+            {/* Back button */}
+            <div className="flex justify-start gap-4 mt-6">
+              <BackButton />
+            </div>
+          </>
         );
 
       case 'VI':
         return (
-          <div className="flex flex-col gap-2">
-            <label className="text-sm text-gray-700 dark:text-gray-200">
-              Pilih Dampak terhadap Reputasi
-            </label>
-            <select
-              value={inputKerugian}
-              onChange={(e) => setInputKerugian(e.target.value)}
-              className="p-2 border rounded-lg dark:bg-gray-800 dark:border-gray-600 dark:text-white"
-            >
-              <option value="">-- Pilih Dampak --</option>
-              <option value="Tidak Berdampak">Tidak Berdampak</option>
-              <option value="Unit Kerja">Unit Kerja</option>
-              <option value="Instansi/Tersangka">Instansi / Jadi Tersangka</option>
-            </select>
-          </div>
+          <>
+            <div className="flex flex-col gap-2">
+              <label className="text-sm text-gray-700 dark:text-gray-200">
+                Pilih Dampak terhadap Reputasi:
+              </label>
+              <RadioGroup onChange={(val) => handleSubmit(val)}>
+                <div className="flex flex-col gap-2 mt-2">
+                  {[
+                    'Tidak Berdampak',
+                    'Unit Kerja',
+                    'Instansi/Tersangka'
+                  ].map((item) => (
+                    <RadioGroup.Option
+                      key={item}
+                      value={item}
+                      className={({ checked }) =>
+                        `cursor-pointer p-3 rounded-md border text-sm ${
+                          checked
+                            ? 'bg-primary text-white'
+                            : 'bg-white dark:bg-gray-800 text-gray-700 dark:text-white border-gray-300 dark:border-gray-600'
+                        }`
+                      }
+                    >
+                      {item}
+                    </RadioGroup.Option>
+                  ))}
+                </div>
+              </RadioGroup>
+            </div>
+
+            {/* Back button */}
+            <div className="flex justify-start gap-4 mt-6">
+              <BackButton />
+            </div>
+          </>
         );
 
       default:
@@ -165,21 +214,8 @@ export default function Step5_FaktorUtama() {
       </h1>
 
       <Card>
-        <div className="flex flex-col gap-6">
-          {/* Render Input Dinamis */}
+        <div className="flex flex-col gap-4 mt-6">
           {renderInput()}
-
-          {/* Tombol Navigasi */}
-          <div className="flex justify-between gap-4 mt-6">
-            <BackButton className="flex-1" />
-            <Button
-              onClick={handleSubmit}
-              className="flex-1"
-              disabled={!inputKerugian || (state.kelompok === 'III Khusus Bersama' && !inputPeran)}
-            >
-              Lanjut
-            </Button>
-          </div>
         </div>
       </Card>
 

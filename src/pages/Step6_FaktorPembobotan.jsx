@@ -3,7 +3,7 @@ import Card from '../components/Card';
 import Button from '../components/Button';
 import BackButton from '../components/BackButton';
 import Stepper from '../components/Stepper';
-import InputDropdown from '../components/InputDropdown'; // 🔥 Pakai komponen clean
+import InputDropdown from '../components/InputDropdown';
 import { useNavigate } from 'react-router-dom';
 import { useMPJHD } from '../context/MPJHDContext';
 
@@ -16,7 +16,6 @@ export default function Step6_FaktorPembobotan() {
     hukdis: '',
     kesengajaan: '',
     hambatan: '',
-    meringankan: '',
   };
 
   const handleChange = (key, value) => {
@@ -24,6 +23,10 @@ export default function Step6_FaktorPembobotan() {
   };
 
   const handleNext = () => {
+    if (!pembobotan.banyakPasal || !pembobotan.hukdis || !pembobotan.kesengajaan || !pembobotan.hambatan) {
+      alert('Semua pertanyaan wajib diisi sebelum lanjut.');
+      return;
+    }
     navigate('/step/7');
   };
 
@@ -90,24 +93,12 @@ export default function Step6_FaktorPembobotan() {
               ]}
             />
 
-            {/* Faktor Meringankan */}
-            <InputDropdown
-              label="Faktor Meringankan:"
-              value={pembobotan.meringankan}
-              onChange={(val) => handleChange('meringankan', val)}
-              options={[
-                { value: 'tidakAda', label: 'Tidak ada faktor meringankan' },
-                { value: 'kooperatif', label: 'Berperilaku baik/kooperatif' },
-                { value: 'inisiator', label: 'Inisiator pengungkapan' },
-              ]}
-            />
-
           </div>
 
           {/* Tombol Navigasi */}
           <div className="flex justify-between gap-4 mt-6">
-            <BackButton className="flex-1" />
-            <Button onClick={handleNext} className="flex-1">
+            <BackButton />
+            <Button onClick={handleNext}>
               Lanjut
             </Button>
           </div>

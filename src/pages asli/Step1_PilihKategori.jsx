@@ -64,8 +64,8 @@ const Step1_PilihKategori = () => {
           )}
 
           <div className="flex justify-between gap-4 mt-6">
-            <BackButton className="flex-1" />
-            <Button onClick={handleSubmit} className="flex-1">
+            <BackButton />
+            <Button onClick={handleSubmit}>
               Lanjut
             </Button>
           </div>

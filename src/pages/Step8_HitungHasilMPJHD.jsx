@@ -1,12 +1,21 @@
 import { useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { useMPJHD } from '../context/MPJHDContext';
-import { hitungFaktorTambahanII, hitungFaktorTambahanIIIUmum, hitungFaktorTambahanIIIKhususIndividual, hitungFaktorTambahanIV, hitungFaktorTambahanV, hitungFaktorTambahanVI } from '../utils/hitungNilaiTambahan';
+import {
+  hitungFaktorTambahanII,
+  hitungFaktorTambahanIIIUmum,
+  hitungFaktorTambahanIIIKhususIndividual,
+  hitungFaktorTambahanIV,
+  hitungFaktorTambahanV,
+  hitungFaktorTambahanVI
+} from '../utils/hitungNilaiTambahan';
 import { hitungFaktorMeringankan } from '../utils/hitungFaktorMeringankan';
 import { hitungNilaiAkhir } from '../utils/hitungNilaiAkhir';
+
 import PageWrapper from '../components/PageWrapper';
 import Card from '../components/Card';
 import Button from '../components/Button';
+import BackButton from '../components/BackButton';
 import Stepper from '../components/Stepper';
 
 export default function Step8_HitungHasilMPJHD() {
@@ -52,7 +61,6 @@ export default function Step8_HitungHasilMPJHD() {
     dispatch({ type: 'SET', key: 'faktorTambahan', value: faktorTambahan });
     dispatch({ type: 'SET', key: 'faktorMeringankan', value: faktorMeringankan });
     dispatch({ type: 'SET', key: 'nilaiAkhir', value: nilaiAkhir });
-
   }, [state.kelompok, dispatch]);
 
   const handleNext = () => {
@@ -64,7 +72,7 @@ export default function Step8_HitungHasilMPJHD() {
     switch (state.faktorPembobotan.banyakPasal) {
       case 'satu': return 'Hanya satu pasal yang dilanggar';
       case 'dua': return 'Dua pasal yang dilanggar';
-      case 'lebihDariDua': return 'Lebih dari dua pasal yang dilanggar';
+      case 'lebihDua': return 'Lebih dari dua pasal yang dilanggar';
       default: return '-';
     }
   };
@@ -73,13 +81,12 @@ export default function Step8_HitungHasilMPJHD() {
     if (!state.faktorPembobotan?.kesengajaan) return '-';
     switch (state.faktorPembobotan.kesengajaan) {
       case 'terpaksa': return 'Pelanggaran dilakukan karena terpaksa';
-      case 'tidakSengaja': return 'Pelanggaran dilakukan tidak sengaja/lalai';
+      case 'lalai': return 'Pelanggaran dilakukan tidak sengaja/lalai';
       case 'sengaja': return 'Pelanggaran dilakukan dengan sengaja';
       default: return '-';
     }
   };
 
-  // 🔥 Tambahkan fungsi hitung total faktor meringankan
   const getTotalFaktorMeringankan = () => {
     if (!state.faktorMeringankan) return 0;
     let total = 0;
@@ -87,9 +94,6 @@ export default function Step8_HitungHasilMPJHD() {
     if (state.faktorMeringankan.inisiator) total += 10;
     return total;
   };
-
-  console.log('Nilai Pokok:', state.nilaiPokok);
-
 
   return (
     <PageWrapper>
@@ -112,10 +116,14 @@ export default function Step8_HitungHasilMPJHD() {
             <p>8. Faktor Meringankan: {getTotalFaktorMeringankan()}</p>
           </div>
 
-          {/* Tombol */}
-          <Button onClick={handleNext} className="w-full">
-            Lanjut ke Konversi Grade
-          </Button>
+          {/* Tombol navigasi */}
+          <div className="flex justify-between gap-4 mt-6">
+            <BackButton />
+            <Button className="w-60" onClick={handleNext}>
+              Lanjut ke Konversi Grade
+            </Button>
+          </div>
+
         </div>
       </Card>
 

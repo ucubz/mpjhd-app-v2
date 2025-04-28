@@ -1,11 +1,11 @@
 import { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
+import { RadioGroup } from '@headlessui/react';
 import { useMPJHD } from '../context/MPJHDContext';
-import { tentukanNilaiPokok } from '../utils/tentukanNilaiPokok'; // 🔥 penting import!
+import { tentukanNilaiPokok } from '../utils/tentukanNilaiPokok';
 
 import PageWrapper from '../components/PageWrapper';
 import Card from '../components/Card';
-import Button from '../components/Button';
 import BackButton from '../components/BackButton';
 import Stepper from '../components/Stepper';
 
@@ -17,10 +17,8 @@ export default function StepKelompokIII_Check() {
 
   const handleJawabanKerugian = (jawaban) => {
     if (jawaban === 'tidak') {
-      // Tidak ada kerugian ➔ Kelompok III Umum
       dispatch({ type: 'SET', key: 'kelompok', value: 'III Umum' });
 
-      // Hitung nilai pokok langsung
       const nilaiPokok = tentukanNilaiPokok({
         pasal: state.pasalUtama,
         kelompok: 'III',
@@ -29,9 +27,8 @@ export default function StepKelompokIII_Check() {
       });
       dispatch({ type: 'SET', key: 'nilaiPokok', value: nilaiPokok });
 
-      navigate('/step/6'); // Langsung ke faktor pembobotan tambahan
-    } else {
-      // Ada kerugian ➔ lanjut pilih individual atau bersama
+      navigate('/step/6');
+    } else if (jawaban === 'ya') {
       setJawabanAdaKerugian('ya');
     }
   };
@@ -43,17 +40,16 @@ export default function StepKelompokIII_Check() {
       dispatch({ type: 'SET', key: 'kelompok', value: 'III Khusus Bersama' });
     }
 
-    // Hitung nilai pokok berdasarkan pasal
     const nilaiPokok = tentukanNilaiPokok({
       pasal: state.pasalUtama,
-      kelompok: 'III', // Tetap kelompok III untuk penentuan nilai pokok
+      kelompok: 'III',
       dampak: state.dampak,
       jabatan: state.jabatan,
     });
 
     dispatch({ type: 'SET', key: 'nilaiPokok', value: nilaiPokok });
 
-    navigate('/step/5'); // Lanjut ke input faktor utama
+    navigate('/step/5');
   };
 
   return (
@@ -71,20 +67,22 @@ export default function StepKelompokIII_Check() {
               <p className="text-gray-700 dark:text-gray-200">
                 Apakah dalam pelanggaran ini terdapat penerimaan uang dan/atau kerugian negara/pihak lain?
               </p>
-              <div className="flex flex-col md:flex-row justify-center gap-6">
-                <Button
-                  onClick={() => handleJawabanKerugian('ya')}
-                  className="bg-green-600 hover:bg-green-700 flex-1"
-                >
-                  Ada
-                </Button>
-                <Button
-                  onClick={() => handleJawabanKerugian('tidak')}
-                  className="bg-blue-600 hover:bg-blue-700 flex-1"
-                >
-                  Tidak Ada
-                </Button>
-              </div>
+              <RadioGroup onChange={handleJawabanKerugian} className="flex flex-col gap-4 mt-4">
+                <RadioGroup.Option value="ya">
+                  {({ active, checked }) => (
+                    <div className={`cursor-pointer rounded-md border p-3 ${checked ? 'bg-primary text-white' : 'bg-white dark:bg-gray-800 text-gray-700 dark:text-white border-gray-300 dark:border-gray-600'}`}>
+                      Ada
+                    </div>
+                  )}
+                </RadioGroup.Option>
+                <RadioGroup.Option value="tidak">
+                  {({ active, checked }) => (
+                    <div className={`cursor-pointer rounded-md border p-3 ${checked ? 'bg-primary text-white' : 'bg-white dark:bg-gray-800 text-gray-700 dark:text-white border-gray-300 dark:border-gray-600'}`}>
+                      Tidak Ada
+                    </div>
+                  )}
+                </RadioGroup.Option>
+              </RadioGroup>
             </>
           )}
 
@@ -94,20 +92,22 @@ export default function StepKelompokIII_Check() {
               <p className="text-gray-700 dark:text-gray-200">
                 Apakah pelanggaran dilakukan secara individual atau bersama-sama?
               </p>
-              <div className="flex flex-col md:flex-row justify-center gap-6">
-                <Button
-                  onClick={() => handlePilihTipe('individual')}
-                  className="bg-green-600 hover:bg-green-700 flex-1"
-                >
-                  Individual
-                </Button>
-                <Button
-                  onClick={() => handlePilihTipe('bersama')}
-                  className="bg-blue-600 hover:bg-blue-700 flex-1"
-                >
-                  Bersama-sama
-                </Button>
-              </div>
+              <RadioGroup onChange={handlePilihTipe} className="flex flex-col gap-4 mt-4">
+                <RadioGroup.Option value="individual">
+                  {({ active, checked }) => (
+                    <div className={`cursor-pointer rounded-md border p-3 ${checked ? 'bg-primary text-white' : 'bg-white dark:bg-gray-800 text-gray-700 dark:text-white border-gray-300 dark:border-gray-600'}`}>
+                      Individual
+                    </div>
+                  )}
+                </RadioGroup.Option>
+                <RadioGroup.Option value="bersama">
+                  {({ active, checked }) => (
+                    <div className={`cursor-pointer rounded-md border p-3 ${checked ? 'bg-primary text-white' : 'bg-white dark:bg-gray-800 text-gray-700 dark:text-white border-gray-300 dark:border-gray-600'}`}>
+                      Bersama-sama
+                    </div>
+                  )}
+                </RadioGroup.Option>
+              </RadioGroup>
             </>
           )}
 

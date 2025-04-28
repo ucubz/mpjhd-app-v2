@@ -1,16 +1,15 @@
-// src/pages/Step9_KonversiGrade.jsx
-
-import { useEffect } from 'react'; // Jangan lupa import!
+import { useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { useMPJHD } from '../context/MPJHDContext';
 import PageWrapper from '../components/PageWrapper';
 import Card from '../components/Card';
 import Button from '../components/Button';
+import BackButton from '../components/BackButton'; // 🔥 Tambah import BackButton
 import Stepper from '../components/Stepper';
 import { konversiGrade } from '../utils/konversiGrade';
 
 export default function Step9_KonversiGrade() {
-  const { state, dispatch } = useMPJHD(); // <--- dispatch harus diambil juga
+  const { state, dispatch } = useMPJHD();
   const navigate = useNavigate();
 
   useEffect(() => {
@@ -20,7 +19,7 @@ export default function Step9_KonversiGrade() {
 
     dispatch({ type: 'SET', key: 'grade', value: grade });
     dispatch({ type: 'SET', key: 'jenisHukuman', value: jenisHukuman });
-  }, [state.nilaiAkhir, dispatch]); // depend hanya pada nilaiAkhir
+  }, [state.nilaiAkhir, dispatch]);
 
   const handleNext = () => {
     navigate('/step/10');
@@ -35,6 +34,7 @@ export default function Step9_KonversiGrade() {
       <Card>
         <div className="flex flex-col items-center gap-6">
 
+          {/* Tampil Grade */}
           <div className="text-center">
             <p className="text-gray-600 dark:text-gray-300 mb-2">Grade Hukuman</p>
             <p className="text-4xl font-bold text-primary dark:text-primary-dark">
@@ -42,6 +42,7 @@ export default function Step9_KonversiGrade() {
             </p>
           </div>
 
+          {/* Tampil Jenis Hukuman */}
           <div className="text-center">
             <p className="text-gray-600 dark:text-gray-300 mb-2">Jenis Hukuman Disiplin</p>
             <p className="text-xl font-semibold text-gray-800 dark:text-gray-100">
@@ -49,9 +50,13 @@ export default function Step9_KonversiGrade() {
             </p>
           </div>
 
-          <Button onClick={handleNext} className="w-full mt-4">
-            Lanjut ke Hasil Akhir
-          </Button>
+          {/* Tombol Navigasi */}
+          <div className="flex justify-between gap-4 mt-6">
+            <BackButton />
+            <Button className="w-60" onClick={handleNext}>
+              Lanjut ke Hasil Akhir
+            </Button>
+          </div>
 
         </div>
       </Card>

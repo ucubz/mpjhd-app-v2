@@ -1,5 +1,3 @@
-// src/pages/Step10_HasilTabelOutput.jsx
-
 import { useNavigate } from 'react-router-dom';
 import { useMPJHD } from '../context/MPJHDContext';
 import PageWrapper from '../components/PageWrapper';
@@ -8,6 +6,7 @@ import Button from '../components/Button';
 import BackButton from '../components/BackButton';
 import Stepper from '../components/Stepper';
 import HasilTabelAngka from '../components/HasilTabelAngka';
+import { generateHTMLTable } from '../utils/generateHTMLTable';
 
 export default function Step10_HasilTabelOutput() {
   const { state } = useMPJHD();
@@ -17,6 +16,21 @@ export default function Step10_HasilTabelOutput() {
     if (window.confirm('Yakin ingin mengulang perhitungan MPJHD? Semua data akan dihapus.')) {
       navigate('/');
       window.location.reload();
+    }
+  };
+
+  const handleCopyTable = async () => {
+    const html = generateHTMLTable(state.kelompok, state);
+
+    try {
+      const blob = new Blob([html], { type: 'text/html' });
+      const clipboardItem = new ClipboardItem({ 'text/html': blob });
+
+      await navigator.clipboard.write([clipboardItem]);
+      alert('✅ Tabel berhasil disalin dalam format tabel (HTML) ke clipboard!');
+    } catch (err) {
+      console.error(err);
+      alert('❌ Gagal menyalin. Coba gunakan browser terbaru (Chrome/Edge).');
     }
   };
 
@@ -37,11 +51,20 @@ export default function Step10_HasilTabelOutput() {
           {/* Tabel Perhitungan Angka */}
           <Section title="Rincian Perhitungan MPJHD">
             <HasilTabelAngka kelompok={state.kelompok} hasilState={state} />
+            <div className="flex justify-end mt-4">
+              <Button onClick={handleCopyTable}>
+                Salin Tabel ke Clipboard
+              </Button>
+            </div>
           </Section>
 
-          {/* Tombol */}
-          <div className="flex flex-col md:flex-row gap-4 mt-4">
-            <Button onClick={handleReset} className="w-full bg-red-600 hover:bg-red-700 dark:bg-red-700 dark:hover:bg-red-800">
+          {/* Tombol Reset */}
+          <div className="flex flex-col md:flex-row gap-4 mt-6">
+            <BackButton />
+            <Button
+              onClick={handleReset}
+              className="w-full bg-red-600 hover:bg-red-700 dark:bg-red-700 dark:hover:bg-red-800"
+            >
               Ulang dari Awal
             </Button>
           </div>
