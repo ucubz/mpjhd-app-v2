@@ -1,6 +1,6 @@
 // src/pages/Step10_HasilTabelOutput.jsx
 
-import { useNavigate } from 'react-router-dom'; import { useMPJHD } from '../context/MPJHDContext'; import PageWrapper from '../components/PageWrapper'; import Card from '../components/Card'; import Button from '../components/Button'; import BackButton from '../components/BackButton'; import Stepper from '../components/Stepper'; import HasilTabelAngka from '../components/HasilTabelAngka'; import { generateHTMLTable } from '../utils/generateHTMLTable';
+import { useNavigate } from 'react-router-dom'; import { useMPJHD } from '../context/MPJHDContext'; import PageWrapper from '../components/PageWrapper'; import Card from '../components/Card'; import Button from '../components/Button'; import BackButton from '../components/BackButton'; import Stepper from '../components/Stepper'; import HasilTabelOutput from '../components/HasilTabelOutput'; import { generateHTMLTable } from '../utils/generateHTMLTable';
 
 export default function Step10_HasilTabelOutput() { const { state } = useMPJHD(); const navigate = useNavigate();
 
@@ -33,7 +33,7 @@ return ( <PageWrapper> <h1 className="text-2xl font-bold text-center mb-8"> Hasi
 
       {/* Tabel Perhitungan Angka */}
       <Section title="Rincian Perhitungan MPJHD">
-        <HasilTabelAngka kelompok={state.kelompok} hasilState={state} />
+        <HasilTabelOutput kelompok={state.kelompok} hasilState={state} />
         <div className="flex justify-end mt-4">
           <Button onClick={handleCopyTable}>
             Salin Tabel ke Clipboard
