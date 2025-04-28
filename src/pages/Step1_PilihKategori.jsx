@@ -86,7 +86,7 @@ export default function Step1_PilihKategori() {
                     <div className="flex w-full items-center justify-between">
                       <div>
                         <p className="text-sm font-semibold">{opt.label}</p>
-                        <p className="text-xs text-stone-600">{opt.description}</p>
+                        <p className="text-xs text-stone-600 dark:text-white-600">{opt.description}</p>
                       </div>
                       {checked && (
                         <CheckCircleIcon className="h-6 w-6 text-white" />
