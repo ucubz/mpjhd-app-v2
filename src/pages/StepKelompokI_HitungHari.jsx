@@ -54,7 +54,7 @@ export default function StepKelompokI_HitungHari() {
               value={jumlahHari}
               onChange={(e) => setJumlahHari(e.target.value)}
               className={clsx(
-                'mt-3 block w-full rounded-lg border-none bg-white/5 px-3 py-1.5 text-sm/6 text-white',
+                'mt-3 block w-full rounded-lg border-none bg-white/5 px-3 py-1.5 text-sm/6',
                 'focus:outline-none focus:ring-2 focus:ring-primary focus:ring-offset-2 focus:ring-offset-gray-100 dark:focus:ring-offset-gray-800'
               )}
               placeholder="Contoh: 5"
