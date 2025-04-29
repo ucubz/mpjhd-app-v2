@@ -79,7 +79,7 @@ export default function Step1_PilihKategori() {
                   <div
                     className={`
                       ${active ? 'ring-2 ring-primary' : ''}
-                      ${checked ? 'bg-primary text-stone-800' : 'bg-white/10'}
+                      ${checked ? 'bg-primary text-grey-800' : 'bg-white/10'}
                       group relative flex cursor-pointer rounded-lg px-3 py-2 shadow-md transition
                     `}
                   >
