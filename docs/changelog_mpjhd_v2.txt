@@ -1,0 +1,50 @@
+CHANGELOG MPJHD APP V2 – Sampai Dengan 2025-04-29
+
+Tanggal: 2025-04-29
+
+1. Struktur dan Rumus Perhitungan MPJHD
+- Rumus final penghitungan MPJHD:
+  Nilai Akhir = Nilai Pokok + Nilai Tambahan
+  Dimana:
+    - Nilai Tambahan = Faktor Utama *atau* Faktor Peran + Faktor Tambahan - Faktor Meringankan (tergantung kelompok).
+- Khusus Kelompok I: Nilai Akhir langsung dari jumlah hari ketidakhadiran (tanpa faktor lain).
+
+2. Penyusunan Faktor dan Opsi Lengkap
+- Semua opsi faktor pembobotan tambahan telah dirinci untuk:
+  Kelompok II, III Umum, III Khusus Bersama-sama, III Khusus Individual, IV, V, VI
+- Semua opsi termasuk nilai 0 tetap dicatat (untuk transparansi hasil akhir).
+
+3. Penetapan Logika Tiap Kelompok
+Kelompok | Ciri Utama
+I | Nilai akhir langsung dari hari, tanpa faktor tambahan atau meringankan
+II | Nilai pokok dari pasal+dampak; faktor tambahan 4 macam; meringankan ada
+III Umum | Nilai pokok dari pasal; faktor tambahan 4 macam; meringankan ada
+III Khusus Bersama-sama | Faktor peran + faktor kerugian; meringankan ada
+III Khusus Individual | Faktor utama (kerugian) + 4 faktor tambahan; meringankan ada
+IV | Faktor utama (kerugian pihak dilayani) + 4 faktor tambahan; meringankan ada
+V | Nilai pokok bergantung jabatan; faktor tambahan 4 macam; meringankan ada
+VI | Faktor utama (dampak reputasi) + 2 faktor tambahan (hukdis + hambatan); meringankan ada
+
+4. Penyesuaian Spesifik
+- Kelompok V: Hanya berlaku untuk Pasal 4 huruf e.
+  Harus cek jabatan pelaku:
+    - Pejabat Administrator/Fungsional → Nilai Pokok 30
+    - Pejabat Pimpinan Tinggi/lainnya → Nilai Pokok 60
+
+5. Tabel Ringkasan Besar
+- Tabel struktur seluruh kelompok sudah selesai, berisi:
+  Nilai Pokok, Faktor Utama, Faktor Peran, Faktor Tambahan, Faktor Meringankan
+
+6. Kesiapan Menuju Simulasi
+- Semua fondasi logika sudah fix dan solid.
+- Siap masuk tahap:
+  - Simulasi pengisian kasus nyata
+  - Pengujian hasil penghitungan nilai akhir dan jenis hukuman
+
+Status Progress
+- Penyusunan Rumus: ✔️ Selesai
+- Definisi Unsur Faktor: ✔️ Selesai
+- Pemisahan Kelompok I–VI: ✔️ Selesai
+- Opsi Faktor Tambahan/Meringankan: ✔️ Selesai
+- Spesifikasi Khusus Kelompok V: ✔️ Selesai
+- Tabel Rekap Besar: ✔️ Selesai

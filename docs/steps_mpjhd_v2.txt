@@ -1,0 +1,72 @@
+LIST STEP PERHITUNGAN MPJHD
+
+Step 1: Pilih Kategori Awal
+- KEWAJIBAN (Pasal 3 & 4)
+- LARANGAN (Pasal 5)
+- PELANGGARAN IZIN PERKAWINAN/PERCERAIAN (Kelompok VI)
+
+Step 2: Pilih Pasal Pelanggaran
+- Daftar pasal sesuai kategori
+- Pasal khusus seperti 4e dan 5n angka 2–7 diberi keterangan
+
+Step 3: Pilih Dampak Pelanggaran
+- Unit Kerja
+- Instansi
+- Negara
+- (hanya muncul jika pasal perlu cek dampak)
+
+Step 4: Cek Jabatan Pelaku (Khusus Pasal 4e)
+- Pejabat Administrator/Fungsional
+- Pejabat Pimpinan Tinggi/Lainnya
+
+Step 5: Pilih Banyaknya Pasal yang Dilanggar
+- Satu pasal
+- Dua pasal
+- Lebih dari dua pasal
+
+Step 6: Pilih Riwayat Hukuman Disiplin
+- Belum pernah dijatuhi hukdis
+- Pernah 1 kali
+- Pernah lebih dari 1 kali
+
+Step 7: Pilih Faktor Kesengajaan
+- Terpaksa melakukan
+- Tidak sengaja/lalai
+- Sengaja
+
+Step 8: Pilih Faktor Hambatan Pemeriksaan
+- Tidak ada hambatan
+- Tidak kooperatif / berbelit-belit
+- Menghalangi/menghilangkan bukti
+
+Step 9: Pilih Faktor Meringankan
+- Berperilaku baik/kooperatif (5)
+- Inisiator pengungkapan besar (10)
+
+Step 10: Masukkan Nilai Kerugian (Khusus)
+- ≤10 juta
+- >10 juta s.d. 50 juta
+- >50 juta s.d. 100 juta
+- >100 juta
+(hanya untuk Kelompok III Khusus & IV)
+
+Step 11: Pilih Peran Pelaku (Khusus)
+- Pelaku Pasif
+- Pelaku Aktif
+- Inisiator
+(hanya untuk Kelompok III Khusus Bersama-sama)
+
+Step 12: Hasil Akhir
+- Nilai Pokok
+- Nilai Tambahan
+- Nilai Akhir
+- Kategori Hukuman
+- Grade Hukuman
+- Jenis Hukuman Disiplin
+- Catatan
+
+Ringkasan Step Khusus
+- Step 3 hanya muncul jika pasal perlu cek dampak
+- Step 4 hanya untuk Pasal 4 huruf e
+- Step 10 hanya untuk Kelompok III Khusus & IV
+- Step 11 hanya untuk Kelompok III Khusus Bersama-sama

@@ -1,0 +1,25 @@
+CHANGELOG MPJHD APP V2 – Sampai Dengan 2025-04-29 (Update 2)
+
+Tanggal: 2025-04-29
+
+1. Struktur dan Rumus Perhitungan MPJHD Final
+- Rumus Nilai Akhir = Nilai Pokok + Nilai Tambahan
+- Nilai Tambahan = Faktor Utama *atau* Faktor Peran + Faktor Tambahan - Faktor Meringankan
+
+2. Penyusunan dan Revisi Lengkap Nilai Pokok
+- Penyusunan ulang seluruh tabel pasal, kelompok, dan nilai pokok berdasarkan logika resmi dari file tentukanNilaiPokok.js
+- Penyesuaian:
+  - Pasal 3 huruf b dampak negara = 60, unit/instansi = 30
+  - Pasal 3c s.d. 5j dampak unit = 0, instansi = 30, negara = 60
+  - Kelompok III Khusus memakai pasal dan nilai pokok sama seperti Kelompok III Umum
+  - Kelompok V: pasal 4e cek jabatan, pasal 5 huruf n angka 2–7 nilai 30/60
+  - Pasal 5 huruf n angka 1: tidak masuk kelompok manapun
+
+3. Penyempurnaan Struktur Step Awal
+- Kelompok VI muncul di Step 1 karena pelanggaran izin perkawinan/perceraian
+
+4. Status Final Saat Ini
+- Penyusunan rumus: ✔️
+- Penentuan nilai pokok: ✔️
+- Rekap final tabel nilai pokok: ✔️
+- Siap masuk tahap simulasi perhitungan kasus nyata

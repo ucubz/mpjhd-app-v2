@@ -1,0 +1,18 @@
+KETENTUAN TAMBAHAN MPJHD - WAJIB TANYA DAMPAK
+
+1. Dampak Pelanggaran (Unit Kerja / Instansi / Negara) WAJIB ditanyakan eksplisit di aplikasi, 
+   TIDAK BOLEH diasumsikan default ke "Unit Kerja" atau apapun.
+
+2. Step Pilih Dampak harus muncul:
+   - Untuk semua pasal yang masuk Kelompok II.
+
+3. Validasi:
+   - User WAJIB memilih salah satu dampak sebelum bisa melanjutkan ke step berikutnya.
+   - Jika belum memilih, tombol "Lanjut" harus disable.
+
+4. Dampak menentukan nilai pokok:
+   - Unit Kerja → Nilai tertentu
+   - Instansi → Nilai tertentu
+   - Negara → Nilai tertentu
+   
+5. Ketentuan ini final dan berlaku permanen untuk semua alur perhitungan MPJHD.

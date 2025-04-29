@@ -1,0 +1,15 @@
+TABEL FINAL PENENTUAN NILAI POKOK MPJHD (VERSI 2)
+
+Kelompok | Pasal | Kondisi Tambahan | Nilai Pokok
+-------------------------------------------------------------
+II | Pasal 3 huruf a | (apapun dampaknya) | 60
+II | Pasal 3 huruf b | Unit Kerja / Instansi → 30, Negara → 60
+II | Pasal 3 huruf c - 3 huruf f, 4 huruf c - 4 huruf d, 4 huruf g - 4 huruf h, 5 huruf f - 5 huruf j | Unit Kerja → 0, Instansi → 30, Negara → 60
+III Umum / III Khusus (Bersama-sama dan Individual) | Pasal 4 huruf a, 4 huruf b | (apapun) | 30
+III Umum / III Khusus (Bersama-sama dan Individual) | Pasal 5 huruf a - 5 huruf e, 5 huruf k, 5 huruf l | (apapun) | 60
+IV | Pasal 5 huruf h | (apapun) | 30
+V | Pasal 4 huruf e | Pejabat Administrator/Fungsional → 30, Pejabat Pimpinan Tinggi/lainnya → 60
+V | Pasal 5 huruf n angka 2 | (apapun) | 30
+V | Pasal 5 huruf n angka 3 - angka 7 | (apapun) | 60
+VI | (Pelanggaran terkait izin perkawinan/perceraian) | (apapun) | 60
+Non-Kelompok | Pasal 5 huruf n angka 1 | (apapun) | Tidak dihitung, tampilkan informasi

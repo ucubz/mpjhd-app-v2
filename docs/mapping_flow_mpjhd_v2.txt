@@ -1,0 +1,37 @@
+MAPPING FLOW KHUSUS PERHITUNGAN MPJHD (2025-04-29)
+
+=== Kelompok II ===
+- Setelah pilih pasal → Pilih Dampak (Unit Kerja / Instansi / Negara) [1 dropdown]
+- Pindah halaman → Pilih 4 Faktor Pembobotan Tambahan [4 dropdown dalam satu halaman]
+
+=== Kelompok IV ===
+- Setelah pilih pasal → Pilih Besaran Kerugian Pihak Dilayani [1 dropdown]
+- Pindah halaman → Pilih 4 Faktor Pembobotan Tambahan [4 dropdown dalam satu halaman]
+
+=== Kelompok V ===
+- Jika pilih Pasal 4 huruf e → Pilih Jabatan Pelaku (Administrator/Fungsional atau Pimpinan Tinggi/Lainnya) [1 dropdown]
+- Pindah halaman → Pilih 4 Faktor Pembobotan Tambahan [4 dropdown dalam satu halaman]
+
+=== Kelompok VI ===
+- Setelah pilih kategori Izin Perkawinan/Perceraian → Pilih Dampak terhadap Reputasi [1 dropdown]
+- Pindah halaman → Pilih 2 Faktor Pembobotan Tambahan (Riwayat Hukdis dan Hambatan) [2 dropdown dalam satu halaman]
+
+=== Kelompok III ===
+
+1. Cek Ada/Tidak Penerimaan Uang/Kerugian
+- Jika Tidak Ada → Kelompok III Umum:
+    - Langsung Pilih 4 Faktor Pembobotan Tambahan [4 dropdown dalam satu halaman]
+- Jika Ada → Cek Bersama-sama atau Individu:
+
+2. Jika Bersama-sama:
+- Pilih Peran Pelaku (Pasif/Aktif/Inisiator) [1 dropdown]
+- Pilih Besaran Kerugian (≤10jt, >10–50jt, >50–100jt, >100jt) [1 dropdown]
+(Both peran dan kerugian dalam satu halaman)
+
+3. Jika Individu:
+- Pilih Besaran Kerugian (≤10jt, >10–50jt, >50–100jt, >100jt) [1 dropdown]
+- Pindah halaman → Pilih 4 Faktor Pembobotan Tambahan [4 dropdown dalam satu halaman]
+
+=== Catatan ===
+- Faktor Meringankan akan selalu ditanyakan PALING AKHIR, sebelum hasil akhir dihitung.
+- Setiap halaman wajib validasi seluruh input sebelum lanjut.

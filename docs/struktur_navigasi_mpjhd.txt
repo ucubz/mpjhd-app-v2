@@ -1,0 +1,46 @@
+CATATAN STRUKTUR HALAMAN & TOMBOL NAVIGASI MPJHD
+
+=== Struktur Pages ===
+Step 1 - Step1_PilihKategori.jsx
+- Pilih kategori awal (KEWAJIBAN / LARANGAN / IZIN PERKAWINAN)
+
+Step 2 - Step2_PilihPasal.jsx
+- Pilih pasal pelanggaran
+
+Step 3 - Step3_KondisiAwal.jsx
+- Pilih dampak (jika kelompok II)
+- Pilih jabatan pelaku (jika pasal 4e)
+- Cek apakah ada kerugian (jika kelompok III)
+
+Step 4 - Step4_FaktorUtama.jsx
+- Pilih besaran kerugian (jika kelompok III/IV/VI)
+- Pilih peran pelaku (jika kelompok III bersama-sama)
+
+Step 5 - Step5_FaktorTambahan.jsx
+- Pilih 4 faktor pembobotan tambahan (semua dalam satu halaman)
+
+Step 6 - Step6_FaktorMeringankan.jsx
+- Pilih faktor meringankan (kooperatif / inisiator)
+
+Step 7 - Step7_HasilAkhir.jsx
+- Tampilkan hasil nilai akhir, grade hukuman, jenis hukuman
+
+=== Aturan Tombol Navigasi ===
+- Semua halaman WAJIB punya tombol "Kembali"
+- Semua halaman WAJIB punya tombol "Lanjut"
+- Untuk halaman kategori dan pasal: klik otomatis lanjut (tidak perlu tekan tombol "Lanjut")
+- Untuk halaman dengan dropdown (Step 3–6): tombol "Lanjut" hanya aktif jika semua input sudah valid
+- Halaman hasil (Step 7) tidak ada tombol lanjut, hanya "Kembali" dan opsional "Selesai" atau "Reset"
+
+=== Validasi Per Halaman ===
+- Step 1: wajib pilih kategori
+- Step 2: wajib pilih pasal
+- Step 3: wajib pilih dampak/jabatan/ada kerugian (jika muncul)
+- Step 4: wajib pilih kerugian/peran (jika muncul)
+- Step 5: semua 4 dropdown wajib dipilih
+- Step 6: wajib pilih faktor meringankan
+
+=== Ringkasan ===
+- Halaman 7 langkah total, dinamis sesuai jalur kelompok
+- Navigasi konsisten, user experience efisien
+- Validasi lengkap untuk menghindari input kosong
