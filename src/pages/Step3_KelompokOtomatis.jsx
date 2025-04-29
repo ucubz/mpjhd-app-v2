@@ -51,7 +51,7 @@ export default function Step3_KelompokOtomatis() {
             Berdasarkan Pasal Utama, pelanggaran masuk ke:
           </p>
 
-          <p className="text-4xl font-bold py-7 text-primary dark:text-primary-dark mt-2">
+          <p className="text-4xl font-bold py-7 text-primary dark:text-white mt-2 underline">
             Kelompok {kelompok ? kelompok : 'Sedang menentukan kelompok...'}
           </p>
 
