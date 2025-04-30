@@ -115,11 +115,9 @@ export default function Step3_KondisiAwal() {
           <RadioGroup
             value={state.adaKerugian}
             onChange={(val) => {
-  dispatch({ type: 'SET', field: 'adaKerugian', value: val });
-  if (!showDampak && !showJabatan) {
-    nextStep();
-  }
-}}
+              dispatch({ type: 'SET', field: 'adaKerugian', value: val });
+              if (!showDampak && !showJabatan) nextStep();
+            }}
           >
             <div className="space-y-2">
               {[{ label: 'Ya', value: true }, { label: 'Tidak', value: false }].map(({ label, value }) => (
@@ -140,7 +138,7 @@ export default function Step3_KondisiAwal() {
         </div>
       )}
 
-      {isComplete && (showDampak && showJabatan) && (
+      {isComplete && (showDampak || showJabatan || showKerugian) && (
         <button
           onClick={nextStep}
           className="mt-4 px-4 py-2 bg-blue-600 text-white rounded-md"
