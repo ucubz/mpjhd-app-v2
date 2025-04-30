@@ -1,4 +1,3 @@
-// Step 4 - Faktor utama
 import { useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { RadioGroup } from '@headlessui/react';
@@ -28,30 +27,34 @@ export default function Step4_FaktorUtama() {
   const handleNext = () => navigate('/step/5');
 
   const updateFaktor = (field, value) => {
-    dispatch({
-      type: 'SET_FAKTOR_UTAMA',
-      field,
-      value,
-    });
+    dispatch({ type: 'SET_FAKTOR_UTAMA', field, value });
 
     let nilai = 0;
 
     if (field === 'peran') {
-      if (value === 'Pasif') nilai = 2;
-      if (value === 'Aktif') nilai = 5;
-      if (value === 'Inisiator') nilai = 10;
+      if (value === 'Pasif') nilai = 10;
+      if (value === 'Aktif') nilai = 20;
+      if (value === 'Inisiator') nilai = 30;
     }
 
     if (field === 'jumlahKerugian') {
-      if (value === '< 1 juta') nilai = 2;
-      if (value === '1 - 10 juta') nilai = 5;
-      if (value === '> 10 juta') nilai = 10;
+      if (kelompok === 'III Khusus Bersama') {
+        if (value === '< 1 juta') nilai = 2.5;
+        if (value === '1 - 10 juta') nilai = 5;
+        if (value === '> 10 juta') nilai = 7.5;
+        if (value === '> 100 juta') nilai = 10;
+      } else if (kelompok === 'III Khusus Individu' || kelompok === 'IV') {
+        if (value === '< 1 juta') nilai = 7.5;
+        if (value === '1 - 10 juta') nilai = 15;
+        if (value === '> 10 juta') nilai = 22.5;
+        if (value === '> 100 juta') nilai = 30;
+      }
     }
 
     if (field === 'reputasi') {
-      if (value === 'Rendah') nilai = 2;
-      if (value === 'Sedang') nilai = 5;
-      if (value === 'Tinggi') nilai = 10;
+      if (value === 'Tidak berdampak') nilai = 0;
+      if (value === 'Unit Kerja') nilai = 15;
+      if (value === 'Instansi/Tersangka') nilai = 30;
     }
 
     dispatch({
@@ -114,14 +117,14 @@ export default function Step4_FaktorUtama() {
           <p className="font-semibold mb-2">
             {kelompok === 'IV'
               ? 'Kerugian bagi pihak yang dilayani:'
-              : 'Jumlah uang yang diterima atau kerugian negara:'}
+              : 'Jumlah uang yang diterima atau kerugian negara/pihak lain:'}
           </p>
           <RadioGroup
             value={state.faktorUtama.jumlahKerugian}
             onChange={(val) => updateFaktor('jumlahKerugian', val)}
           >
             <div className="space-y-2">
-              {['< 1 juta', '1 - 10 juta', '> 10 juta'].map((val) => (
+              {['< 1 juta', '1 - 10 juta', '> 10 juta', '> 100 juta'].map((val) => (
                 <RadioGroup.Option key={val} value={val}
                   className={({ checked }) =>
                     `p-3 border rounded-xl ${checked ? 'bg-blue-100 border-blue-500' : 'border-gray-300'}`
@@ -141,13 +144,13 @@ export default function Step4_FaktorUtama() {
 
       {showReputasiVI && (
         <div className="mb-6">
-          <p className="font-semibold mb-2">Dampak terhadap reputasi instansi:</p>
+          <p className="font-semibold mb-2">Dampak terhadap reputasi atau penugasan:</p>
           <RadioGroup
             value={state.faktorUtama.reputasi}
             onChange={(val) => updateFaktor('reputasi', val)}
           >
             <div className="space-y-2">
-              {['Rendah', 'Sedang', 'Tinggi'].map((val) => (
+              {['Tidak berdampak', 'Unit Kerja', 'Instansi/Tersangka'].map((val) => (
                 <RadioGroup.Option key={val} value={val}
                   className={({ checked }) =>
                     `p-3 border rounded-xl ${checked ? 'bg-blue-100 border-blue-500' : 'border-gray-300'}`
