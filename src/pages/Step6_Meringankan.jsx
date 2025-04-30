@@ -30,7 +30,7 @@ export default function Step6_Meringankan() {
 
     const nilaiAkhir = hitungNilaiAkhir(
       state.nilaiPokok || 0,
-      state.faktorUtama?.nilai || 0,
+      Number(state.faktorUtama?.nilai) || 0,
       state.nilaiTambahan || 0,
       pengurang
     );
