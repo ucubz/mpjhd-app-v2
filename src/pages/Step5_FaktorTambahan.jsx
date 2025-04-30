@@ -2,7 +2,7 @@ import { useNavigate } from 'react-router-dom';
 import { useMPJHD } from '../context/MPJHDContext';
 import Stepper from '../components/Stepper';
 import { Listbox } from '@headlessui/react';
-import { hitungFaktorTambahan } from '../utils_v2/hitungFaktorTambahan';
+import { hitungTotalTambahan } from '../utils_v2/hitungFaktorTambahan';
 
 const options = {
   banyakPasal: [
@@ -42,7 +42,9 @@ function Dropdown({ label, field, value, onChange, list }) {
                 key={item.value}
                 value={item.value}
                 className={({ active }) =>
-                  `cursor-pointer px-4 py-2 ${active ? 'bg-blue-100 dark:bg-blue-900' : ''}`
+                  `cursor-pointer px-4 py-2 ${
+                    active ? 'bg-blue-100 dark:bg-blue-900' : ''
+                  }`
                 }
               >
                 {item.label}
@@ -60,15 +62,12 @@ export default function Step5_FaktorTambahan() {
   const navigate = useNavigate();
   const faktor = state.faktorPembobotan;
 
-  const isComplete =
-    faktor.banyakPasal &&
-    faktor.hukdis &&
-    faktor.kesengajaan &&
-    faktor.hambatan;
-
   const updateField = (field, value) => {
     dispatch({ type: 'SET_FAKTOR_PEMBOBOTAN', field, value });
   };
+
+  const isComplete = ['banyakPasal', 'hukdis', 'kesengajaan', 'hambatan']
+    .every((key) => faktor[key] !== undefined && faktor[key] !== null);
 
   const handleNext = () => {
     const nilaiTambahan = hitungTotalTambahan(state);
