@@ -2,7 +2,7 @@
 import { useMPJHD } from '../context/MPJHDContext';
 import { useNavigate } from 'react-router-dom';
 import Stepper from '../components/Stepper';
-import generateHTMLTable from '../utils/generateHTMLTable';
+import { generateHTMLTable } from '../utils/generateHTMLTable';
 
 export default function Step7_HasilAkhir() {
   const { state } = useMPJHD();
