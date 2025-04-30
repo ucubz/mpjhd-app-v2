@@ -1,4 +1,4 @@
-// Step 6 - Faktor meringankan
+// Step 6 - Faktor Meringankan
 import { useNavigate } from 'react-router-dom';
 import { useMPJHD } from '../context/MPJHDContext';
 import Stepper from '../components/Stepper';
@@ -28,13 +28,8 @@ export default function Step6_Meringankan() {
     const pengurang = hitungPengurang();
     dispatch({ type: 'SET_PENGURANG_MERINGANKAN', pengurang });
 
-    const nilaiAkhir = hitungNilaiAkhir(
-      state.nilaiPokok || 0,
-      Number(state.faktorUtama?.nilai) || 0,
-      state.nilaiTambahan || 0,
-      pengurang
-    );
-    dispatch({ type: 'SET_NILAI_AKHIR', nilaiAkhir });
+    const hasil = hitungNilaiAkhir({ ...state, pengurangMeringankan: pengurang });
+    dispatch({ type: 'SET_NILAI_AKHIR', nilaiAkhir: hasil.nilaiAkhir });
 
     navigate('/step/7');
   };
