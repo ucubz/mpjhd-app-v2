@@ -1,4 +1,3 @@
-
 // Step 4 - Faktor utama
 import { useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
@@ -14,8 +13,7 @@ export default function Step4_FaktorUtama() {
 
   const showPeran = kelompok === 'III Khusus Bersama';
   const showKerugian =
-    kelompok === 'III Khusus Bersama' ||
-    kelompok === 'III Khusus Individu';
+    kelompok === 'III Khusus Bersama' || kelompok === 'III Khusus Individu';
   const showKerugianIV = kelompok === 'IV';
   const showReputasiVI = kelompok === 'VI';
 
@@ -35,7 +33,36 @@ export default function Step4_FaktorUtama() {
       field,
       value,
     });
-    if ((!showPeran && (showKerugian || showKerugianIV || showReputasiVI)) === false) {
+
+    let nilai = 0;
+
+    if (field === 'peran') {
+      if (value === 'Pasif') nilai = 2;
+      if (value === 'Aktif') nilai = 5;
+      if (value === 'Inisiator') nilai = 10;
+    }
+
+    if (field === 'jumlahKerugian') {
+      if (value === '< 1 juta') nilai = 2;
+      if (value === '1 - 10 juta') nilai = 5;
+      if (value === '> 10 juta') nilai = 10;
+    }
+
+    if (field === 'reputasi') {
+      if (value === 'Rendah') nilai = 2;
+      if (value === 'Sedang') nilai = 5;
+      if (value === 'Tinggi') nilai = 10;
+    }
+
+    dispatch({
+      type: 'SET_FAKTOR_UTAMA',
+      field: 'nilai',
+      value: nilai,
+    });
+
+    if (
+      (!showPeran && (showKerugian || showKerugianIV || showReputasiVI)) === false
+    ) {
       handleNext();
     }
   };
