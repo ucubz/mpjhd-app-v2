@@ -16,13 +16,12 @@ export default function Step4_FaktorUtama() {
   const isIII_Khusus_Bersama = kelompok === 'III Khusus Bersama';
   const isIII_Khusus_Individu = kelompok === 'III Khusus Individu';
 
-  const showPemecahIII =
-    isIIIKhusus && !isIII_Khusus_Bersama && !isIII_Khusus_Individu;
-
+  const showPemecahIII = isIIIKhusus;
   const showPeran = isIII_Khusus_Bersama;
-  const showKerugian =
-    isIII_Khusus_Individu || kelompok === 'IV';
+  const showKerugian = isIII_Khusus_Individu || kelompok === 'IV';
   const showReputasiVI = kelompok === 'VI';
+
+  const faktor = state.faktorUtama;
 
   useEffect(() => {
     const noFaktorToShow =
@@ -30,7 +29,7 @@ export default function Step4_FaktorUtama() {
     if (noFaktorToShow) {
       navigate('/step/5');
     }
-  }, [showPemecahIII, showPeran, showKerugian, showReputasiVI, navigate]);
+  }, [navigate, showPemecahIII, showPeran, showKerugian, showReputasiVI]);
 
   const updateFaktor = (field, value) => {
     dispatch({ type: 'SET_FAKTOR_UTAMA', field, value });
@@ -80,6 +79,16 @@ export default function Step4_FaktorUtama() {
     });
   };
 
+  const handleNext = () => {
+    navigate('/step/5');
+  };
+
+  const isComplete =
+    (!showPemecahIII || tipeDipilih) &&
+    (!showPeran || faktor.peran) &&
+    (!showKerugian || faktor.jumlahKerugian) &&
+    (!showReputasiVI || faktor.reputasi);
+
   return (
     <div className="max-w-xl mx-auto py-10 px-4">
       <button
@@ -109,7 +118,7 @@ export default function Step4_FaktorUtama() {
                   {({ checked }) => (
                     <div className="flex items-center gap-2">
                       {checked && <CheckCircleIcon className="h-5 w-5 text-blue-600" />}
-                      <span>{val === 'bersama' ? 'Bersama-sama' : 'Secara Individual'}</span>
+                      <span>{val === 'bersama' ? 'Bersama-sama' : 'Secara Individu'}</span>
                     </div>
                   )}
                 </RadioGroup.Option>
@@ -123,7 +132,7 @@ export default function Step4_FaktorUtama() {
         <div className="mb-6">
           <p className="font-semibold mb-2">Peran Pelaku:</p>
           <RadioGroup
-            value={state.faktorUtama.peran}
+            value={faktor.peran}
             onChange={(val) => updateFaktor('peran', val)}
           >
             <div className="space-y-2">
@@ -153,7 +162,7 @@ export default function Step4_FaktorUtama() {
               : 'Jumlah uang yang diterima atau kerugian negara/pihak lain:'}
           </p>
           <RadioGroup
-            value={state.faktorUtama.jumlahKerugian}
+            value={faktor.jumlahKerugian}
             onChange={(val) => updateFaktor('jumlahKerugian', val)}
           >
             <div className="space-y-2">
@@ -179,7 +188,7 @@ export default function Step4_FaktorUtama() {
         <div className="mb-6">
           <p className="font-semibold mb-2">Dampak terhadap reputasi atau pelaksanaan tugas:</p>
           <RadioGroup
-            value={state.faktorUtama.reputasi}
+            value={faktor.reputasi}
             onChange={(val) => updateFaktor('reputasi', val)}
           >
             <div className="space-y-2">
@@ -200,6 +209,25 @@ export default function Step4_FaktorUtama() {
           </RadioGroup>
         </div>
       )}
+
+      {isComplete && (
+        <button
+          onClick={handleNext}
+          className="mt-4 px-4 py-2 bg-blue-600 text-white rounded-md"
+        >
+          Lanjut
+        </button>
+      )}
+      
+      <div className="mt-12">
+        <Stepper currentStep={4} totalSteps={7} />
+        <button
+          onClick={() => navigate('/step/3')}
+          className="mt-4 text-sm text-blue-600 underline"
+        >
+          Kembali
+        </button>
+      </div>
     </div>
   );
 }
