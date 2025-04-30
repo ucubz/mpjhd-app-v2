@@ -28,12 +28,12 @@ export default function Step3_KondisiAwal() {
   const showJabatan = isPasal4e;
   const showKerugian = isKelompokIII;
 
-  const nextStep = () => navigate('/step/4');
-
   const isComplete =
     (!showDampak || !!state.dampak) &&
     (!showJabatan || !!state.jabatan) &&
     (!showKerugian || typeof state.adaKerugian === 'boolean');
+
+  const nextStep = () => navigate('/step/4');
 
   return (
     <div className="max-w-xl mx-auto py-10 px-4">
@@ -56,10 +56,7 @@ export default function Step3_KondisiAwal() {
           <p className="font-semibold mb-2">Dampak pelanggaran:</p>
           <RadioGroup
             value={state.dampak}
-            onChange={(val) => {
-              dispatch({ type: 'SET', field: 'dampak', value: val });
-              if (!showJabatan && !showKerugian) nextStep();
-            }}
+            onChange={(val) => dispatch({ type: 'SET', field: 'dampak', value: val })}
           >
             <div className="space-y-2">
               {dampakOptions.map((val) => (
@@ -85,10 +82,7 @@ export default function Step3_KondisiAwal() {
           <p className="font-semibold mb-2">Jabatan Pelaku:</p>
           <RadioGroup
             value={state.jabatan}
-            onChange={(val) => {
-              dispatch({ type: 'SET', field: 'jabatan', value: val });
-              if (!showDampak && !showKerugian) nextStep();
-            }}
+            onChange={(val) => dispatch({ type: 'SET', field: 'jabatan', value: val })}
           >
             <div className="space-y-2">
               {jabatanOptions.map((val) => (
@@ -114,10 +108,7 @@ export default function Step3_KondisiAwal() {
           <p className="font-semibold mb-2">Apakah terdapat kerugian negara/pihak lain?</p>
           <RadioGroup
             value={state.adaKerugian}
-            onChange={(val) => {
-              dispatch({ type: 'SET', field: 'adaKerugian', value: val });
-              if (!showDampak && !showJabatan) nextStep();
-            }}
+            onChange={(val) => dispatch({ type: 'SET', field: 'adaKerugian', value: val })}
           >
             <div className="space-y-2">
               {[{ label: 'Ya', value: true }, { label: 'Tidak', value: false }].map(({ label, value }) => (
@@ -138,7 +129,7 @@ export default function Step3_KondisiAwal() {
         </div>
       )}
 
-      {isComplete && (showDampak || showJabatan || showKerugian) && (
+      {isComplete && (
         <button
           onClick={nextStep}
           className="mt-4 px-4 py-2 bg-blue-600 text-white rounded-md"
