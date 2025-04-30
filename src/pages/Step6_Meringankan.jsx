@@ -2,6 +2,7 @@
 import { useNavigate } from 'react-router-dom';
 import { useMPJHD } from '../context/MPJHDContext';
 import Stepper from '../components/Stepper';
+import { hitungNilaiAkhir } from '../utils_v2/hitungNilaiAkhir';
 
 export default function Step6_Meringankan() {
   const { state, dispatch } = useMPJHD();
@@ -16,7 +17,25 @@ export default function Step6_Meringankan() {
     });
   };
 
+  const hitungPengurang = () => {
+    let total = 0;
+    if (meringankan.kooperatif) total += 5;
+    if (meringankan.inisiator) total += 10;
+    return total;
+  };
+
   const handleNext = () => {
+    const pengurang = hitungPengurang();
+    dispatch({ type: 'SET_PENGURANG_MERINGANKAN', pengurang });
+
+    const nilaiAkhir = hitungNilaiAkhir(
+      state.nilaiPokok || 0,
+      state.faktorUtama?.nilai || 0,
+      state.nilaiTambahan || 0,
+      pengurang
+    );
+    dispatch({ type: 'SET_NILAI_AKHIR', nilaiAkhir });
+
     navigate('/step/7');
   };
 
