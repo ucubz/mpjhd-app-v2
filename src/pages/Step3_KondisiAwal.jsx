@@ -1,4 +1,3 @@
-// Step 3 - Kondisi awal
 import { useNavigate } from 'react-router-dom';
 import { RadioGroup } from '@headlessui/react';
 import { CheckCircleIcon } from '@heroicons/react/24/solid';
@@ -32,9 +31,9 @@ export default function Step3_KondisiAwal() {
   const nextStep = () => navigate('/step/4');
 
   const isComplete =
-    (showDampak ? !!state.dampak : true) &&
-    (showJabatan ? !!state.jabatan : true) &&
-    (showKerugian ? state.adaKerugian !== '' : true);
+    (!showDampak || !!state.dampak) &&
+    (!showJabatan || !!state.jabatan) &&
+    (!showKerugian || typeof state.adaKerugian === 'boolean');
 
   return (
     <div className="max-w-xl mx-auto py-10 px-4">
@@ -117,19 +116,19 @@ export default function Step3_KondisiAwal() {
             value={state.adaKerugian}
             onChange={(val) => {
               dispatch({ type: 'SET', field: 'adaKerugian', value: val });
-              nextStep(); // langsung lanjut
+              if (!showDampak && !showJabatan) nextStep();
             }}
           >
             <div className="space-y-2">
-              {['Ya', 'Tidak'].map((val) => (
-                <RadioGroup.Option key={val} value={val === 'Ya'}
+              {[{ label: 'Ya', value: true }, { label: 'Tidak', value: false }].map(({ label, value }) => (
+                <RadioGroup.Option key={label} value={value}
                   className={({ checked }) =>
                     `p-3 border rounded-xl ${checked ? 'bg-blue-100 border-blue-500' : 'border-gray-300'}`
                   }>
                   {({ checked }) => (
                     <div className="flex items-center gap-2">
                       {checked && <CheckCircleIcon className="h-5 w-5 text-blue-600" />}
-                      <span>{val}</span>
+                      <span>{label}</span>
                     </div>
                   )}
                 </RadioGroup.Option>
