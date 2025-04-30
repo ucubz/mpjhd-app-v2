@@ -2,7 +2,7 @@ import { useNavigate } from 'react-router-dom';
 import { useMPJHD } from '../context/MPJHDContext';
 import Stepper from '../components/Stepper';
 import { Listbox } from '@headlessui/react';
-import { hitungFaktorTambahan } from '../utils_v2/hitungFaktorTambahan';
+import { hitungTotalTambahan } from '../utils_v2/hitungFaktorTambahan';
 
 const options = {
   banyakPasal: [
@@ -67,7 +67,7 @@ export default function Step5_FaktorTambahan() {
   };
 
   const isComplete = ['banyakPasal', 'hukdis', 'kesengajaan', 'hambatan']
-    .every((key) => faktor[key] !== undefined && faktor[key] !== null);
+    .every((key) => faktor[key] !== null && faktor[key] !== '');
 
   const handleNext = () => {
     const nilaiTambahan = hitungTotalTambahan(state);
