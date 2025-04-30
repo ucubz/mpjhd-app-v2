@@ -2,7 +2,7 @@ import { useNavigate } from 'react-router-dom';
 import { useMPJHD } from '../context/MPJHDContext';
 import Stepper from '../components/Stepper';
 import { Listbox } from '@headlessui/react';
-import { hitungTotalTambahan } from '../utils_v2/hitungFaktorTambahan';
+import { hitungFaktorTambahan } from '../utils_v2/hitungFaktorTambahan';
 
 const options = {
   banyakPasal: [
