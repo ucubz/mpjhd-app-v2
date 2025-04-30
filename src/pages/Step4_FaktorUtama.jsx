@@ -1,4 +1,6 @@
+
 // Step 4 - Faktor utama
+import { useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { RadioGroup } from '@headlessui/react';
 import { CheckCircleIcon } from '@heroicons/react/24/solid';
@@ -17,9 +19,13 @@ export default function Step4_FaktorUtama() {
   const showKerugianIV = kelompok === 'IV';
   const showReputasiVI = kelompok === 'VI';
 
-  const isComplete =
-    (!showPeran || state.faktorUtama.peran) &&
-    ((!showKerugian && !showKerugianIV && !showReputasiVI) || state.faktorUtama.jumlahKerugian || state.faktorUtama.reputasi);
+  useEffect(() => {
+    const noFaktorToShow =
+      !showPeran && !showKerugian && !showKerugianIV && !showReputasiVI;
+    if (noFaktorToShow) {
+      navigate('/step/5');
+    }
+  }, [navigate, showPeran, showKerugian, showKerugianIV, showReputasiVI]);
 
   const handleNext = () => navigate('/step/5');
 
@@ -29,10 +35,7 @@ export default function Step4_FaktorUtama() {
       field,
       value,
     });
-    // auto next jika hanya satu
-    if (
-      (!showPeran && (showKerugian || showKerugianIV || showReputasiVI)) === false
-    ) {
+    if ((!showPeran && (showKerugian || showKerugianIV || showReputasiVI)) === false) {
       handleNext();
     }
   };
@@ -91,42 +94,7 @@ export default function Step4_FaktorUtama() {
             onChange={(val) => updateFaktor('jumlahKerugian', val)}
           >
             <div className="space-y-2">
-              {[
-                { label: '≤ Rp10 juta', value: 7.5 },
-                { label: '> Rp10 juta s.d. 50 juta', value: 15 },
-                { label: '> Rp50 juta s.d. 100 juta', value: 22.5 },
-                { label: '> Rp100 juta', value: 30 },
-              ].map(({ label, value }) => (
-                <RadioGroup.Option key={value} value={value}
-                  className={({ checked }) =>
-                    `p-3 border rounded-xl ${checked ? 'bg-blue-100 border-blue-500' : 'border-gray-300'}`
-                  }>
-                  {({ checked }) => (
-                    <div className="flex items-center gap-2">
-                      {checked && <CheckCircleIcon className="h-5 w-5 text-blue-600" />}
-                      <span>{label}</span>
-                    </div>
-                  )}
-                </RadioGroup.Option>
-              ))}
-            </div>
-          </RadioGroup>
-        </div>
-      )}
-
-      {showReputasiVI && (
-        <div className="mb-6">
-          <p className="font-semibold mb-2">Dampak terhadap reputasi / tugas:</p>
-          <RadioGroup
-            value={state.faktorUtama.reputasi}
-            onChange={(val) => updateFaktor('reputasi', val)}
-          >
-            <div className="space-y-2">
-              {[
-                'Tidak berdampak',
-                'Berdampak pada unit kerja',
-                'Berdampak pada instansi / tersangka',
-              ].map((val) => (
+              {['< 1 juta', '1 - 10 juta', '> 10 juta'].map((val) => (
                 <RadioGroup.Option key={val} value={val}
                   className={({ checked }) =>
                     `p-3 border rounded-xl ${checked ? 'bg-blue-100 border-blue-500' : 'border-gray-300'}`
@@ -144,24 +112,31 @@ export default function Step4_FaktorUtama() {
         </div>
       )}
 
-      {isComplete && showPeran && (
-        <button
-          onClick={handleNext}
-          className="mt-4 px-4 py-2 bg-blue-600 text-white rounded-md"
-        >
-          Lanjut
-        </button>
+      {showReputasiVI && (
+        <div className="mb-6">
+          <p className="font-semibold mb-2">Dampak terhadap reputasi instansi:</p>
+          <RadioGroup
+            value={state.faktorUtama.reputasi}
+            onChange={(val) => updateFaktor('reputasi', val)}
+          >
+            <div className="space-y-2">
+              {['Rendah', 'Sedang', 'Tinggi'].map((val) => (
+                <RadioGroup.Option key={val} value={val}
+                  className={({ checked }) =>
+                    `p-3 border rounded-xl ${checked ? 'bg-blue-100 border-blue-500' : 'border-gray-300'}`
+                  }>
+                  {({ checked }) => (
+                    <div className="flex items-center gap-2">
+                      {checked && <CheckCircleIcon className="h-5 w-5 text-blue-600" />}
+                      <span>{val}</span>
+                    </div>
+                  )}
+                </RadioGroup.Option>
+              ))}
+            </div>
+          </RadioGroup>
+        </div>
       )}
-
-      <div className="mt-12">
-        <Stepper currentStep={4} totalSteps={7} />
-        <button
-          onClick={() => navigate('/step/3')}
-          className="mt-4 text-sm text-blue-600 underline"
-        >
-          Kembali
-        </button>
-      </div>
     </div>
   );
 }

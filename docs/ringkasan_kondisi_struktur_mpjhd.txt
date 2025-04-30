@@ -1,0 +1,44 @@
+RINGKASAN FINAL KONDISI & STRUKTUR MPJHD (2025-04-29)
+
+📘 LOGIKA PERHITUNGAN
+- Nilai akhir = Nilai Pokok + Faktor Utama + Faktor Tambahan - Faktor Meringankan
+- Nilai akhir dibatasi dalam rentang kelompok (batas bawah dan atas)
+- Nilai meringankan bisa digabung (Kooperatif = 5, Inisiator = 10)
+- Tabel hukuman mengikuti grade hasil akhir (Ringan, Sedang 1-3, Berat)
+
+📊 STRUKTUR 6 KELOMPOK + TURUNAN
+- Kelompok I: langsung nilai akhir, berdasarkan jumlah hari
+- Kelompok II: berdasarkan pasal dan dampak, + 4 faktor tambahan + meringankan
+- Kelompok III:
+  - Umum: seperti kelompok II tapi beda nilai
+  - Khusus Bersama: ada peran + kerugian → faktor utama dan tambahan
+  - Khusus Individu: kerugian → faktor utama, + 4 faktor tambahan
+- Kelompok IV: kerugian pihak dilayani → faktor utama, + 4 tambahan
+- Kelompok V: pasal 4e → perlu jabatan pelaku
+- Kelompok VI: pelanggaran izin → dampak reputasi, + 2 faktor tambahan
+
+🧱 STRUKTUR HALAMAN (7 STEP)
+1. Pilih Kategori (KEWAJIBAN / LARANGAN / IZIN)
+2. Pilih Pasal
+3. Kondisi Awal: dampak, jabatan, kerugian (jika perlu)
+4. Faktor Utama: jumlah kerugian / peran pelaku
+5. Faktor Tambahan: 4 dropdown faktor
+6. Faktor Meringankan: bisa pilih dua (kooperatif + inisiator)
+7. Hasil Akhir: nilai, grade, jenis hukuman, tombol copy
+
+🧠 STATE CONTEXT (MPJHDContext)
+- Field aktif: kategori, pasal, kelompok, dampak, jabatan, adaKerugian, jumlahKerugian
+- faktorUtama, faktorPembobotan, faktorMeringankan → terstruktur rapi
+- nilaiPokok, nilaiAkhir, grade, jenisHukuman
+- `motifKeuntungan`, `peranPelaku`, `meringankan` → sudah tidak dipakai
+
+🧩 KOMPONEN TERSEDIA
+- HasilTabel.jsx → tampilkan rekap
+- SalinClipboardButton.jsx → tombol copy isi tabel
+- Semua input bawaan (dropdown, radio) sudah modular
+
+🎨 HEADLESS UI
+- Semua komponen interaktif akan pakai Headless UI + Tailwind
+- Langsung integrasi dengan UI final halaman
+
+SIAP LANJUT CODING HALAMAN STEP 1

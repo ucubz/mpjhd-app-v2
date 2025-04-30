@@ -1,0 +1,58 @@
+REKAP LENGKAP MPJHD APP - SESI 29 APRIL 2025
+
+1. 🎯 TUJUAN
+- Membangun aplikasi perhitungan MPJHD berbasis aturan PP 94 Tahun 2021
+- Menyusun perhitungan nilai akhir berdasarkan pasal, kelompok, dan faktor-faktor pembobotan
+- Menghasilkan output tabel rekap yang bisa disalin ke Word
+
+2. 🔧 STRUKTUR PERHITUNGAN
+Nilai Akhir = Nilai Pokok + Faktor Utama + Faktor Tambahan - Faktor Meringankan
+- Nilai akhir dikunci pada rentang minimum dan maksimum per kelompok
+- Kelompok yang digunakan: I, II, III Umum, III Khusus Bersama, III Khusus Individu, IV, V, VI
+
+3. 📊 TABEL FAKTOR PERHITUNGAN PER KELOMPOK
+
+| Kelompok               | Nilai Pokok         | Faktor Utama          | Faktor Tambahan (4)                          | Faktor Meringankan     |
+|------------------------|---------------------|------------------------|----------------------------------------------|------------------------|
+| I                      | ✅ Jumlah hari       | ❌                     | ❌                                           | ❌                      |
+| II                     | ✅ Pasal + Dampak    | ❌                     | ✅ Banyak pasal, hukdis, kesengajaan, hambatan | ✅ Kooperatif, Inisiator |
+| III Umum               | ✅ Pasal             | ❌                     | ✅ Banyak pasal, hukdis, kesengajaan, hambatan | ✅ Kooperatif, Inisiator |
+| III Khusus Bersama     | ✅ Pasal             | ✅ Peran + kerugian    | ✅ Jumlah kerugian                            | ✅ Kooperatif, Inisiator |
+| III Khusus Individu    | ✅ Pasal             | ✅ Jumlah kerugian     | ✅ Banyak pasal, hukdis, kesengajaan, hambatan | ✅ Kooperatif, Inisiator |
+| IV                     | ✅ Default 30        | ✅ Kerugian pihak dilayani | ✅ Banyak pasal, hukdis, kesengajaan, hambatan | ✅ Kooperatif, Inisiator |
+| V                      | ✅ Pasal + Jabatan   | ❌                     | ✅ Banyak pasal, hukdis, kesengajaan, hambatan | ✅ Kooperatif, Inisiator |
+| VI                     | ✅ Dampak izin       | ✅ Dampak reputasi     | ✅ Hukdis, Hambatan                           | ✅ Kooperatif, Inisiator |
+
+4. 🧠 LOGIKA PASAL
+- Pasal 3 → KEWAJIBAN → kelompok II
+- Pasal 4 → LARANGAN → bisa kelompok I, II, atau V tergantung huruf
+- Pasal 5 → LARANGAN → kelompok III, IV, atau V tergantung huruf/angka
+- "Izin perkawinan/perceraian" → langsung masuk kelompok VI
+
+5. 📘 STRUKTUR HALAMAN STEP (ALUR)
+1. Pilih kategori pasal (Pasal 3 / Pasal 4 / Pasal 5 / Izin)
+2. Pilih pasal (menggunakan RadioGroup)
+3. Kondisi awal (dampak, jabatan, kerugian)
+4. Faktor utama
+5. Faktor tambahan (4 dropdown)
+6. Faktor meringankan (kooperatif/inisiator)
+7. Hasil akhir (nilai, grade, jenis hukuman + tombol copy)
+
+6. 📦 utils_v2
+- Sudah direstrukturisasi total: semua fungsi perhitungan sudah modular dan dinamis
+- Fungsi-fungsi utama: tentukanKelompok, tentukanNilaiPokok, hitungFaktorTambahan, hitungFaktorUtama, kunciNilai, konversiGrade, dll
+
+7. 🧩 COMPONENTS
+- `PasalSelector.jsx` sudah direfactor:
+  - Menggunakan RadioGroup dari Headless UI
+  - Terima prop: `jenisPilihanUtama` (pasal3/pasal4/pasal5)
+  - Daftar pasal lengkap dan terstruktur (termasuk pasal 5 huruf n angka 1–7)
+
+8. 🧠 CONTEXT
+- `MPJHDContext.jsx` sudah disederhanakan:
+  - Field lama yang tidak dipakai sudah dihapus (motifKeuntungan, peranPelaku, meringankan)
+  - Ditambahkan: `jabatan`, `tipeKelompokIII`, `jumlahKerugian`, dll
+
+9. 📋 OUTPUT AKHIR
+- `HasilTabel.jsx` + `SalinClipboardButton.jsx` siap dipakai kembali
+- Format tabel akhir bisa dicopy ke Word
