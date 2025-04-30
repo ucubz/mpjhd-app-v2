@@ -11,17 +11,42 @@ const daftarPasal = {
     { kode: 'Pasal 3 huruf a', deskripsi: 'Setia kepada Pancasila' },
     { kode: 'Pasal 3 huruf b', deskripsi: 'Menjaga persatuan dan kesatuan bangsa' },
     { kode: 'Pasal 3 huruf c', deskripsi: 'Melaksanakan kebijakan pejabat berwenang' },
-    // lanjutkan...
+    { kode: 'Pasal 3 huruf d', deskripsi: 'Menaati peraturan perundang-undangan' },
+    { kode: 'Pasal 3 huruf e', deskripsi: 'Melaksanakan tugas dengan penuh tanggung jawab' },
+    { kode: 'Pasal 3 huruf f', deskripsi: 'Menunjukkan integritas dan keteladanan' },
   ],
   pasal4: [
     { kode: 'Pasal 4 huruf a', deskripsi: 'Mengutamakan kepentingan negara' },
     { kode: 'Pasal 4 huruf b', deskripsi: 'Menghindari konflik kepentingan' },
-    // lanjutkan...
+    { kode: 'Pasal 4 huruf c', deskripsi: 'Memberikan pelayanan kepada masyarakat' },
+    { kode: 'Pasal 4 huruf d', deskripsi: 'Menjadi perekat persatuan' },
+    { kode: 'Pasal 4 huruf e', deskripsi: 'Melaporkan harta kekayaan' },
+    { kode: 'Pasal 4 huruf f', deskripsi: 'Masuk kerja dan menaati jam kerja' },
+    { kode: 'Pasal 4 huruf g', deskripsi: 'Menaati perintah atasan' },
+    { kode: 'Pasal 4 huruf h', deskripsi: 'Menjaga netralitas' },
+    { kode: 'Pasal 4 huruf i', deskripsi: 'Memelihara barang milik negara' },
+    { kode: 'Pasal 4 huruf j', deskripsi: 'Melaksanakan tugas kedinasan' },
+    { kode: 'Pasal 4 huruf k', deskripsi: 'Menaati peraturan kedinasan' },
   ],
   pasal5: [
     { kode: 'Pasal 5 huruf a', deskripsi: 'Menyalahgunakan wewenang' },
-    { kode: 'Pasal 5 huruf k', deskripsi: 'Menerima hadiah terkait jabatan' },
-    // lanjutkan + pasal 5 huruf n angka 1 s.d. 7
+    { kode: 'Pasal 5 huruf b', deskripsi: 'Menjadi perantara untuk keuntungan pribadi' },
+    { kode: 'Pasal 5 huruf c', deskripsi: 'Bekerja untuk negara lain' },
+    { kode: 'Pasal 5 huruf f', deskripsi: 'Menguasai barang milik negara secara tidak sah' },
+    { kode: 'Pasal 5 huruf g', deskripsi: 'Melakukan pungutan liar' },
+    { kode: 'Pasal 5 huruf h', deskripsi: 'Kegiatan yang merugikan negara' },
+    { kode: 'Pasal 5 huruf i', deskripsi: 'Tindak sewenang-wenang pada bawahan' },
+    { kode: 'Pasal 5 huruf j', deskripsi: 'Menghalangi tugas kedinasan' },
+    { kode: 'Pasal 5 huruf k', deskripsi: 'Menerima hadiah yang berhubungan dengan jabatan' },
+    { kode: 'Pasal 5 huruf l', deskripsi: 'Meminta sesuatu yang berhubungan dengan jabatan' },
+    { kode: 'Pasal 5 huruf m', deskripsi: 'Tindakan merugikan pihak dilayani' },
+    { kode: 'Pasal 5 huruf n angka 1', deskripsi: 'Memberikan dukungan kepada calon presiden/wakil presiden' },
+    { kode: 'Pasal 5 huruf n angka 2', deskripsi: 'Mengikuti kampanye' },
+    { kode: 'Pasal 5 huruf n angka 3', deskripsi: 'Peserta kampanye dengan atribut partai/PNS' },
+    { kode: 'Pasal 5 huruf n angka 4', deskripsi: 'Mengajak PNS lain ikut kampanye' },
+    { kode: 'Pasal 5 huruf n angka 5', deskripsi: 'Menggunakan fasilitas negara untuk kampanye' },
+    { kode: 'Pasal 5 huruf n angka 6', deskripsi: 'Membuat keputusan/tindakan yang merugikan calon lain' },
+    { kode: 'Pasal 5 huruf n angka 7', deskripsi: 'Memberikan surat dukungan dengan fotokopi KTP' },
   ],
 };
 
@@ -69,9 +94,9 @@ export default function Step2_PilihPasal() {
               }
             >
               {({ checked }) => (
-                <div className="flex items-center gap-3">
+                <div className="flex items-start gap-3">
                   {checked && (
-                    <CheckCircleIcon className="h-5 w-5 text-blue-600" />
+                    <CheckCircleIcon className="h-5 w-5 text-blue-600 mt-1" />
                   )}
                   <div>
                     <p className="font-semibold">{item.kode}</p>
