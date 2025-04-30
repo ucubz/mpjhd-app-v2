@@ -1,13 +1,14 @@
-// Step 7 - Hasil akhir
 import { useMPJHD } from '../context/MPJHDContext';
 import { useNavigate } from 'react-router-dom';
 import Stepper from '../components/Stepper';
 import { generateHTMLTable } from '../utils/generateHTMLTable';
+import { hitungNilaiAkhir } from '../utils_v2/hitungNilaiAkhir';
 
 export default function Step7_HasilAkhir() {
   const { state } = useMPJHD();
   const navigate = useNavigate();
   const kelompok = state.kelompok;
+  const hasil = hitungNilaiAkhir(state);
 
   const handleCopy = async () => {
     const html = generateHTMLTable(kelompok, state);
@@ -34,20 +35,19 @@ export default function Step7_HasilAkhir() {
 
       <h2 className="text-xl font-bold mb-6">Hasil Rekapitulasi</h2>
 
-      {/* Ringkasan visual */}
       <table className="w-full border border-gray-300 dark:border-gray-600 text-sm">
         <tbody>
           <tr><td className="p-2 font-semibold">Pasal yang dilanggar</td><td className="p-2">{state.pasalUtama}</td></tr>
           <tr><td className="p-2 font-semibold">Kelompok</td><td className="p-2">{state.kelompok}</td></tr>
-          <tr><td className="p-2 font-semibold">Nilai Pokok</td><td className="p-2">{state.nilaiPokok}</td></tr>
-          <tr><td className="p-2 font-semibold">Nilai Tambahan</td><td className="p-2">{state.nilaiTambahan}</td></tr>
-          <tr><td className="p-2 font-semibold">Faktor Meringankan</td><td className="p-2">{state.pengurangMeringankan}</td></tr>
+          <tr><td className="p-2 font-semibold">Nilai Pokok</td><td className="p-2">{hasil.nilaiPokok}</td></tr>
+          <tr><td className="p-2 font-semibold">Nilai Tambahan</td><td className="p-2">{hasil.totalTambahan}</td></tr>
+          <tr><td className="p-2 font-semibold">Faktor Meringankan</td><td className="p-2">{hasil.totalMeringankan}</td></tr>
           <tr>
             <td className="p-2 font-semibold">Nilai Akhir</td>
-            <td className="p-2 font-bold">{formatNilai(state.nilaiAkhir)}</td>
+            <td className="p-2 font-bold">{formatNilai(hasil.nilaiAkhir)}</td>
           </tr>
-          <tr><td className="p-2 font-semibold">Grade</td><td className="p-2">{state.grade}</td></tr>
-          <tr><td className="p-2 font-semibold">Jenis Hukuman Disiplin</td><td className="p-2">{state.jenisHukuman}</td></tr>
+          <tr><td className="p-2 font-semibold">Grade</td><td className="p-2">{hasil.grade}</td></tr>
+          <tr><td className="p-2 font-semibold">Jenis Hukuman Disiplin</td><td className="p-2">{hasil.jenisHukuman}</td></tr>
         </tbody>
       </table>
 
