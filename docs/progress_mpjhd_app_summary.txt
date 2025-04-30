@@ -1,0 +1,47 @@
+RINGKASAN PROGRESS PENGEMBANGAN MPJHD APP (sampai 2025-04-29)
+
+1. 📘 LOGIC & FLOW PERHITUNGAN
+- Semua kelompok I–VI telah dimapping lengkap: nilai pokok, faktor tambahan, faktor utama, faktor meringankan
+- Logika nilai akhir: Pokok + Tambahan - Meringankan (dengan batas nilai sesuai rentang kelompok)
+- Perbedaan logic berdasarkan kelompok sudah tercatat dan diuji simulasi
+
+2. 📊 TABEL NILAI & RENTANG
+- Telah dibuat tabel lengkap faktor pembobotan per kelompok
+- Telah ditentukan rentang nilai hukuman disiplin per kelompok
+- Sudah dipastikan bahwa nilai akhir dibatasi oleh batas bawah dan atas tiap kelompok
+
+3. 📁 utils_v2 DITATA ULANG
+- Revisi besar pada: hitungFaktorTambahan.js, hitungFaktorUtama.js, tentukanNilaiPokok.js
+- Semua fungsi sudah modular, terdokumentasi, dan dinamis
+- Telah dibuat rekap final utils_v2 dan file cadangan .txt
+
+4. 🧠 MPJHDContext
+- Telah dibaca ulang dan dirancang ulang
+- State disederhanakan untuk menyesuaikan step baru
+- Beberapa field lama dihapus (motifKeuntungan, peranPelaku)
+- Akan ditambahkan field baru (jabatan, tipeKelompokIII)
+
+5. 🧱 STRUKTUR HALAMAN (Step Pages)
+- Total 7 halaman:
+  1. Pilih Kategori
+  2. Pilih Pasal
+  3. Kondisi Awal (dampak, jabatan, kerugian)
+  4. Faktor Utama
+  5. Faktor Tambahan (4 faktor)
+  6. Faktor Meringankan
+  7. Hasil Akhir
+- Sudah ditentukan aturan tombol kembali/lanjut dan validasi per halaman
+- Sudah dibuat file `.txt` backup struktur navigasi dan alur
+
+6. 🧩 KOMPONEN SIAP PAKAI
+- Telah ditemukan kembali: HasilTabel.jsx dan SalinClipboardButton.jsx
+- Sudah siap untuk menampilkan hasil akhir dan fitur copy
+
+7. 🎨 HEADLESS UI
+- Akan digunakan sebagai tema utama untuk dropdown, radio button, dll
+
+8. ✅ SIAP CODING
+- Struktur sudah lengkap
+- utils_v2 sudah bersih
+- context akan segera disesuaikan
+- halaman step siap mulai dibangun

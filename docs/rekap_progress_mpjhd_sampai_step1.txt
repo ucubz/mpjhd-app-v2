@@ -1,0 +1,42 @@
+REKAP PROGRESS MPJHD APP V2 — SAMPAI SEBELUM STEP 1
+Tanggal: 2025-04-30
+
+1. ✅ STRUKTUR HALAMAN
+- Dipastikan hanya menggunakan 7 langkah utama sesuai dengan ketentuan MPJHD v2 final.
+- routes/AppRoutes.jsx sudah disesuaikan agar hanya memuat:
+  Step1_PilihKategori → Step2_PilihPasal → Step3_KondisiAwal → Step4_FaktorUtama →
+  Step5_FaktorTambahan → Step6_FaktorMeringankan → Step7_HasilAkhir
+
+2. ✅ CONTEXT
+- File MPJHDContext.jsx sudah diperbarui lengkap.
+- Menyimpan semua state perhitungan (kategori, pasal, kelompok, dampak, kerugian, faktor, hasil).
+- Ditambahkan field baru: `isFinished` untuk mendeteksi apakah user sudah menyelesaikan pengisian.
+- Mendukung action `SET`, `SET_FAKTOR_UTAMA`, `SET_FINISHED`, dan `RESET`.
+
+3. ✅ PROTEKSI REFRESH
+- Hook `useBeforeUnloadProtection()` dibuat untuk mencegah kehilangan data akibat refresh/tab close.
+- Dipasang di App.jsx dan hanya aktif jika `state.isFinished === false`.
+
+4. ✅ FILE APP
+- App.jsx final sudah dibuat. Berisi:
+  - MPJHDProvider
+  - Router
+  - AppRoutes
+  - Hook proteksi refresh
+
+5. ✅ FILE MAIN
+- main.jsx sudah benar, memuat App ke dalam root DOM dengan React.StrictMode.
+- Tidak perlu diubah.
+
+6. ✅ UTILS
+- Folder utils_v2 sudah lengkap sesuai dengan struktur dan logika MPJHD final.
+- Semua fungsi perhitungan nilai pokok, tambahan, faktor utama, dan konversi grade tersedia.
+
+7. ✅ FILE TAMBAHAN
+- hooks/useBeforeUnloadProtection.js
+- context/MPJHDContext.jsx
+- routes/AppRoutes.jsx
+
+📌 Status Saat Ini:
+Seluruh fondasi aplikasi MPJHD V2 sudah siap — termasuk context, routing, hook proteksi, dan struktur halaman. 
+Selanjutnya akan mulai mengimplementasikan halaman Step1_PilihKategori.jsx.

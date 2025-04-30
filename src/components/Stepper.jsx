@@ -1,53 +1,43 @@
-import { useLocation, useNavigate } from 'react-router-dom'
+// src/components/Stepper.jsx
+import { useLocation, useNavigate } from 'react-router-dom';
 
-const Stepper = () => {
-  const location = useLocation()
-  const navigate = useNavigate()
+export default function Stepper({ totalSteps = 7 }) {
+  const location = useLocation();
+  const navigate = useNavigate();
 
   const getCurrentStep = () => {
-    const match = location.pathname.match(/\/step\/(\d+)/)
-    return match ? parseInt(match[1], 10) : 0
-  }
+    const match = location.pathname.match(/\/step\/(\d+)/);
+    return match ? parseInt(match[1], 10) : 0;
+  };
 
-  const currentStep = getCurrentStep()
-  const totalSteps = 9
+  const currentStep = getCurrentStep();
 
-  const handleStepClick = (stepNumber) => {
-    navigate(`/step/${stepNumber}`)
-  }
+  const handleClick = (step) => {
+    if (step < currentStep) {
+      navigate(`/step/${step}`);
+    }
+  };
 
   return (
-    <div className="flex flex-col items-center mt-8 gap-2">
-      {/* Container stepper bulat */}
-      <div className="flex flex-row items-center justify-center gap-3 flex-wrap">
-        {Array.from({ length: totalSteps }, (_, index) => {
-          const stepNumber = index + 1
-          const isActive = currentStep >= stepNumber
+    <div className="flex justify-center mt-6 gap-3 flex-wrap">
+      {Array.from({ length: totalSteps }, (_, i) => {
+        const step = i + 1;
+        const isActive = step <= currentStep;
+        const isClickable = step < currentStep;
 
-          return (
-            <div
-              key={stepNumber}
-              role="button"            // ✅ properti biasa
-              tabIndex={0}              // ✅ properti biasa
-              onClick={() => handleStepClick(stepNumber)}
-              className={`cursor-pointer rounded-full 
-                ${isActive ? 'bg-primary' : 'bg-gray-300 dark:bg-gray-600'}
-                w-4 h-4 md:w-5 md:h-5
-                transition-transform duration-300 ease-in-out
-                hover:scale-125
-                focus:outline-none
-              `}
-              aria-label={`Pindah ke Step ${stepNumber}`}
-            />
-          )
-        })}
-      </div>
-
-      <p className="text-xs text-gray-500 dark:text-gray-400">
-        Step {currentStep} dari {totalSteps}
-      </p>
+        return (
+          <div
+            key={step}
+            onClick={() => isClickable && handleClick(step)}
+            className={`
+              w-4 h-4 md:w-5 md:h-5 rounded-full transition-all
+              ${isActive ? 'bg-blue-600' : 'bg-gray-300 dark:bg-gray-600'}
+              ${isClickable ? 'cursor-pointer hover:scale-110' : 'cursor-default'}
+            `}
+            title={`Langkah ${step}`}
+          />
+        );
+      })}
     </div>
-  )
+  );
 }
-
-export default Stepper

@@ -1,0 +1,62 @@
+
+# 📋 MPJHD Project — Changelog & Milestone
+Tanggal: 2025-04-28
+Status: ✅ Selesai sampai generate tabel HTML untuk copy-paste ke Word
+
+---
+
+## 1. Update Step Pages
+- Step 4 → Sudah diperbaiki:
+  - Menu dampak dan jabatan muncul sesuai kebutuhan kelompok.
+  - Ada tombol lanjut dan tombol kembali.
+- Step 5 → Sudah diperbaiki:
+  - Input faktor utama sesuai kelompok.
+  - Validasi jumlah kerugian (tidak bisa lanjut kalau kosong).
+- Step 6 → Sudah diperbaiki:
+  - Semua dropdown wajib diisi.
+  - Faktor Meringankan dipindahkan ke Step 7.
+- Step 7 → Sudah diperbaiki:
+  - RadioGroup untuk faktor meringankan.
+  - Auto-next ke Step 8 setelah klik pilihan.
+- Step 8 → Sudah diperbaiki:
+  - Tambahkan tombol Back.
+  - Hitung faktor tambahan dan meringankan otomatis.
+- Step 9 → Sudah diperbaiki:
+  - Tambahkan tombol Back.
+  - Konversi grade hukuman otomatis setelah nilai akhir dihitung.
+- Step 10 → Sudah diperbaiki:
+  - Tambahkan tombol Copy Tabel Rincian.
+  - Hasil tabel angka dapat disalin dalam format HTML rapi untuk paste di Word.
+
+## 2. Update Komponen
+- Button sudah diperbaiki supaya tidak wrap teks (pakai whitespace-nowrap).
+- SalinClipboardButton dihapus karena sudah digabung ke tombol biasa.
+- generateHTMLTable.js dibuat baru:
+  - Tabel HTML dinamis per kelompok (II s.d. VI).
+  - Font Arial 11pt.
+  - Padding 4px 8px.
+  - Header abu-abu bold.
+  - Angka rata kanan.
+  - Indentasi 5 spasi untuk sub-faktor.
+  - Format kompatibel untuk paste Word.
+
+## 3. Problem Critical yang Sudah Diselesaikan
+- Dropdown kosong bisa next — sudah diperbaiki.
+- Faktor Meringankan redundant di Step 6 & 7 — sudah diperbaiki.
+- Tabel Word nempel tulisan & angka — sudah diperbaiki.
+- Kolom angka tidak align — sudah diperbaiki.
+- Header tabel Word — sekarang sudah abu-abu dan bold.
+- Sub-faktor (jumlah pasal, rekam jejak) — sudah diberi indentasi.
+
+# 📌 Catatan Milestone Saat Ini
+✅ Sampai titik ini, semua flow MPJHD Step 1-10 sudah berfungsi:
+- Navigasi antar halaman berjalan sempurna.
+- Data tersimpan antar halaman.
+- Tabel output bisa disalin ke Word dengan format rapih sesuai standar.
+
+# 🔥 Next Improvement (Opsional Kalau Mau Lanjut)
+| Prioritas | Task |
+|:---|:---|
+| ⚡ | Auto-hitung preview nilai akhir sebelum klik lanjut |
+| 🌟 | Tambahkan export ke Word otomatis (bukan copy-paste manual) |
+| ✨ | Buatkan halaman Ringkasan Final sebelum reset |

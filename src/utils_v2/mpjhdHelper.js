@@ -1,17 +1,28 @@
 // utils_v2/mpjhdHelper.js
 
-// Fungsi untuk memformat angka dengan pemisah ribuan
+/**
+ * Format angka dengan pemisah ribuan sesuai lokal Indonesia.
+ * @param {number} angka
+ * @returns {string}
+ */
 export function formatAngka(angka) {
-    return angka.toLocaleString('id-ID');
-  }
-  
-  // Fungsi untuk memastikan input adalah angka positif
-  export function cekInputPositif(input) {
-    return !isNaN(input) && input > 0;
-  }
-  
-  // Fungsi untuk menghitung total dari array angka
-  export function hitungTotal(angkaArray) {
-    return angkaArray.reduce((total, angka) => total + angka, 0);
-  }
-  
+  return angka.toLocaleString('id-ID');
+}
+
+/**
+* Memastikan input adalah angka positif (> 0).
+* @param {number} input
+* @returns {boolean}
+*/
+export function cekInputPositif(input) {
+  return typeof input === 'number' && input > 0;
+}
+
+/**
+* Menghitung total dari array angka.
+* @param {number[]} angkaArray
+* @returns {number}
+*/
+export function hitungTotal(angkaArray) {
+  return angkaArray.reduce((total, angka) => total + angka, 0);
+}

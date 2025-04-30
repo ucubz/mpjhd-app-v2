@@ -1,106 +1,76 @@
-import { RadioGroup } from '@headlessui/react'
-import { CheckCircleIcon } from '@heroicons/react/24/solid'
-import PageWrapper from '../components/PageWrapper'
-import Card from '../components/Card'
-import Stepper from '../components/Stepper'
-import { useNavigate } from 'react-router-dom'
-import { useState } from 'react'
-import { useMPJHD } from '../context/MPJHDContext'
+// Step 1 - Pilih kategori
+import { useNavigate } from 'react-router-dom';
+import { RadioGroup } from '@headlessui/react';
+import { CheckCircleIcon } from '@heroicons/react/24/solid';
+import { useMPJHD } from '../context/MPJHDContext';
+import Stepper from '../components/Stepper';
 
-const options = [
-  {
-    label: 'Kewajiban',
-    description: 'Pasal 3',
-    kategori: 'KEWAJIBAN',
-    pasalGroup: '3',
-    isSpecial: false
-  },
-  {
-    label: 'Larangan',
-    description: 'Pasal 4',
-    kategori: 'LARANGAN',
-    pasalGroup: '4',
-    isSpecial: false
-  },
-  {
-    label: 'Larangan',
-    description: 'Pasal 5',
-    kategori: 'LARANGAN',
-    pasalGroup: '5',
-    isSpecial: false
-  },
-  {
-    label: 'Izin Perkawinan/Perceraian',
-    description: 'Khusus (Langsung Kelompok VI)',
-    kategori: 'IZIN_PERKAWINAN',
-    pasalGroup: null,
-    isSpecial: true
-  }
-]
+const pilihan = [
+  { label: 'Pasal 3 - Kewajiban', value: 'pasal3' },
+  { label: 'Pasal 4 - Larangan', value: 'pasal4' },
+  { label: 'Pasal 5 - Larangan', value: 'pasal5' },
+  { label: 'Izin Perkawinan atau Perceraian', value: 'izin' },
+];
 
 export default function Step1_PilihKategori() {
-  const navigate = useNavigate()
-  const { dispatch } = useMPJHD()
-  const [selected, setSelected] = useState(null)
+  const navigate = useNavigate();
+  const { dispatch } = useMPJHD();
 
-  const handleSelect = (value) => {
-    if (!value) return
-
-    setSelected(value)
-
-    if (value.isSpecial) {
-      dispatch({ type: 'SET', key: 'kategori', value: value.kategori })
-      dispatch({ type: 'SET', key: 'kelompok', value: 'VI' })
-      dispatch({ type: 'SET', key: 'nilaiPokok', value: 60 })
-      setTimeout(() => {
-        navigate('/step/5')
-      }, 200)
+  const handleSelect = (val) => {
+    dispatch({ type: 'SET', field: 'jenisPilihanUtama', value: val });
+    if (val === 'izin') {
+      dispatch({ type: 'SET', field: 'kelompok', value: 'VI' });
+      navigate('/step/3');
     } else {
-      dispatch({ type: 'SET', key: 'kategori', value: value.kategori })
-      dispatch({ type: 'SET', key: 'pasalGroup', value: value.pasalGroup })
-      setTimeout(() => {
-        navigate('/step/2')
-      }, 200)
+      navigate('/step/2');
     }
-  }
+  };
 
   return (
-    <PageWrapper>
-      <h1 className="text-2xl font-bold text-center mb-8 sm:text-xl md:text-3xl">
-        Pilih Kategori dan Pasal Utama
-      </h1>
+    <div className="max-w-xl mx-auto py-10 px-4">
+      <button
+        onClick={() => {
+          if (confirm('Yakin ingin mereset dan kembali ke awal?')) {
+            navigate('/step/1');
+            dispatch({ type: 'RESET' });
+          }
+        }}
+        className="text-red-600 font-semibold mb-4"
+      >
+        Reset
+      </button>
 
-      <Card>
-        <div className="flex flex-col gap-6">
-          <RadioGroup value={selected} onChange={handleSelect} className="space-y-2">
-            {options.map((opt) => (
-              <RadioGroup.Option key={`${opt.label}-${opt.pasalGroup ?? 'special'}`} value={opt}>
-                {({ active, checked }) => (
-                  <div
-                    className={`
-                      ${active ? 'ring-2 ring-primary' : ''}
-                      ${checked ? 'bg-primary text-grey-800' : 'bg-white/10'}
-                      group relative flex cursor-pointer rounded-lg px-3 py-2 shadow-md transition
-                    `}
-                  >
-                    <div className="flex w-full items-center justify-between">
-                      <div>
-                        <p className="text-sm font-semibold">{opt.label}</p>
-                        <p className="text-xs text-grey-600">{opt.description}</p>
-                      </div>
-                      {checked && (
-                        <CheckCircleIcon className="h-6 w-6 text-white" />
-                      )}
-                    </div>
-                  </div>
-                )}
-              </RadioGroup.Option>
-            ))}
-          </RadioGroup>
+      <h2 className="text-xl font-bold mb-6">Pilih Jenis Pelanggaran</h2>
+      <RadioGroup onChange={handleSelect}>
+        <div className="space-y-3">
+          {pilihan.map((item) => (
+            <RadioGroup.Option
+              key={item.value}
+              value={item.value}
+              className={({ checked }) =>
+                `p-4 rounded-xl border cursor-pointer transition-all ${
+                  checked
+                    ? 'bg-blue-50 border-blue-500'
+                    : 'bg-white border-gray-300 dark:bg-gray-800'
+                }`
+              }
+            >
+              {({ checked }) => (
+                <div className="flex items-center gap-3">
+                  {checked && (
+                    <CheckCircleIcon className="h-5 w-5 text-blue-600" />
+                  )}
+                  <span>{item.label}</span>
+                </div>
+              )}
+            </RadioGroup.Option>
+          ))}
         </div>
-      </Card>
+      </RadioGroup>
 
-      <Stepper currentStep={1} />
-    </PageWrapper>
-  )
+      <div className="mt-12">
+        <Stepper currentStep={1} totalSteps={7} />
+      </div>
+    </div>
+  );
 }

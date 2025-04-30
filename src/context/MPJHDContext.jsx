@@ -1,62 +1,67 @@
-// src/context/MPJHDContext.js
 import { createContext, useContext, useReducer } from 'react';
 
-// Initial State
 const initialState = {
-  kategori: '',             // KEWAJIBAN / LARANGAN
-  pasalUtama: '',            // Pasal utama yang dipilih
-  kelompok: '',              // Kelompok otomatis berdasarkan pasal
-  dampak: '',                // Unit Kerja / Instansi / Negara
-  riwayatHukdis: '',         // Ada / Tidak Ada
-  motifKeuntungan: '',       // Ada / Tidak Ada
-  peranPelaku: '',           // Utama / Penyerta / Inisiator / Aktif / Pasif
-  adaKerugian: false,        // True / False
-  jumlahKerugian: 0,         // Angka nominal kerugian
+  kategori: '',         // KEWAJIBAN / LARANGAN
+  pasalUtama: '',
+  kelompok: '',
+  dampak: '',           // Unit Kerja / Instansi / Negara
+  jabatan: '',          // Untuk pasal 4 huruf e (Kelompok V)
+  adaKerugian: false,
+  jumlahKerugian: 0,
+  tipeKelompokIII: '',  // Umum / Khusus Bersama / Khusus Individual
+
   faktorUtama: {},
+
   faktorPembobotan: {
     banyakPasal: '',
     hukdis: '',
     kesengajaan: '',
     hambatan: '',
-    meringankan: '',
   },
+
   faktorMeringankan: {
     kooperatif: false,
-    mengakui: false,
-    menyesal: false,
-    tekanan: false,
+    inisiator: false,
   },
+
   nilaiPokok: 0,
-  pembobotanTambahan: 0,
-  pengurangMeringankan: 0,
   nilaiAkhir: 0,
   grade: '',
   jenisHukuman: '',
+  isFinished: false,     // Untuk proteksi refresh sebelum selesai
 };
 
-// Reducer
 function reducer(state, action) {
   switch (action.type) {
     case 'SET':
-      return { ...state, [action.key]: action.value };
-      
+      return { ...state, [action.field]: action.value };
+
     case 'SET_FAKTOR_UTAMA':
-      return { 
-        ...state, 
-        faktorUtama: { 
-          ...state.faktorUtama, 
-          [action.key]: action.value 
-        } 
+      return {
+        ...state,
+        faktorUtama: { ...state.faktorUtama, [action.field]: action.value },
       };
 
     case 'SET_FAKTOR_PEMBOBOTAN':
-      return { 
-        ...state, 
-        faktorPembobotan: { 
-          ...state.faktorPembobotan, 
-          [action.key]: action.value 
-        } 
+      return {
+        ...state,
+        faktorPembobotan: {
+          ...state.faktorPembobotan,
+          [action.field]: action.value,
+        },
       };
+
+    case 'SET_FAKTOR_MERINGANKAN':
+      return {
+        ...state,
+        faktorMeringankan: {
+          ...state.faktorMeringankan,
+          [action.field]: action.value,
+        },
+      };
+
+    case 'SET_FINISHED':
+      return { ...state, isFinished: action.value };
 
     case 'RESET':
       return initialState;
@@ -66,24 +71,22 @@ function reducer(state, action) {
   }
 }
 
-// Context
 const MPJHDContext = createContext();
 
-// Provider
-export const MPJHDProvider = ({ children }) => {
+export function MPJHDProvider({ children }) {
   const [state, dispatch] = useReducer(reducer, initialState);
   return (
     <MPJHDContext.Provider value={{ state, dispatch }}>
       {children}
     </MPJHDContext.Provider>
   );
-};
+}
 
-// Hooks
-export const useMPJHD = () => useContext(MPJHDContext);
+export function useMPJHD() {
+  return useContext(MPJHDContext);
+}
 
-// Optional: Helper untuk reset cepat
-export const useResetMPJHD = () => {
+export function useResetMPJHD() {
   const { dispatch } = useContext(MPJHDContext);
   return () => dispatch({ type: 'RESET' });
-};
+}

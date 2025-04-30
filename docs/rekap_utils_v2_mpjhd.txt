@@ -1,0 +1,28 @@
+REKAP FINAL utils_v2 - MPJHD App (2025-04-29)
+
+✅ STATUS UTILS V2:
+
+1. cariKelompokPasal.js - Aman
+2. daftarGradeHukumanDisiplin.js - Aman
+3. daftarJenisHukumanDisiplin.js - Aman
+4. hitungFaktorMeringankan.js - Revisi dokumentasi (nilai 5+10 bisa dijumlahkan)
+5. hitungFaktorTambahan.js - Revisi besar, digabung ke fungsi dinamis
+6. hitungFaktorUtama.js - Rapi, dokumentasi diperjelas
+7. hitungNilaiAkhir.js - Aman
+8. hitungNilaiKelompokI.js - Aman
+9. index.js - Aman
+10. konversiGrade.js - Aman
+11. kunciNilaiDalamRentang.js - Aman
+12. mpjhdHelper.js - Aman
+13. pengelompokanPasal.js - Aman
+14. rentangNilaiHukumanDisiplin.js - Aman
+15. tentukanKelompok.js - Aman
+16. tentukanNilaiPokok.js - Revisi besar, input dampak dipisahkan, logika fix
+
+📋 Catatan Penting:
+- Semua file sekarang konsisten terhadap flow MPJHD v2.
+- Fungsi input ke perhitungan nilai akhir sudah clean dan siap dipanggil dari context/frontend.
+- Tidak ada asumsi default dampak (wajib input dari user).
+- Nilai akhir tetap dikunci dalam rentang setelah semua faktor dihitung.
+
+Siap lanjut ke implementasi frontend Step Pages berdasarkan struktur final.
