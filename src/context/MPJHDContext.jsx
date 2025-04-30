@@ -1,22 +1,27 @@
 import { createContext, useContext, useReducer } from 'react';
 
 const initialState = {
-  kategori: '',         // KEWAJIBAN / LARANGAN
-  pasalUtama: '',
-  kelompok: '',
-  dampak: '',           // Unit Kerja / Instansi / Negara
-  jabatan: '',          // Untuk pasal 4 huruf e (Kelompok V)
-  adaKerugian: false,
+  kategori: null,             // KEWAJIBAN / LARANGAN
+  pasalUtama: null,
+  kelompok: null,
+  dampak: null,               // Unit Kerja / Instansi / Negara
+  jabatan: null,              // Untuk pasal 4 huruf e (Kelompok V)
+  adaKerugian: null,          // true / false
   jumlahKerugian: 0,
-  tipeKelompokIII: '',  // Umum / Khusus Bersama / Khusus Individual
+  tipeKelompokIII: null,      // bersama / individu
 
-  faktorUtama: {},
+  faktorUtama: {
+    peran: null,
+    jumlahKerugian: null,
+    reputasi: null,
+    nilai: 0,
+  },
 
   faktorPembobotan: {
-    banyakPasal: '',
-    hukdis: '',
-    kesengajaan: '',
-    hambatan: '',
+    banyakPasal: null,
+    hukdis: null,
+    kesengajaan: null,
+    hambatan: null,
   },
 
   faktorMeringankan: {
@@ -25,6 +30,7 @@ const initialState = {
   },
 
   nilaiPokok: 0,
+  nilaiTambahan: 0,
   nilaiAkhir: 0,
   grade: '',
   jenisHukuman: '',
