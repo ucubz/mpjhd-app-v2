@@ -1,8 +1,8 @@
-// Step 5 - Faktor tambahan
 import { useNavigate } from 'react-router-dom';
 import { useMPJHD } from '../context/MPJHDContext';
 import Stepper from '../components/Stepper';
 import { Listbox } from '@headlessui/react';
+import { hitungTotalTambahan } from '../utils_v2/hitungFaktorTambahan';
 
 const options = {
   banyakPasal: [
@@ -42,9 +42,7 @@ function Dropdown({ label, field, value, onChange, list }) {
                 key={item.value}
                 value={item.value}
                 className={({ active }) =>
-                  `cursor-pointer px-4 py-2 ${
-                    active ? 'bg-blue-100 dark:bg-blue-900' : ''
-                  }`
+                  `cursor-pointer px-4 py-2 ${active ? 'bg-blue-100 dark:bg-blue-900' : ''}`
                 }
               >
                 {item.label}
@@ -70,6 +68,12 @@ export default function Step5_FaktorTambahan() {
 
   const updateField = (field, value) => {
     dispatch({ type: 'SET_FAKTOR_PEMBOBOTAN', field, value });
+  };
+
+  const handleNext = () => {
+    const nilaiTambahan = hitungTotalTambahan(state);
+    dispatch({ type: 'SET_NILAI_TAMBAHAN', nilaiTambahan });
+    navigate('/step/6');
   };
 
   return (
@@ -119,7 +123,7 @@ export default function Step5_FaktorTambahan() {
 
       {isComplete && (
         <button
-          onClick={() => navigate('/step/6')}
+          onClick={handleNext}
           className="mt-4 px-4 py-2 bg-blue-600 text-white rounded-md"
         >
           Lanjut
