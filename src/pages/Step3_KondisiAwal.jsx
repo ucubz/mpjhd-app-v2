@@ -10,7 +10,7 @@ export default function Step3_KondisiAwal() {
 
   const isKelompokII = state.kelompok === 'II';
   const isKelompokVI = state.kelompok === 'VI';
-  const isKelompokIII = state.kelompok?.startsWith('III');
+  const isKelompokIII = state.kelompok === 'III';
   const isPasal4e = state.pasalUtama?.includes('Pasal 4 huruf e');
 
   const dampakOptions = isKelompokII
@@ -108,7 +108,17 @@ export default function Step3_KondisiAwal() {
           <p className="font-semibold mb-2">Apakah terdapat kerugian negara/pihak lain?</p>
           <RadioGroup
             value={state.adaKerugian}
-            onChange={(val) => dispatch({ type: 'SET', field: 'adaKerugian', value: val })}
+            onChange={(val) => {
+              dispatch({ type: 'SET', field: 'adaKerugian', value: val });
+
+              if (isKelompokIII) {
+                dispatch({
+                  type: 'SET',
+                  field: 'kelompok',
+                  value: val ? 'III Khusus' : 'III Umum',
+                });
+              }
+            }}
           >
             <div className="space-y-2">
               {[{ label: 'Ya', value: true }, { label: 'Tidak', value: false }].map(({ label, value }) => (
