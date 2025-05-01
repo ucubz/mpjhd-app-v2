@@ -17,13 +17,19 @@ export default function Step3_KondisiAwal() {
   const [isDialogOpen, setIsDialogOpen] = useState(false); // State untuk kontrol dialog
   const [dialogMessage, setDialogMessage] = useState(''); // Pesan dialog
 
-  const kelompok = state.kelompok || 'Tidak Diketahui'; // Kelompok hasil dari Step 1 & 2
+  // Pastikan kelompok memiliki nilai fallback jika kosong
+  const kelompok = state.kelompok || 'Tidak Diketahui';
 
   // State untuk validasi pertanyaan yang harus dijawab
-  const [isDampakValid, setIsDampakValid] = useState(!['II', 'VI'].includes(state.kelompok));
+  const [isDampakValid, setIsDampakValid] = useState(!['II', 'VI'].includes(kelompok));
   const [isJabatanValid, setIsJabatanValid] = useState(state.pasalUtama !== 'Pasal 4 huruf e');
-  const [isKerugianValid, setIsKerugianValid] = useState(state.kelompok !== 'III');
+  const [isKerugianValid, setIsKerugianValid] = useState(kelompok !== 'III');
   const [kerugianSelected, setKerugianSelected] = useState(state.adaKerugian || null); // Untuk menyimpan pilihan
+
+  // Opsi untuk RadioGroup
+  const dampakOptions = kelompok === 'II'
+    ? ['Unit Kerja', 'Instansi', 'Negara']
+    : ['Tidak Berdampak', 'Unit Kerja', 'Instansi/Tersangka'];
 
   // Validasi apakah user bisa melanjutkan ke langkah berikutnya
   const isComplete = isDampakValid && isJabatanValid && isKerugianValid;
@@ -50,7 +56,7 @@ export default function Step3_KondisiAwal() {
   const handleKerugianSubmit = () => {
     dispatch({ type: 'SET', field: 'adaKerugian', value: kerugianSelected });
 
-    if (state.kelompok === 'III') {
+    if (kelompok === 'III') {
       const newKelompok = kerugianSelected ? 'III Khusus' : 'III Umum';
       dispatch({ type: 'SET', field: 'kelompok', value: newKelompok });
     }
@@ -60,11 +66,12 @@ export default function Step3_KondisiAwal() {
 
   // Menampilkan dialog hanya untuk kelompok II dan VI saat page dimuat
   useEffect(() => {
-    if (['II', 'VI'].includes(state.kelompok)) {
+    console.log('Kelompok saat ini:', kelompok); // Debugging nilai kelompok
+    if (['II', 'VI'].includes(kelompok)) {
       setDialogMessage(`Pelanggaran ini termasuk ke dalam Kelompok ${kelompok}.`);
       setIsDialogOpen(true);
     }
-  }, [state.kelompok]);
+  }, [kelompok]);
 
   return (
     <PageWrapper>
@@ -126,16 +133,16 @@ export default function Step3_KondisiAwal() {
 
         <h2 className="text-xl font-bold mb-6 text-center">Kondisi Awal</h2>
 
-        {/* Pertanyaan Kerugian */}
-        {state.kelompok === 'III' && (
+        {/* Pertanyaan Dampak */}
+        {['II', 'VI'].includes(kelompok) && (
           <div className="mb-6">
-            <p className="font-semibold mb-2">Apakah terdapat kerugian negara/pihak lain?</p>
-            <RadioGroup value={kerugianSelected} onChange={handleKerugianChange}>
+            <p className="font-semibold mb-2">Dampak pelanggaran:</p>
+            <RadioGroup value={state.dampak} onChange={handleDampakChange}>
               <div className="space-y-2">
-                {[{ label: 'Ya', value: true }, { label: 'Tidak', value: false }].map(({ label, value }) => (
+                {dampakOptions.map((val) => (
                   <RadioGroup.Option
-                    key={label}
-                    value={value}
+                    key={val}
+                    value={val}
                     className={({ checked }) =>
                       `p-3 border rounded-xl ${
                         checked
@@ -147,22 +154,13 @@ export default function Step3_KondisiAwal() {
                     {({ checked }) => (
                       <div className="flex items-center gap-2">
                         {checked && <CheckCircleIcon className="h-5 w-5 text-blue-600" />}
-                        <span>{label}</span>
+                        <span>{val}</span>
                       </div>
                     )}
                   </RadioGroup.Option>
                 ))}
               </div>
             </RadioGroup>
-            {/* Tombol Lanjut */}
-            {kerugianSelected !== null && (
-              <button
-                onClick={handleKerugianSubmit}
-                className="mt-4 w-full py-2 px-4 bg-blue-600 text-white rounded-md hover:bg-blue-700 transition"
-              >
-                Lanjut
-              </button>
-            )}
           </div>
         )}
 
