@@ -45,26 +45,28 @@ export default function Step1_PilihKategori() {
         <div className="space-y-3">
           {pilihan.map((item) => (
             <RadioGroup.Option
-  key={item.value}
-  value={item.value}
-  className={({ checked }) =>
-    `p-4 rounded-xl border cursor-pointer transition-all ${
-      checked
-        ? 'bg-blue-50 border-blue-500 text-blue-600'
-        : 'bg-white border-gray-300 text-gray-900 dark:bg-gray-800 dark:text-gray-100'
-    }`
-  }
->
-  {({ checked }) => (
-    <div className="flex items-center gap-3">
-      {checked && (
-        <CheckCircleIcon className="h-5 w-5 text-blue-600" />
-      )}
-      <span>{item.label}</span>
-    </div>
-  )}
-</RadioGroup.Option>
-
+              key={item.value}
+              value={item.value}
+              className={({ checked }) =>
+                `p-4 rounded-xl border cursor-pointer transition-all ${
+                  checked
+                    ? 'bg-blue-50 border-blue-500 text-blue-600'
+                    : 'bg-white border-gray-300 text-gray-900 dark:bg-gray-800 dark:text-gray-100'
+                }`
+              }
+            >
+              {({ checked }) => (
+                <div className="flex items-center gap-3">
+                  {checked && (
+                    <CheckCircleIcon className="h-5 w-5 text-blue-600" />
+                  )}
+                  <span>{item.label}</span>
+                </div>
+              )}
+            </RadioGroup.Option>
+          ))}
+        </div>
+      </RadioGroup>
 
       <div className="mt-12">
         <Stepper currentStep={1} totalSteps={7} />
