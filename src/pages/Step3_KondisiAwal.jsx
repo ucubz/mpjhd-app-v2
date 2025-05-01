@@ -47,8 +47,12 @@ export default function Step3_KondisiAwal() {
   };
 
   const handleNextStep = () => {
+  if (kelompok === 'VI') {
+    navigate('/step/5');
+  } else {
     navigate('/step/4');
-  };
+  }
+};
 
   useEffect(() => {
     if (state.pasalUtama === 'Pasal 4 huruf f' || kelompok === 'I') {
