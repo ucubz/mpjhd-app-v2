@@ -111,11 +111,9 @@ export default function Step2_PilihPasal() {
 </RadioGroup>
 
       <div className="mt-12">
-        <Stepper currentStep={2} totalSteps={7} />
-        <button
-          onClick={() => navigate('/step/1')}
-          className="mt-4 text-sm text-blue-600 underline"
-        >
+  <Stepper currentStep={2} totalSteps={7} />
+  <BackButton label="Kembali ke Step 1" className="mt-4" />
+</div>
           Kembali
         </button>
       </div>
