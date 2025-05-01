@@ -23,11 +23,13 @@ export default function Step1_PilihKategori() {
     dispatch({ type: 'SET', field: 'jenisPilihanUtama', value: val });
     if (val === 'izin') {
       dispatch({ type: 'SET', field: 'kelompok', value: 'VI' });
-      navigate('/step/3'); // Langsung ke step 3 jika "izin" dipilih
-    } else {
-      navigate('/step/2'); // Pindah ke step 2 untuk yang lain
-    }
-  };
+      dispatch({ type: 'SET', field: 'pasalUtama', value: 'terkait Perkawinan/Perceraian ' });
+				setTimeout(() => {
+					navigate('/step/3');
+				}, 0);
+			} else {
+			}
+};
 
   return (
     <PageWrapper>
