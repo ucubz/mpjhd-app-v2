@@ -37,6 +37,8 @@ export default function Step3_KondisiAwal() {
   // Navigasi ke langkah berikutnya
   const nextStep = () => navigate('/step/4');
 
+  const skipToStep6 = () => navigate('/step/6');
+
   // Logika untuk memperbarui validasi
   const handleDampakChange = (val) => {
     dispatch({ type: 'SET', field: 'dampak', value: val });
@@ -64,9 +66,29 @@ export default function Step3_KondisiAwal() {
     nextStep(); // Navigasi ke langkah berikutnya
   };
 
-  // Menampilkan dialog hanya untuk kelompok II dan VI saat page dimuat
+  // Navigasi dan logika awal berdasarkan kelompok
   useEffect(() => {
     console.log('Kelompok saat ini:', kelompok); // Debugging nilai kelompok
+
+    // Navigasikan langsung sesuai kelompok
+    switch (kelompok) {
+      case 'I':
+        skipToStep6();
+        break;
+      case 'IV':
+        nextStep();
+        break;
+      case 'II':
+      case 'III':
+      case 'V':
+      case 'VI':
+        // Tetap di Step3 untuk kelompok yang membutuhkan pertanyaan
+        break;
+      default:
+        console.warn('Kelompok tidak dikenal:', kelompok); // Debugging
+    }
+
+    // Tampilkan dialog untuk kelompok tertentu
     if (['II', 'VI'].includes(kelompok)) {
       setDialogMessage(`Pelanggaran ini termasuk ke dalam Kelompok ${kelompok}.`);
       setIsDialogOpen(true);
@@ -133,7 +155,7 @@ export default function Step3_KondisiAwal() {
 
         <h2 className="text-xl font-bold mb-6 text-center">Kondisi Awal</h2>
 
-        {/* Pertanyaan Dampak */}
+        {/* Pertanyaan Dampak untuk Kelompok II dan VI */}
         {['II', 'VI'].includes(kelompok) && (
           <div className="mb-6">
             <p className="font-semibold mb-2">Dampak pelanggaran:</p>
@@ -161,6 +183,78 @@ export default function Step3_KondisiAwal() {
                 ))}
               </div>
             </RadioGroup>
+          </div>
+        )}
+
+        {/* Pertanyaan Jabatan untuk Kelompok V */}
+        {kelompok === 'V' && (
+          <div className="mb-6">
+            <p className="font-semibold mb-2">Jabatan Pelaku:</p>
+            <RadioGroup value={state.jabatan} onChange={handleJabatanChange}>
+              <div className="space-y-2">
+                {['Pejabat Administrator', 'Pejabat Fungsional', 'Pejabat Pimpinan Tinggi', 'Pejabat lainnya'].map(
+                  (val) => (
+                    <RadioGroup.Option
+                      key={val}
+                      value={val}
+                      className={({ checked }) =>
+                        `p-3 border rounded-xl ${
+                          checked
+                            ? 'bg-blue-100 border-blue-500 text-black dark:text-gray-900'
+                            : 'border-gray-300 dark:bg-gray-700 dark:text-gray-300'
+                        }`
+                      }
+                    >
+                      {({ checked }) => (
+                        <div className="flex items-center gap-2">
+                          {checked && <CheckCircleIcon className="h-5 w-5 text-blue-600" />}
+                          <span>{val}</span>
+                        </div>
+                      )}
+                    </RadioGroup.Option>
+                  )
+                )}
+              </div>
+            </RadioGroup>
+          </div>
+        )}
+
+        {/* Pertanyaan Kerugian untuk Kelompok III */}
+        {kelompok === 'III' && (
+          <div className="mb-6">
+            <p className="font-semibold mb-2">Apakah terdapat kerugian negara/pihak lain?</p>
+            <RadioGroup value={kerugianSelected} onChange={handleKerugianChange}>
+              <div className="space-y-2">
+                {[{ label: 'Ya', value: true }, { label: 'Tidak', value: false }].map(({ label, value }) => (
+                  <RadioGroup.Option
+                    key={label}
+                    value={value}
+                    className={({ checked }) =>
+                      `p-3 border rounded-xl ${
+                        checked
+                          ? 'bg-blue-100 border-blue-500 text-black dark:text-gray-900'
+                          : 'border-gray-300 dark:bg-gray-700 dark:text-gray-300'
+                      }`
+                    }
+                  >
+                    {({ checked }) => (
+                      <div className="flex items-center gap-2">
+                        {checked && <CheckCircleIcon className="h-5 w-5 text-blue-600" />}
+                        <span>{label}</span>
+                      </div>
+                    )}
+                  </RadioGroup.Option>
+                ))}
+              </div>
+            </RadioGroup>
+            {kerugianSelected !== null && (
+              <button
+                onClick={handleKerugianSubmit}
+                className="mt-4 w-full py-2 px-4 bg-blue-600 text-white rounded-md hover:bg-blue-700 transition"
+              >
+                Lanjut
+              </button>
+            )}
           </div>
         )}
 
