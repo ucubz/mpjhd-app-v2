@@ -123,31 +123,38 @@ export default function Step3_KondisiAwal() {
 
         {/* Kelompok II – dampak */}
         {kelompok === 'II' && (
-          <>
-            <p className="font-semibold mb-2">Dampak pelanggaran:</p>
-            <RadioGroup value={state.dampak} onChange={(val) => handleOptionChange(val, 'dampak')}>
-              <div className="space-y-2">
-                {dampakOptions.map((val) => (
-                  <RadioGroup.Option key={val} value={val} className={({ checked }) =>
-                    `p-3 border rounded-xl ${checked ? 'bg-blue-100 border-blue-500' : 'border-gray-300'}`
-                  }>
-                    {({ checked }) => (
-                      <div className="flex items-center gap-2">
-                        {checked && <CheckCircleIcon className="h-5 w-5 text-blue-600" />}
-                        <span>{val}</span>
-                      </div>
-                    )}
-                  </RadioGroup.Option>
-                ))}
+  <>
+    <p className="font-semibold mb-2">Dampak pelanggaran:</p>
+    <RadioGroup value={state.dampak} onChange={(val) => handleOptionChange(val, 'dampak')}>
+      <div className="space-y-2">
+        {dampakOptions.map((val) => (
+          <RadioGroup.Option key={val} value={val} className={({ checked }) =>
+            `p-3 border rounded-xl ${checked ? 'bg-blue-100 border-blue-500' : 'border-gray-300'}`
+          }>
+            {({ checked }) => (
+              <div className="flex items-center gap-2">
+                {checked && <CheckCircleIcon className="h-5 w-5 text-blue-600" />}
+                <span>{val}</span>
               </div>
-            </RadioGroup>
-            {state.dampak && (
-              <button onClick={handleNextStep} className="mt-4 w-full bg-blue-600 text-white py-2 rounded-md">
-                Lanjut
-              </button>
             )}
-          </>
-        )}
+          </RadioGroup.Option>
+        ))}
+      </div>
+    </RadioGroup>
+
+    <button
+      onClick={handleNextStep}
+      disabled={!state.dampak}
+      className={`mt-4 w-full py-2 px-4 rounded-md ${
+        state.dampak
+          ? 'bg-blue-600 text-white hover:bg-blue-700'
+          : 'bg-gray-300 text-gray-600 cursor-not-allowed'
+      }`}
+    >
+      Lanjut
+    </button>
+  </>
+)}
 
         {/* Kelompok III – kerugian */}
         {kelompok === 'III' && (
