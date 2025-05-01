@@ -1,22 +1,31 @@
-import { useNavigate } from 'react-router-dom';
+import { useEffect, useState } from 'react';
+import { Dialog, Transition } from '@headlessui/react';
 import { RadioGroup } from '@headlessui/react';
 import { CheckCircleIcon } from '@heroicons/react/24/solid';
+import { useNavigate } from 'react-router-dom';
 import { useMPJHD } from '../context/MPJHDContext';
+import PageWrapper from '../components/PageWrapper';
+import Card from '../components/Card';
 import Stepper from '../components/Stepper';
+import BackButton from '../components/BackButton';
+import ResetButton from '../components/ResetButton';
 
 export default function Step3_KondisiAwal() {
   const { state, dispatch } = useMPJHD();
   const navigate = useNavigate();
 
-  const isKelompokII = state.kelompok === 'II';
-  const isKelompokVI = state.kelompok === 'VI';
-  const isKelompokIII = state.kelompok === 'III';
-  const isPasal4e = state.pasalUtama?.includes('Pasal 4 huruf e');
+  const [isDialogOpen, setIsDialogOpen] = useState(true); // State untuk mengontrol dialog
+  const kelompok = state.kelompok || 'Tidak Diketahui'; // Kelompok hasil dari Step 1 & 2
 
-  const dampakOptions = isKelompokII
+  // State untuk validasi pertanyaan yang harus dijawab
+  const [isDampakValid, setIsDampakValid] = useState(!['II', 'VI'].includes(state.kelompok));
+  const [isJabatanValid, setIsJabatanValid] = useState(state.pasalUtama !== 'Pasal 4 huruf e');
+  const [isKerugianValid, setIsKerugianValid] = useState(state.kelompok !== 'III');
+
+  // Opsi untuk RadioGroup
+  const dampakOptions = state.kelompok === 'II'
     ? ['Unit Kerja', 'Instansi', 'Negara']
     : ['Tidak Berdampak', 'Unit Kerja', 'Instansi/Tersangka'];
-
   const jabatanOptions = [
     'Pejabat Administrator',
     'Pejabat Fungsional',
@@ -24,139 +33,197 @@ export default function Step3_KondisiAwal() {
     'Pejabat lainnya',
   ];
 
-  const showDampak = isKelompokII || isKelompokVI;
-  const showJabatan = isPasal4e;
-  const showKerugian = isKelompokIII;
+  // Validasi apakah user bisa melanjutkan ke langkah berikutnya
+  const isComplete = isDampakValid && isJabatanValid && isKerugianValid;
 
-  const isComplete =
-    (!showDampak || !!state.dampak) &&
-    (!showJabatan || !!state.jabatan) &&
-    (!showKerugian || typeof state.adaKerugian === 'boolean');
-
+  // Navigasi ke langkah berikutnya
   const nextStep = () => navigate('/step/4');
 
+  // Logika untuk memperbarui validasi
+  const handleDampakChange = (val) => {
+    dispatch({ type: 'SET', field: 'dampak', value: val });
+    setIsDampakValid(true);
+  };
+
+  const handleJabatanChange = (val) => {
+    dispatch({ type: 'SET', field: 'jabatan', value: val });
+    setIsJabatanValid(true);
+  };
+
+  const handleKerugianChange = (val) => {
+    dispatch({ type: 'SET', field: 'adaKerugian', value: val });
+    if (state.kelompok === 'III') {
+      dispatch({
+        type: 'SET',
+        field: 'kelompok',
+        value: val ? 'III Khusus' : 'III Umum',
+      });
+    }
+    setIsKerugianValid(true);
+  };
+
   return (
-    <div className="max-w-xl mx-auto py-10 px-4">
-      <button
-        onClick={() => {
-          if (confirm('Yakin ingin mereset dan kembali ke awal?')) {
-            dispatch({ type: 'RESET' });
-            navigate('/step/1');
-          }
-        }}
-        className="text-red-600 font-semibold mb-4"
-      >
-        Reset
-      </button>
-
-      <h2 className="text-xl font-bold mb-6">Kondisi Awal</h2>
-
-      {showDampak && (
-        <div className="mb-6">
-          <p className="font-semibold mb-2">Dampak pelanggaran:</p>
-          <RadioGroup
-            value={state.dampak}
-            onChange={(val) => dispatch({ type: 'SET', field: 'dampak', value: val })}
+    <PageWrapper>
+      <Transition appear show={isDialogOpen} as="div">
+        <Dialog as="div" className="relative z-10" onClose={() => setIsDialogOpen(false)}>
+          <Transition.Child
+            as="div"
+            enter="ease-out duration-300"
+            enterFrom="opacity-0"
+            enterTo="opacity-100"
+            leave="ease-in duration-200"
+            leaveFrom="opacity-100"
+            leaveTo="opacity-0"
           >
-            <div className="space-y-2">
-              {dampakOptions.map((val) => (
-                <RadioGroup.Option key={val} value={val}
-                  className={({ checked }) =>
-                    `p-3 border rounded-xl ${checked ? 'bg-blue-100 border-blue-500' : 'border-gray-300'}`
-                  }>
-                  {({ checked }) => (
-                    <div className="flex items-center gap-2">
-                      {checked && <CheckCircleIcon className="h-5 w-5 text-blue-600" />}
-                      <span>{val}</span>
-                    </div>
-                  )}
-                </RadioGroup.Option>
-              ))}
-            </div>
-          </RadioGroup>
-        </div>
-      )}
+            <div className="fixed inset-0 bg-black bg-opacity-25" />
+          </Transition.Child>
 
-      {showJabatan && (
-        <div className="mb-6">
-          <p className="font-semibold mb-2">Jabatan Pelaku:</p>
-          <RadioGroup
-            value={state.jabatan}
-            onChange={(val) => dispatch({ type: 'SET', field: 'jabatan', value: val })}
+          <div className="fixed inset-0 overflow-y-auto">
+            <div className="flex min-h-full items-center justify-center p-4 text-center">
+              <Transition.Child
+                as="div"
+                enter="ease-out duration-300"
+                enterFrom="opacity-0 scale-95"
+                enterTo="opacity-100 scale-100"
+                leave="ease-in duration-200"
+                leaveFrom="opacity-100 scale-100"
+                leaveTo="opacity-0 scale-95"
+              >
+                <Dialog.Panel className="w-full max-w-md transform overflow-hidden rounded-2xl bg-white p-6 text-left align-middle shadow-xl transition-all dark:bg-gray-800 dark:text-gray-100">
+                  <Dialog.Title as="h3" className="text-lg font-medium leading-6 text-gray-900 dark:text-gray-100">
+                    Informasi Kelompok
+                  </Dialog.Title>
+                  <div className="mt-2">
+                    <p className="text-sm text-gray-500 dark:text-gray-300">
+                      Pelanggaran ini termasuk ke dalam kelompok <strong>{kelompok}</strong>.
+                    </p>
+                  </div>
+
+                  <div className="mt-4">
+                    <button
+                      type="button"
+                      className="inline-flex justify-center rounded-md border border-transparent bg-blue-100 px-4 py-2 text-sm font-medium text-blue-900 hover:bg-blue-200 focus:outline-none focus-visible:ring-2 focus-visible:ring-blue-500 focus-visible:ring-offset-2"
+                      onClick={() => setIsDialogOpen(false)}
+                    >
+                      Mengerti
+                    </button>
+                  </div>
+                </Dialog.Panel>
+              </Transition.Child>
+            </div>
+          </div>
+        </Dialog>
+      </Transition>
+
+      <Card>
+        <div className="flex justify-between items-center mb-6">
+          <BackButton label="Kembali ke Step 2" />
+          <ResetButton />
+        </div>
+
+        <h2 className="text-xl font-bold mb-6 text-center">Kondisi Awal</h2>
+
+        {/* Pertanyaan Dampak */}
+        {['II', 'VI'].includes(state.kelompok) && (
+          <div className="mb-6">
+            <p className="font-semibold mb-2">Dampak pelanggaran:</p>
+            <RadioGroup value={state.dampak} onChange={handleDampakChange}>
+              <div className="space-y-2">
+                {dampakOptions.map((val) => (
+                  <RadioGroup.Option
+                    key={val}
+                    value={val}
+                    className={({ checked }) =>
+                      `p-3 border rounded-xl ${
+                        checked ? 'bg-blue-100 border-blue-500' : 'border-gray-300 dark:bg-gray-700'
+                      }`
+                    }
+                  >
+                    {({ checked }) => (
+                      <div className="flex items-center gap-2">
+                        {checked && <CheckCircleIcon className="h-5 w-5 text-blue-600" />}
+                        <span>{val}</span>
+                      </div>
+                    )}
+                  </RadioGroup.Option>
+                ))}
+              </div>
+            </RadioGroup>
+          </div>
+        )}
+
+        {/* Pertanyaan Jabatan */}
+        {state.pasalUtama === 'Pasal 4 huruf e' && (
+          <div className="mb-6">
+            <p className="font-semibold mb-2">Jabatan Pelaku:</p>
+            <RadioGroup value={state.jabatan} onChange={handleJabatanChange}>
+              <div className="space-y-2">
+                {jabatanOptions.map((val) => (
+                  <RadioGroup.Option
+                    key={val}
+                    value={val}
+                    className={({ checked }) =>
+                      `p-3 border rounded-xl ${
+                        checked ? 'bg-blue-100 border-blue-500' : 'border-gray-300 dark:bg-gray-700'
+                      }`
+                    }
+                  >
+                    {({ checked }) => (
+                      <div className="flex items-center gap-2">
+                        {checked && <CheckCircleIcon className="h-5 w-5 text-blue-600" />}
+                        <span>{val}</span>
+                      </div>
+                    )}
+                  </RadioGroup.Option>
+                ))}
+              </div>
+            </RadioGroup>
+          </div>
+        )}
+
+        {/* Pertanyaan Kerugian */}
+        {state.kelompok === 'III' && (
+          <div className="mb-6">
+            <p className="font-semibold mb-2">Apakah terdapat kerugian negara/pihak lain?</p>
+            <RadioGroup value={state.adaKerugian} onChange={handleKerugianChange}>
+              <div className="space-y-2">
+                {[{ label: 'Ya', value: true }, { label: 'Tidak', value: false }].map(({ label, value }) => (
+                  <RadioGroup.Option
+                    key={label}
+                    value={value}
+                    className={({ checked }) =>
+                      `p-3 border rounded-xl ${
+                        checked ? 'bg-blue-100 border-blue-500' : 'border-gray-300 dark:bg-gray-700'
+                      }`
+                    }
+                  >
+                    {({ checked }) => (
+                      <div className="flex items-center gap-2">
+                        {checked && <CheckCircleIcon className="h-5 w-5 text-blue-600" />}
+                        <span>{label}</span>
+                      </div>
+                    )}
+                  </RadioGroup.Option>
+                ))}
+              </div>
+            </RadioGroup>
+          </div>
+        )}
+
+        {/* Tombol Lanjut */}
+        {isComplete && (
+          <button
+            onClick={nextStep}
+            className="mt-4 w-full py-2 px-4 bg-blue-600 text-white rounded-md hover:bg-blue-700 transition"
           >
-            <div className="space-y-2">
-              {jabatanOptions.map((val) => (
-                <RadioGroup.Option key={val} value={val}
-                  className={({ checked }) =>
-                    `p-3 border rounded-xl ${checked ? 'bg-blue-100 border-blue-500' : 'border-gray-300'}`
-                  }>
-                  {({ checked }) => (
-                    <div className="flex items-center gap-2">
-                      {checked && <CheckCircleIcon className="h-5 w-5 text-blue-600" />}
-                      <span>{val}</span>
-                    </div>
-                  )}
-                </RadioGroup.Option>
-              ))}
-            </div>
-          </RadioGroup>
+            Lanjut
+          </button>
+        )}
+
+        <div className="mt-12">
+          <Stepper currentStep={3} totalSteps={7} />
         </div>
-      )}
-
-      {showKerugian && (
-        <div className="mb-6">
-          <p className="font-semibold mb-2">Apakah terdapat kerugian negara/pihak lain?</p>
-          <RadioGroup
-            value={state.adaKerugian}
-            onChange={(val) => {
-              dispatch({ type: 'SET', field: 'adaKerugian', value: val });
-
-              if (isKelompokIII) {
-                dispatch({
-                  type: 'SET',
-                  field: 'kelompok',
-                  value: val ? 'III Khusus' : 'III Umum',
-                });
-              }
-            }}
-          >
-            <div className="space-y-2">
-              {[{ label: 'Ya', value: true }, { label: 'Tidak', value: false }].map(({ label, value }) => (
-                <RadioGroup.Option key={label} value={value}
-                  className={({ checked }) =>
-                    `p-3 border rounded-xl ${checked ? 'bg-blue-100 border-blue-500' : 'border-gray-300'}`
-                  }>
-                  {({ checked }) => (
-                    <div className="flex items-center gap-2">
-                      {checked && <CheckCircleIcon className="h-5 w-5 text-blue-600" />}
-                      <span>{label}</span>
-                    </div>
-                  )}
-                </RadioGroup.Option>
-              ))}
-            </div>
-          </RadioGroup>
-        </div>
-      )}
-
-      {isComplete && (
-        <button
-          onClick={nextStep}
-          className="mt-4 px-4 py-2 bg-blue-600 text-white rounded-md"
-        >
-          Lanjut
-        </button>
-      )}
-
-      <div className="mt-12">
-        <Stepper currentStep={3} totalSteps={7} />
-        <button
-          onClick={() => navigate('/step/2')}
-          className="mt-4 text-sm text-blue-600 underline"
-        >
-          Kembali
-        </button>
-      </div>
-    </div>
+      </Card>
+    </PageWrapper>
   );
 }
