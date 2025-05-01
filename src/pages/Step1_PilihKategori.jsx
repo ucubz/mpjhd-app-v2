@@ -64,18 +64,7 @@ export default function Step1_PilihKategori() {
     </div>
   )}
 </RadioGroup.Option>
-              {({ checked }) => (
-                <div className="flex items-center gap-3">
-                  {checked && (
-                    <CheckCircleIcon className="h-5 w-5 text-blue-600" />
-                  )}
-                  <span>{item.label}</span>
-                </div>
-              )}
-            </RadioGroup.Option>
-          ))}
-        </div>
-      </RadioGroup>
+
 
       <div className="mt-12">
         <Stepper currentStep={1} totalSteps={7} />
