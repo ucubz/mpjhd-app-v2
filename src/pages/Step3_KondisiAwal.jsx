@@ -56,18 +56,11 @@ export default function Step3_KondisiAwal() {
     dispatch({ type: 'SET', field: 'adaKerugian', value: val });
 
     if (state.kelompok === 'III') {
-      // Mengatur kelompok III berdasarkan jawaban
       const newKelompok = val ? 'III Khusus' : 'III Umum';
       dispatch({ type: 'SET', field: 'kelompok', value: newKelompok });
-
-      // Menampilkan dialog untuk Kelompok III setelah data tersedia
-      setDialogMessage(
-        `Pelanggaran ini termasuk ke dalam ${val ? 'Kelompok III Khusus' : 'Kelompok III Umum'}.`
-      );
-      setIsDialogOpen(true); // Membuka dialog
     }
 
-    setIsKerugianValid(true); // Validasi selesai
+    setIsKerugianValid(true);
   };
 
   // Menampilkan dialog hanya untuk kelompok II dan VI saat page dimuat
@@ -150,7 +143,9 @@ export default function Step3_KondisiAwal() {
                     value={val}
                     className={({ checked }) =>
                       `p-3 border rounded-xl ${
-                        checked ? 'bg-blue-100 border-blue-500' : 'border-gray-300 dark:bg-gray-700'
+                        checked
+                          ? 'bg-blue-100 border-blue-500 text-black dark:text-gray-900'
+                          : 'border-gray-300 dark:bg-gray-700 dark:text-gray-300'
                       }`
                     }
                   >
@@ -179,7 +174,9 @@ export default function Step3_KondisiAwal() {
                     value={val}
                     className={({ checked }) =>
                       `p-3 border rounded-xl ${
-                        checked ? 'bg-blue-100 border-blue-500' : 'border-gray-300 dark:bg-gray-700'
+                        checked
+                          ? 'bg-blue-100 border-blue-500 text-black dark:text-gray-900'
+                          : 'border-gray-300 dark:bg-gray-700 dark:text-gray-300'
                       }`
                     }
                   >
@@ -208,7 +205,9 @@ export default function Step3_KondisiAwal() {
                     value={value}
                     className={({ checked }) =>
                       `p-3 border rounded-xl ${
-                        checked ? 'bg-blue-100 border-blue-500' : 'border-gray-300 dark:bg-gray-700'
+                        checked
+                          ? 'bg-blue-100 border-blue-500 text-black dark:text-gray-900'
+                          : 'border-gray-300 dark:bg-gray-700 dark:text-gray-300'
                       }`
                     }
                   >
