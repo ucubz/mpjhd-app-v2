@@ -14,7 +14,9 @@ export default function Step3_KondisiAwal() {
   const { state, dispatch } = useMPJHD();
   const navigate = useNavigate();
 
-  const [isDialogOpen, setIsDialogOpen] = useState(true); // State untuk mengontrol dialog
+  const [isDialogOpen, setIsDialogOpen] = useState(false); // State untuk kontrol dialog
+  const [dialogMessage, setDialogMessage] = useState(''); // Pesan dialog
+
   const kelompok = state.kelompok || 'Tidak Diketahui'; // Kelompok hasil dari Step 1 & 2
 
   // State untuk validasi pertanyaan yang harus dijawab
@@ -52,18 +54,33 @@ export default function Step3_KondisiAwal() {
 
   const handleKerugianChange = (val) => {
     dispatch({ type: 'SET', field: 'adaKerugian', value: val });
+
     if (state.kelompok === 'III') {
-      dispatch({
-        type: 'SET',
-        field: 'kelompok',
-        value: val ? 'III Khusus' : 'III Umum',
-      });
+      // Mengatur kelompok III berdasarkan jawaban
+      const newKelompok = val ? 'III Khusus' : 'III Umum';
+      dispatch({ type: 'SET', field: 'kelompok', value: newKelompok });
+
+      // Menampilkan dialog untuk Kelompok III setelah data tersedia
+      setDialogMessage(
+        `Pelanggaran ini termasuk ke dalam ${val ? 'Kelompok III Khusus' : 'Kelompok III Umum'}.`
+      );
+      setIsDialogOpen(true); // Membuka dialog
     }
-    setIsKerugianValid(true);
+
+    setIsKerugianValid(true); // Validasi selesai
   };
+
+  // Menampilkan dialog hanya untuk kelompok II dan VI saat page dimuat
+  useEffect(() => {
+    if (['II', 'VI'].includes(state.kelompok)) {
+      setDialogMessage(`Pelanggaran ini termasuk ke dalam Kelompok ${kelompok}.`);
+      setIsDialogOpen(true);
+    }
+  }, [state.kelompok]);
 
   return (
     <PageWrapper>
+      {/* Dialog Informasi Kelompok */}
       <Transition appear show={isDialogOpen} as="div">
         <Dialog as="div" className="relative z-10" onClose={() => setIsDialogOpen(false)}>
           <Transition.Child
@@ -94,9 +111,7 @@ export default function Step3_KondisiAwal() {
                     Informasi Kelompok
                   </Dialog.Title>
                   <div className="mt-2">
-                    <p className="text-sm text-gray-500 dark:text-gray-300">
-                      Pelanggaran ini termasuk ke dalam kelompok <strong>{kelompok}</strong>.
-                    </p>
+                    <p className="text-sm text-gray-500 dark:text-gray-300">{dialogMessage}</p>
                   </div>
 
                   <div className="mt-4">
