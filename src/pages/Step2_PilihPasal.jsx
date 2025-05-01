@@ -80,34 +80,34 @@ export default function Step2_PilihPasal() {
       <h2 className="text-xl font-bold mb-6">Pilih Pasal yang Dilanggar</h2>
 
       <RadioGroup onChange={handleSelect}>
-        <div className="space-y-3">
-          {pasalList.map((item) => (
-            <RadioGroup.Option
-              key={item.kode}
-              value={item.kode}
-              className={({ checked }) =>
-                `p-4 rounded-xl border cursor-pointer transition-all ${
-                  checked
-                    ? 'bg-blue-50 border-blue-500'
-                    : 'bg-white border-gray-300 dark:bg-gray-800'
-                }`
-              }
-            >
-              {({ checked }) => (
-                <div className="flex items-start gap-3">
-                  {checked && (
-                    <CheckCircleIcon className="h-5 w-5 text-blue-600 mt-1" />
-                  )}
-                  <div>
-                    <p className="font-semibold">{item.kode}</p>
-                    <p className="text-sm text-gray-600">{item.deskripsi}</p>
-                  </div>
-                </div>
-              )}
-            </RadioGroup.Option>
-          ))}
-        </div>
-      </RadioGroup>
+  <div className="space-y-3">
+    {pasalList.map((item) => (
+      <RadioGroup.Option
+        key={item.kode}
+        value={item.kode}
+        className={({ checked }) =>
+          `p-4 rounded-xl border cursor-pointer transition-all ${
+            checked
+              ? 'bg-blue-50 border-blue-500 text-blue-600'
+              : 'bg-white border-gray-300 text-gray-900 dark:bg-gray-800 dark:text-gray-100'
+          }`
+        }
+      >
+        {({ checked }) => (
+          <div className="flex items-start gap-3">
+            {checked && (
+              <CheckCircleIcon className="h-5 w-5 text-blue-600 mt-1" />
+            )}
+            <div>
+              <p className="font-semibold">{item.kode}</p>
+              <p className="text-sm">{item.deskripsi}</p>
+            </div>
+          </div>
+        )}
+      </RadioGroup.Option>
+    ))}
+  </div>
+</RadioGroup>
 
       <div className="mt-12">
         <Stepper currentStep={2} totalSteps={7} />
