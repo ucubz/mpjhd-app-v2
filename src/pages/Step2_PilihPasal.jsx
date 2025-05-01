@@ -2,13 +2,30 @@
 import { RadioGroup } from '@headlessui/react';
 import { CheckCircleIcon } from '@heroicons/react/24/solid';
 import { useNavigate } from 'react-router-dom';
-import { useMPJHD } from '../context/MPJHDContext';
+import { useMPJHD, useResetMPJHD } from '../context/MPJHDContext'; // <-- tambahkan useResetMPJHD
 import PageWrapper from '../components/PageWrapper';
 import Card from '../components/Card';
 import Stepper from '../components/Stepper';
 import BackButton from '../components/BackButton';
 import ResetButton from '../components/ResetButton';
 import { tentukanKelompok } from '../utils_v2/tentukanKelompok';
+
+// --- Custom hook untuk cek state step sebelumnya ---
+import { useEffect } from 'react';
+function useRequireStep(requiredFields = [], redirectTo = '/step/1') {
+  const { state } = useMPJHD();
+  const resetMPJHD = useResetMPJHD();
+  const navigate = useNavigate();
+
+  useEffect(() => {
+    const missing = requiredFields.some(field => !state[field]);
+    if (missing) {
+      resetMPJHD();
+      navigate(redirectTo, { replace: true });
+    }
+  }, [state, requiredFields, navigate, redirectTo, resetMPJHD]);
+}
+// --- End custom hook ---
 
 const daftarPasal = {
   pasal3: [
@@ -40,10 +57,7 @@ const daftarPasal = {
     { kode: 'Pasal 5 huruf g', deskripsi: 'Melakukan pungutan liar' },
     { kode: 'Pasal 5 huruf h', deskripsi: 'Kegiatan yang merugikan negara' },
     { kode: 'Pasal 5 huruf i', deskripsi: 'Tindak sewenang-wenang pada bawahan' },
-    { kode: 'Pasal 5 huruf j', deskripsi: 'Menghalangi tugas kedinasan' },
-    { kode: 'Pasal 5 huruf k', deskripsi: 'Menerima hadiah yang berhubungan dengan jabatan' },
-    { kode: 'Pasal 5 huruf l', deskripsi: 'Meminta sesuatu yang berhubungan dengan jabatan' },
-    { kode: 'Pasal 5 huruf m', deskripsi: 'Tindakan merugikan pihak dilayani' },
+    { kode: 'Pasal Tindakan merugikan pihak dilayani' },
     { kode: 'Pasal 5 huruf n angka 1', deskripsi: 'Memberikan dukungan kepada calon presiden/wakil presiden' },
     { kode: 'Pasal 5 huruf n angka 2', deskripsi: 'Mengikuti kampanye' },
     { kode: 'Pasal 5 huruf n angka 3', deskripsi: 'Peserta kampanye dengan atribut partai/PNS' },
@@ -55,6 +69,10 @@ const daftarPasal = {
 };
 
 export default function Step2_PilihPasal() {
+  // --- Tambahkan ini di awal komponen: cek jenisPilihanUtama wajib ada ---
+  useRequireStep(['jenisPilihanUtama'], '/step/1');
+  // ------------------------------------------------------
+
   const { state, dispatch } = useMPJHD();
   const navigate = useNavigate();
 
