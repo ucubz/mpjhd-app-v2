@@ -1,6 +1,5 @@
 import { useEffect, useState } from 'react';
-import { Dialog, Transition } from '@headlessui/react';
-import { RadioGroup } from '@headlessui/react';
+import { Dialog, Transition, RadioGroup } from '@headlessui/react';
 import { CheckCircleIcon } from '@heroicons/react/24/solid';
 import { useNavigate } from 'react-router-dom';
 import { useMPJHD } from '../context/MPJHDContext';
@@ -10,8 +9,6 @@ import Stepper from '../components/Stepper';
 import BackButton from '../components/BackButton';
 import ResetButton from '../components/ResetButton';
 
-// ... import tetap seperti sebelumnya ...
-
 export default function Step3_KondisiAwal() {
   const { state, dispatch } = useMPJHD();
   const navigate = useNavigate();
@@ -20,6 +17,9 @@ export default function Step3_KondisiAwal() {
   const [dialogMessage, setDialogMessage] = useState('');
 
   const kelompok = state.kelompok || 'Tidak Diketahui';
+  const isKelompokIII = ['III', 'III Umum', 'III Khusus'].includes(kelompok);
+  const isKelompokV = kelompok === 'V';
+  const isKelompokVI = kelompok === 'VI';
 
   const dampakOptions = ['Unit Kerja', 'Instansi', 'Negara'];
   const reputasiOptions = ['Tidak Berdampak', 'Unit Kerja', 'Instansi/Tersangka'];
@@ -33,18 +33,16 @@ export default function Step3_KondisiAwal() {
   const handleOptionChange = (val, field) => {
     dispatch({ type: 'SET', field, value: val });
 
-    // Untuk Kelompok VI → set nilai pokok langsung dari reputasi
+    if (kelompok === 'III' && field === 'adaKerugian') {
+      const newKelompok = val ? 'III Khusus' : 'III Umum';
+      dispatch({ type: 'SET', field: 'kelompok', value: newKelompok });
+    }
+
     if (kelompok === 'VI' && field === 'reputasi') {
       let nilai = 0;
       if (val === 'Unit Kerja') nilai = 15;
       if (val === 'Instansi/Tersangka') nilai = 30;
       dispatch({ type: 'SET_FAKTOR_UTAMA', field: 'nilai', value: nilai });
-    }
-
-    // Untuk Kelompok III → update kelompok berdasarkan adaKerugian
-    if (kelompok === 'III' && field === 'adaKerugian') {
-      const newKelompok = val ? 'III Khusus' : 'III Umum';
-      dispatch({ type: 'SET', field: 'kelompok', value: newKelompok });
     }
   };
 
@@ -69,7 +67,6 @@ export default function Step3_KondisiAwal() {
 
   return (
     <PageWrapper>
-      {/* Dialog */}
       <Transition appear show={isDialogOpen} as="div">
         <Dialog as="div" className="relative z-10" onClose={() => setIsDialogOpen(false)}>
           <Transition.Child
@@ -94,7 +91,7 @@ export default function Step3_KondisiAwal() {
                 leaveFrom="opacity-100 scale-100"
                 leaveTo="opacity-0 scale-95"
               >
-                <Dialog.Panel className="w-full max-w-md transform overflow-hidden rounded-2xl bg-white p-6 shadow-xl transition-all dark:bg-gray-800 dark:text-gray-100">
+                <Dialog.Panel className="w-full max-w-md transform overflow-hidden rounded-2xl bg-white p-6 text-left align-middle shadow-xl transition-all dark:bg-gray-800 dark:text-gray-100">
                   <Dialog.Title className="text-lg font-medium">Informasi Kelompok</Dialog.Title>
                   <div className="mt-2 text-sm">{dialogMessage}</div>
                   <div className="mt-4 text-right">
@@ -112,7 +109,6 @@ export default function Step3_KondisiAwal() {
         </Dialog>
       </Transition>
 
-      {/* Konten */}
       <Card>
         <div className="flex justify-between items-center mb-6">
           <BackButton label="Kembali ke Step 2" />
@@ -121,43 +117,40 @@ export default function Step3_KondisiAwal() {
 
         <h2 className="text-xl font-bold mb-6 text-center">Kondisi Awal</h2>
 
-        {/* Kelompok II – dampak */}
+        {/* Kelompok II */}
         {kelompok === 'II' && (
-  <>
-    <p className="font-semibold mb-2">Dampak pelanggaran:</p>
-    <RadioGroup value={state.dampak} onChange={(val) => handleOptionChange(val, 'dampak')}>
-      <div className="space-y-2">
-        {dampakOptions.map((val) => (
-          <RadioGroup.Option key={val} value={val} className={({ checked }) =>
-            `p-3 border rounded-xl ${checked ? 'bg-blue-100 border-blue-500' : 'border-gray-300'}`
-          }>
-            {({ checked }) => (
-              <div className="flex items-center gap-2">
-                {checked && <CheckCircleIcon className="h-5 w-5 text-blue-600" />}
-                <span>{val}</span>
+          <>
+            <p className="font-semibold mb-2">Dampak pelanggaran:</p>
+            <RadioGroup value={state.dampak} onChange={(val) => handleOptionChange(val, 'dampak')}>
+              <div className="space-y-2">
+                {dampakOptions.map((val) => (
+                  <RadioGroup.Option key={val} value={val} className={({ checked }) =>
+                    `p-3 border rounded-xl ${checked ? 'bg-blue-100 border-blue-500' : 'border-gray-300'}`
+                  }>
+                    {({ checked }) => (
+                      <div className="flex items-center gap-2">
+                        {checked && <CheckCircleIcon className="h-5 w-5 text-blue-600" />}
+                        <span>{val}</span>
+                      </div>
+                    )}
+                  </RadioGroup.Option>
+                ))}
               </div>
-            )}
-          </RadioGroup.Option>
-        ))}
-      </div>
-    </RadioGroup>
+            </RadioGroup>
+            <button
+              onClick={handleNextStep}
+              disabled={!state.dampak}
+              className={`mt-4 w-full py-2 px-4 rounded-md ${
+                state.dampak ? 'bg-blue-600 text-white hover:bg-blue-700' : 'bg-gray-300 text-gray-600 cursor-not-allowed'
+              }`}
+            >
+              Lanjut
+            </button>
+          </>
+        )}
 
-    <button
-      onClick={handleNextStep}
-      disabled={!state.dampak}
-      className={`mt-4 w-full py-2 px-4 rounded-md ${
-        state.dampak
-          ? 'bg-blue-600 text-white hover:bg-blue-700'
-          : 'bg-gray-300 text-gray-600 cursor-not-allowed'
-      }`}
-    >
-      Lanjut
-    </button>
-  </>
-)}
-
-        {/* Kelompok III – kerugian */}
-        {kelompok === 'III' && (
+        {/* Kelompok III */}
+        {isKelompokIII && (
           <>
             <p className="font-semibold mb-2">Apakah terdapat kerugian negara/pihak lain?</p>
             <RadioGroup value={state.adaKerugian} onChange={(val) => handleOptionChange(val, 'adaKerugian')}>
@@ -176,16 +169,20 @@ export default function Step3_KondisiAwal() {
                 ))}
               </div>
             </RadioGroup>
-            {state.adaKerugian !== null && (
-              <button onClick={handleNextStep} className="mt-4 w-full bg-blue-600 text-white py-2 rounded-md">
-                Lanjut
-              </button>
-            )}
+            <button
+              onClick={handleNextStep}
+              disabled={state.adaKerugian === null}
+              className={`mt-4 w-full py-2 px-4 rounded-md ${
+                state.adaKerugian !== null ? 'bg-blue-600 text-white hover:bg-blue-700' : 'bg-gray-300 text-gray-600 cursor-not-allowed'
+              }`}
+            >
+              Lanjut
+            </button>
           </>
         )}
 
-        {/* Kelompok V – jabatan */}
-        {kelompok === 'V' && (
+        {/* Kelompok V */}
+        {isKelompokV && (
           <>
             <p className="font-semibold mb-2">Jabatan Pelaku:</p>
             <RadioGroup value={state.jabatan} onChange={(val) => handleOptionChange(val, 'jabatan')}>
@@ -204,16 +201,20 @@ export default function Step3_KondisiAwal() {
                 ))}
               </div>
             </RadioGroup>
-            {state.jabatan && (
-              <button onClick={handleNextStep} className="mt-4 w-full bg-blue-600 text-white py-2 rounded-md">
-                Lanjut
-              </button>
-            )}
+            <button
+              onClick={handleNextStep}
+              disabled={!state.jabatan}
+              className={`mt-4 w-full py-2 px-4 rounded-md ${
+                state.jabatan ? 'bg-blue-600 text-white hover:bg-blue-700' : 'bg-gray-300 text-gray-600 cursor-not-allowed'
+              }`}
+            >
+              Lanjut
+            </button>
           </>
         )}
 
-        {/* Kelompok VI – reputasi */}
-        {kelompok === 'VI' && (
+        {/* Kelompok VI */}
+        {isKelompokVI && (
           <>
             <p className="font-semibold mb-2">Dampak terhadap reputasi atau pelaksanaan tugas:</p>
             <RadioGroup value={state.reputasi} onChange={(val) => handleOptionChange(val, 'reputasi')}>
@@ -232,11 +233,15 @@ export default function Step3_KondisiAwal() {
                 ))}
               </div>
             </RadioGroup>
-            {state.reputasi && (
-              <button onClick={handleNextStep} className="mt-4 w-full bg-blue-600 text-white py-2 rounded-md">
-                Lanjut
-              </button>
-            )}
+            <button
+              onClick={handleNextStep}
+              disabled={!state.reputasi}
+              className={`mt-4 w-full py-2 px-4 rounded-md ${
+                state.reputasi ? 'bg-blue-600 text-white hover:bg-blue-700' : 'bg-gray-300 text-gray-600 cursor-not-allowed'
+              }`}
+            >
+              Lanjut
+            </button>
           </>
         )}
 
