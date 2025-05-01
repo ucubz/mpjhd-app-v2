@@ -43,10 +43,8 @@ export default function Step3_KondisiAwal() {
   };
 
   useEffect(() => {
-    // Debug kelompok untuk memastikan nilai yang diterima benar
     console.log('Kelompok saat ini:', kelompok);
 
-    // Navigasi langsung sesuai dengan kelompok tertentu
     if (state.pasalUtama === 'Pasal 4 huruf f') {
       navigate('/step/6'); // Langsung ke Step6 untuk pasal 4 huruf f
       return;
@@ -127,6 +125,45 @@ export default function Step3_KondisiAwal() {
         <h2 className="text-xl font-bold mb-6 text-center">Kondisi Awal</h2>
 
         {/* Pertanyaan berdasarkan kelompok */}
+        {kelompok === 'II' && (
+          <div className="mb-6">
+            <p className="font-semibold mb-2">Dampak pelanggaran:</p>
+            <RadioGroup value={state.dampak} onChange={(val) => handleOptionChange(val, 'dampak')}>
+              <div className="space-y-2">
+                {['Unit Kerja', 'Instansi', 'Negara'].map((val) => (
+                  <RadioGroup.Option
+                    key={val}
+                    value={val}
+                    className={({ checked }) =>
+                      `p-3 border rounded-xl ${
+                        checked ? 'bg-blue-100 border-blue-500 text-black' : 'border-gray-300'
+                      }`
+                    }
+                  >
+                    {({ checked }) => (
+                      <div className="flex items-center gap-2">
+                        {checked && <CheckCircleIcon className="h-5 w-5 text-blue-600" />}
+                        <span>{val}</span>
+                      </div>
+                    )}
+                  </RadioGroup.Option>
+                ))}
+              </div>
+            </RadioGroup>
+            <button
+              onClick={handleNextStep}
+              disabled={!isOptionSelected}
+              className={`mt-4 w-full py-2 px-4 rounded-md ${
+                isOptionSelected
+                  ? 'bg-blue-600 text-white hover:bg-blue-700'
+                  : 'bg-gray-300 text-gray-600 cursor-not-allowed'
+              }`}
+            >
+              Lanjut
+            </button>
+          </div>
+        )}
+
         {kelompok === 'III' && (
           <div className="mb-6">
             <p className="font-semibold mb-2">Apakah terdapat kerugian negara/pihak lain?</p>
