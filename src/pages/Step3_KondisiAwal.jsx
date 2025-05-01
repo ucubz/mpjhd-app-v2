@@ -2,14 +2,33 @@ import { useEffect, useState } from 'react';
 import { Dialog, Transition, RadioGroup } from '@headlessui/react';
 import { CheckCircleIcon } from '@heroicons/react/24/solid';
 import { useNavigate } from 'react-router-dom';
-import { useMPJHD } from '../context/MPJHDContext';
+import { useMPJHD, useResetMPJHD } from '../context/MPJHDContext';
 import PageWrapper from '../components/PageWrapper';
 import Card from '../components/Card';
 import Stepper from '../components/Stepper';
 import BackButton from '../components/BackButton';
 import ResetButton from '../components/ResetButton';
 
+// --- CUSTOM HOOK: cek state step sebelumnya ---
+function useRequireStep(requiredFields = [], redirectTo = '/step/1') {
+  const { state } = useMPJHD();
+  const resetMPJHD = useResetMPJHD();
+  const navigate = useNavigate();
+
+  useEffect(() => {
+    const missing = requiredFields.some(field => !state[field]);
+    if (missing) {
+      resetMPJHD();
+      navigate(redirectTo, { replace: true });
+    }
+  }, [state, requiredFields, navigate, redirectTo, resetMPJHD]);
+}
+// --- END CUSTOM HOOK ---
+
 export default function Step3_KondisiAwal() {
+  // Cek: harus sudah pilih pasalUtama & kelompok
+  useRequireStep(['pasalUtama', 'kelompok'], '/step/1');
+
   const { state, dispatch } = useMPJHD();
   const navigate = useNavigate();
 
@@ -47,12 +66,12 @@ export default function Step3_KondisiAwal() {
   };
 
   const handleNextStep = () => {
-  if (kelompok === 'VI') {
-    navigate('/step/5');
-  } else {
-    navigate('/step/4');
-  }
-};
+    if (kelompok === 'VI') {
+      navigate('/step/5');
+    } else {
+      navigate('/step/4');
+    }
+  };
 
   useEffect(() => {
     if (state.pasalUtama === 'Pasal 4 huruf f' || kelompok === 'I') {
