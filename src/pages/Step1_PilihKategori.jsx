@@ -19,16 +19,17 @@ export default function Step1_PilihKategori() {
   const navigate = useNavigate();
   const { dispatch } = useMPJHD();
 
-  const handleSelect = (val) => {
-    dispatch({ type: 'SET', field: 'jenisPilihanUtama', value: val });
-    if (val === 'izin') {
-      dispatch({ type: 'SET', field: 'kelompok', value: 'VI' });
-      dispatch({ type: 'SET', field: 'pasalUtama', value: 'terkait Perkawinan/Perceraian ' });
-				setTimeout(() => {
-					navigate('/step/3');
-				}, 0);
-			} else {
-			}
+ const handleSelect = (val) => {
+  dispatch({ type: 'SET', field: 'jenisPilihanUtama', value: val });
+  if (val === 'izin') {
+    dispatch({ type: 'SET', field: 'kelompok', value: 'VI' });
+    dispatch({ type: 'SET', field: 'pasalUtama', value: 'terkait Perkawinan/Perceraian' });
+    setTimeout(() => {
+      navigate('/step/3');
+    }, 0);
+  } else {
+    navigate('/step/2');
+  }
 };
 
   return (
