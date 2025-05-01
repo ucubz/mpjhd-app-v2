@@ -1,11 +1,14 @@
 // Step 2 - Pilih pasal
-import { useNavigate } from 'react-router-dom';
 import { RadioGroup } from '@headlessui/react';
 import { CheckCircleIcon } from '@heroicons/react/24/solid';
+import { useNavigate } from 'react-router-dom';
 import { useMPJHD } from '../context/MPJHDContext';
+import PageWrapper from '../components/PageWrapper';
+import Card from '../components/Card';
 import Stepper from '../components/Stepper';
-import { tentukanKelompok } from '../utils_v2/tentukanKelompok';
 import BackButton from '../components/BackButton';
+import ResetButton from '../components/ResetButton';
+import { tentukanKelompok } from '../utils_v2/tentukanKelompok';
 
 const daftarPasal = {
   pasal3: [
@@ -65,56 +68,48 @@ export default function Step2_PilihPasal() {
   const pasalList = daftarPasal[state.jenisPilihanUtama] || [];
 
   return (
-    <div className="max-w-xl mx-auto py-10 px-4">
-      <button
-        onClick={() => {
-          if (confirm('Yakin ingin mereset dan kembali ke awal?')) {
-            dispatch({ type: 'RESET' });
-            navigate('/step/1');
-          }
-        }}
-        className="text-red-600 font-semibold mb-4"
-      >
-        Reset
-      </button>
+    <PageWrapper>
+      <Card>
+        <div className="flex justify-between items-center mb-6">
+          <BackButton label="Kembali ke Step 1" />
+          <ResetButton />
+        </div>
 
-      <h2 className="text-xl font-bold mb-6">Pilih Pasal yang Dilanggar</h2>
-
-      <RadioGroup onChange={handleSelect}>
-  <div className="space-y-3">
-    {pasalList.map((item) => (
-      <RadioGroup.Option
-        key={item.kode}
-        value={item.kode}
-        className={({ checked }) =>
-          `p-4 rounded-xl border cursor-pointer transition-all ${
-            checked
-              ? 'bg-blue-50 border-blue-500 text-blue-600'
-              : 'bg-white border-gray-300 text-gray-900 dark:bg-gray-800 dark:text-gray-100'
-          }`
-        }
-      >
-        {({ checked }) => (
-          <div className="flex items-start gap-3">
-            {checked && (
-              <CheckCircleIcon className="h-5 w-5 text-blue-600 mt-1" />
-            )}
-            <div>
-              <p className="font-semibold">{item.kode}</p>
-              <p className="text-sm">{item.deskripsi}</p>
-            </div>
+        <h2 className="text-xl font-bold mb-6 text-center">Pilih Pasal yang Dilanggar</h2>
+        <RadioGroup onChange={handleSelect}>
+          <div className="space-y-3">
+            {pasalList.map((item) => (
+              <RadioGroup.Option
+                key={item.kode}
+                value={item.kode}
+                className={({ checked }) =>
+                  `p-4 rounded-xl border cursor-pointer transition-all ${
+                    checked
+                      ? 'bg-blue-50 border-blue-500 text-blue-600'
+                      : 'bg-white border-gray-300 text-gray-900 dark:bg-gray-800 dark:text-gray-100'
+                  }`
+                }
+              >
+                {({ checked }) => (
+                  <div className="flex items-start gap-3">
+                    {checked && (
+                      <CheckCircleIcon className="h-5 w-5 text-blue-600 mt-1" />
+                    )}
+                    <div>
+                      <p className="font-semibold">{item.kode}</p>
+                      <p className="text-sm">{item.deskripsi}</p>
+                    </div>
+                  </div>
+                )}
+              </RadioGroup.Option>
+            ))}
           </div>
-        )}
-      </RadioGroup.Option>
-    ))}
-  </div>
-</RadioGroup>
+        </RadioGroup>
 
-      <div className="mt-12">
-  <Stepper currentStep={2} totalSteps={7} />
-  <BackButton label="Kembali ke Step 1" className="mt-4" />
-</div>
-         
-    </div>
+        <div className="mt-12">
+          <Stepper currentStep={2} totalSteps={7} />
+        </div>
+      </Card>
+    </PageWrapper>
   );
 }
