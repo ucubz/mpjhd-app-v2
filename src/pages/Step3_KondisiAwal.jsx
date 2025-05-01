@@ -16,88 +16,54 @@ export default function Step3_KondisiAwal() {
 
   const [isDialogOpen, setIsDialogOpen] = useState(false); // State untuk kontrol dialog
   const [dialogMessage, setDialogMessage] = useState(''); // Pesan dialog
+  const [isOptionSelected, setIsOptionSelected] = useState(false);
 
-  // Pastikan kelompok memiliki nilai fallback jika kosong
   const kelompok = state.kelompok || 'Tidak Diketahui';
 
-  // State untuk validasi pertanyaan yang harus dijawab
-  const [isDampakValid, setIsDampakValid] = useState(!['II', 'VI'].includes(kelompok));
-  const [isJabatanValid, setIsJabatanValid] = useState(state.pasalUtama !== 'Pasal 4 huruf e');
-  const [isKerugianValid, setIsKerugianValid] = useState(kelompok !== 'III');
-  const [kerugianSelected, setKerugianSelected] = useState(state.adaKerugian || null); // Untuk menyimpan pilihan
-
-  // Opsi untuk RadioGroup
   const dampakOptions = kelompok === 'II'
     ? ['Unit Kerja', 'Instansi', 'Negara']
     : ['Tidak Berdampak', 'Unit Kerja', 'Instansi/Tersangka'];
 
-  // Validasi apakah user bisa melanjutkan ke langkah berikutnya
-  const isComplete = isDampakValid && isJabatanValid && isKerugianValid;
+  const reputasiOptions = ['Tidak Berdampak', 'Unit Kerja', 'Instansi/Tersangka']; // Untuk kelompok VI
+  const jabatanOptions = [
+    'Pejabat Administrator',
+    'Pejabat Fungsional',
+    'Pejabat Pimpinan Tinggi',
+    'Pejabat lainnya',
+  ];
 
-  // Navigasi ke langkah berikutnya
-  const nextStep = () => navigate('/step/4');
-
-  const skipToStep6 = () => navigate('/step/6');
-
-  // Logika untuk memperbarui validasi
-  const handleDampakChange = (val) => {
-    dispatch({ type: 'SET', field: 'dampak', value: val });
-    setIsDampakValid(true);
+  const handleOptionChange = (val, field) => {
+    dispatch({ type: 'SET', field, value: val });
+    setIsOptionSelected(true);
   };
 
-  const handleJabatanChange = (val) => {
-    dispatch({ type: 'SET', field: 'jabatan', value: val });
-    setIsJabatanValid(true);
-  };
-
-  const handleKerugianChange = (val) => {
-    setKerugianSelected(val); // Simpan pilihan sementara
-    setIsKerugianValid(true); // Validasi selesai
-  };
-
-  const handleKerugianSubmit = () => {
-    dispatch({ type: 'SET', field: 'adaKerugian', value: kerugianSelected });
-
+  const handleNextStep = () => {
     if (kelompok === 'III') {
-      const newKelompok = kerugianSelected ? 'III Khusus' : 'III Umum';
+      const newKelompok = state.adaKerugian ? 'III Khusus' : 'III Umum';
       dispatch({ type: 'SET', field: 'kelompok', value: newKelompok });
     }
-
-    nextStep(); // Navigasi ke langkah berikutnya
+    navigate('/step/4');
   };
 
-  // Navigasi dan logika awal berdasarkan kelompok
   useEffect(() => {
-    console.log('Kelompok saat ini:', kelompok); // Debugging nilai kelompok
-
-    // Navigasikan langsung sesuai kelompok
-    switch (kelompok) {
-      case 'I':
-        skipToStep6();
-        break;
-      case 'IV':
-        nextStep();
-        break;
-      case 'II':
-      case 'III':
-      case 'V':
-      case 'VI':
-        // Tetap di Step3 untuk kelompok yang membutuhkan pertanyaan
-        break;
-      default:
-        console.warn('Kelompok tidak dikenal:', kelompok); // Debugging
-    }
-
-    // Tampilkan dialog untuk kelompok tertentu
-    if (['II', 'VI'].includes(kelompok)) {
+    if (['II', 'VI', 'V'].includes(kelompok)) {
       setDialogMessage(`Pelanggaran ini termasuk ke dalam Kelompok ${kelompok}.`);
       setIsDialogOpen(true);
     }
   }, [kelompok]);
 
+  if (kelompok === 'I') {
+    navigate('/step/6');
+    return null;
+  }
+
+  if (kelompok === 'IV') {
+    navigate('/step/4');
+    return null;
+  }
+
   return (
     <PageWrapper>
-      {/* Dialog Informasi Kelompok */}
       <Transition appear show={isDialogOpen} as="div">
         <Dialog as="div" className="relative z-10" onClose={() => setIsDialogOpen(false)}>
           <Transition.Child
@@ -130,7 +96,6 @@ export default function Step3_KondisiAwal() {
                   <div className="mt-2">
                     <p className="text-sm text-gray-500 dark:text-gray-300">{dialogMessage}</p>
                   </div>
-
                   <div className="mt-4">
                     <button
                       type="button"
@@ -155,11 +120,10 @@ export default function Step3_KondisiAwal() {
 
         <h2 className="text-xl font-bold mb-6 text-center">Kondisi Awal</h2>
 
-        {/* Pertanyaan Dampak untuk Kelompok II dan VI */}
-        {['II', 'VI'].includes(kelompok) && (
+        {kelompok === 'II' && (
           <div className="mb-6">
             <p className="font-semibold mb-2">Dampak pelanggaran:</p>
-            <RadioGroup value={state.dampak} onChange={handleDampakChange}>
+            <RadioGroup value={state.dampak} onChange={(val) => handleOptionChange(val, 'dampak')}>
               <div className="space-y-2">
                 {dampakOptions.map((val) => (
                   <RadioGroup.Option
@@ -167,9 +131,7 @@ export default function Step3_KondisiAwal() {
                     value={val}
                     className={({ checked }) =>
                       `p-3 border rounded-xl ${
-                        checked
-                          ? 'bg-blue-100 border-blue-500 text-black dark:text-gray-900'
-                          : 'border-gray-300 dark:bg-gray-700 dark:text-gray-300'
+                        checked ? 'bg-blue-100 border-blue-500 text-black' : 'border-gray-300'
                       }`
                     }
                   >
@@ -186,54 +148,18 @@ export default function Step3_KondisiAwal() {
           </div>
         )}
 
-        {/* Pertanyaan Jabatan untuk Kelompok V */}
-        {kelompok === 'V' && (
-          <div className="mb-6">
-            <p className="font-semibold mb-2">Jabatan Pelaku:</p>
-            <RadioGroup value={state.jabatan} onChange={handleJabatanChange}>
-              <div className="space-y-2">
-                {['Pejabat Administrator', 'Pejabat Fungsional', 'Pejabat Pimpinan Tinggi', 'Pejabat lainnya'].map(
-                  (val) => (
-                    <RadioGroup.Option
-                      key={val}
-                      value={val}
-                      className={({ checked }) =>
-                        `p-3 border rounded-xl ${
-                          checked
-                            ? 'bg-blue-100 border-blue-500 text-black dark:text-gray-900'
-                            : 'border-gray-300 dark:bg-gray-700 dark:text-gray-300'
-                        }`
-                      }
-                    >
-                      {({ checked }) => (
-                        <div className="flex items-center gap-2">
-                          {checked && <CheckCircleIcon className="h-5 w-5 text-blue-600" />}
-                          <span>{val}</span>
-                        </div>
-                      )}
-                    </RadioGroup.Option>
-                  )
-                )}
-              </div>
-            </RadioGroup>
-          </div>
-        )}
-
-        {/* Pertanyaan Kerugian untuk Kelompok III */}
         {kelompok === 'III' && (
           <div className="mb-6">
             <p className="font-semibold mb-2">Apakah terdapat kerugian negara/pihak lain?</p>
-            <RadioGroup value={kerugianSelected} onChange={handleKerugianChange}>
+            <RadioGroup value={state.adaKerugian} onChange={(val) => handleOptionChange(val, 'adaKerugian')}>
               <div className="space-y-2">
-                {[{ label: 'Ya', value: true }, { label: 'Tidak', value: false }].map(({ label, value }) => (
+                {['Ya', 'Tidak'].map((label, idx) => (
                   <RadioGroup.Option
                     key={label}
-                    value={value}
+                    value={idx === 0}
                     className={({ checked }) =>
                       `p-3 border rounded-xl ${
-                        checked
-                          ? 'bg-blue-100 border-blue-500 text-black dark:text-gray-900'
-                          : 'border-gray-300 dark:bg-gray-700 dark:text-gray-300'
+                        checked ? 'bg-blue-100 border-blue-500 text-black' : 'border-gray-300'
                       }`
                     }
                   >
@@ -247,16 +173,76 @@ export default function Step3_KondisiAwal() {
                 ))}
               </div>
             </RadioGroup>
-            {kerugianSelected !== null && (
-              <button
-                onClick={handleKerugianSubmit}
-                className="mt-4 w-full py-2 px-4 bg-blue-600 text-white rounded-md hover:bg-blue-700 transition"
-              >
-                Lanjut
-              </button>
-            )}
           </div>
         )}
+
+        {kelompok === 'V' && (
+          <div className="mb-6">
+            <p className="font-semibold mb-2">Jabatan Pelaku:</p>
+            <RadioGroup value={state.jabatan} onChange={(val) => handleOptionChange(val, 'jabatan')}>
+              <div className="space-y-2">
+                {jabatanOptions.map((val) => (
+                  <RadioGroup.Option
+                    key={val}
+                    value={val}
+                    className={({ checked }) =>
+                      `p-3 border rounded-xl ${
+                        checked ? 'bg-blue-100 border-blue-500 text-black' : 'border-gray-300'
+                      }`
+                    }
+                  >
+                    {({ checked }) => (
+                      <div className="flex items-center gap-2">
+                        {checked && <CheckCircleIcon className="h-5 w-5 text-blue-600" />}
+                        <span>{val}</span>
+                      </div>
+                    )}
+                  </RadioGroup.Option>
+                ))}
+              </div>
+            </RadioGroup>
+          </div>
+        )}
+
+        {kelompok === 'VI' && (
+          <div className="mb-6">
+            <p className="font-semibold mb-2">Dampak terhadap reputasi atau pelaksanaan tugas:</p>
+            <RadioGroup value={state.reputasi} onChange={(val) => handleOptionChange(val, 'reputasi')}>
+              <div className="space-y-2">
+                {reputasiOptions.map((val) => (
+                  <RadioGroup.Option
+                    key={val}
+                    value={val}
+                    className={({ checked }) =>
+                      `p-3 border rounded-xl ${
+                        checked ? 'bg-blue-100 border-blue-500 text-black' : 'border-gray-300'
+                      }`
+                    }
+                  >
+                    {({ checked }) => (
+                      <div className="flex items-center gap-2">
+                        {checked && <CheckCircleIcon className="h-5 w-5 text-blue-600" />}
+                        <span>{val}</span>
+                      </div>
+                    )}
+                  </RadioGroup.Option>
+                ))}
+              </div>
+            </RadioGroup>
+          </div>
+        )}
+
+        <button
+          onClick={handleNextStep}
+          disabled={!isOptionSelected}
+          className={`mt-4 w-full py-2 px-4 rounded-md ${
+            isOptionSelected
+              ? 'bg-blue-600 text-white hover:bg-blue-700'
+              : 'bg-gray-300 text-gray-600 cursor-not-allowed'
+          }`}
+        >
+          Lanjut
+        </button>
 
         <div className="mt-12">
           <Stepper currentStep={3} totalSteps={7} />
