@@ -20,10 +20,7 @@ export default function Step3_KondisiAwal() {
 
   const kelompok = state.kelompok || 'Tidak Diketahui';
 
-  const dampakOptions = kelompok === 'II'
-    ? ['Unit Kerja', 'Instansi', 'Negara']
-    : ['Tidak Berdampak', 'Unit Kerja', 'Instansi/Tersangka'];
-
+  const dampakOptions = ['Unit Kerja', 'Instansi', 'Negara'];
   const reputasiOptions = ['Tidak Berdampak', 'Unit Kerja', 'Instansi/Tersangka'];
   const jabatanOptions = [
     'Pejabat Administrator',
@@ -65,12 +62,7 @@ export default function Step3_KondisiAwal() {
       return;
     }
 
-    if (kelompok === 'VI') {
-      navigate('/step/5'); // Langsung ke Step5 untuk kelompok VI
-      return;
-    }
-
-    if (['II', 'VI', 'V'].includes(kelompok)) {
+    if (['II', 'V', 'VI'].includes(kelompok)) {
       setDialogMessage(`Pelanggaran ini termasuk ke dalam Kelompok ${kelompok}.`);
       setIsDialogOpen(true);
     }
@@ -135,12 +127,68 @@ export default function Step3_KondisiAwal() {
         <h2 className="text-xl font-bold mb-6 text-center">Kondisi Awal</h2>
 
         {/* Pertanyaan berdasarkan kelompok */}
-        {kelompok === 'II' && (
+        {kelompok === 'III' && (
           <div className="mb-6">
-            <p className="font-semibold mb-2">Dampak pelanggaran:</p>
-            <RadioGroup value={state.dampak} onChange={(val) => handleOptionChange(val, 'dampak')}>
+            <p className="font-semibold mb-2">Apakah terdapat kerugian negara/pihak lain?</p>
+            <RadioGroup value={state.adaKerugian} onChange={(val) => handleOptionChange(val, 'adaKerugian')}>
               <div className="space-y-2">
-                {dampakOptions.map((val) => (
+                {['Ya', 'Tidak'].map((label, idx) => (
+                  <RadioGroup.Option
+                    key={label}
+                    value={idx === 0}
+                    className={({ checked }) =>
+                      `p-3 border rounded-xl ${
+                        checked ? 'bg-blue-100 border-blue-500 text-black' : 'border-gray-300'
+                      }`
+                    }
+                  >
+                    {({ checked }) => (
+                      <div className="flex items-center gap-2">
+                        {checked && <CheckCircleIcon className="h-5 w-5 text-blue-600" />}
+                        <span>{label}</span>
+                      </div>
+                    )}
+                  </RadioGroup.Option>
+                ))}
+              </div>
+            </RadioGroup>
+          </div>
+        )}
+
+        {kelompok === 'V' && (
+          <div className="mb-6">
+            <p className="font-semibold mb-2">Jabatan Pelaku:</p>
+            <RadioGroup value={state.jabatan} onChange={(val) => handleOptionChange(val, 'jabatan')}>
+              <div className="space-y-2">
+                {jabatanOptions.map((val) => (
+                  <RadioGroup.Option
+                    key={val}
+                    value={val}
+                    className={({ checked }) =>
+                      `p-3 border rounded-xl ${
+                        checked ? 'bg-blue-100 border-blue-500 text-black' : 'border-gray-300'
+                      }`
+                    }
+                  >
+                    {({ checked }) => (
+                      <div className="flex items-center gap-2">
+                        {checked && <CheckCircleIcon className="h-5 w-5 text-blue-600" />}
+                        <span>{val}</span>
+                      </div>
+                    )}
+                  </RadioGroup.Option>
+                ))}
+              </div>
+            </RadioGroup>
+          </div>
+        )}
+
+        {kelompok === 'VI' && (
+          <div className="mb-6">
+            <p className="font-semibold mb-2">Dampak terhadap reputasi atau pelaksanaan tugas:</p>
+            <RadioGroup value={state.reputasi} onChange={(val) => handleOptionChange(val, 'reputasi')}>
+              <div className="space-y-2">
+                {reputasiOptions.map((val) => (
                   <RadioGroup.Option
                     key={val}
                     value={val}
