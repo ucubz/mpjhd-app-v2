@@ -114,9 +114,7 @@ export default function Step2_PilihPasal() {
   <Stepper currentStep={2} totalSteps={7} />
   <BackButton label="Kembali ke Step 1" className="mt-4" />
 </div>
-          Kembali
-        </button>
-      </div>
+         
     </div>
   );
 }
