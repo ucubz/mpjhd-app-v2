@@ -5,6 +5,7 @@ import { CheckCircleIcon } from '@heroicons/react/24/solid';
 import { useMPJHD } from '../context/MPJHDContext';
 import Stepper from '../components/Stepper';
 import { tentukanKelompok } from '../utils_v2/tentukanKelompok';
+import BackButton from '../components/BackButton';
 
 const daftarPasal = {
   pasal3: [
