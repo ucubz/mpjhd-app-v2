@@ -1,4 +1,3 @@
-// src/pages/Step7_HasilAkhir.jsx
 import { useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { useMPJHD, useResetMPJHD } from '../context/MPJHDContext';
@@ -16,14 +15,14 @@ import { hitungNilaiAkhir } from '../utils_v2/hitungNilaiAkhir';
 import { konversiGrade } from '../utils_v2/konversiGrade';
 import { hitungNilaiKelompokI } from '../utils_v2/hitungNilaiKelompokI';
 
-// --- Custom Hook ---
+// Custom Hook
 function useRequireStep(requiredFields = [], redirectTo = '/step/1') {
   const { state } = useMPJHD();
   const resetMPJHD = useResetMPJHD();
   const navigate = useNavigate();
 
   useEffect(() => {
-    const missing = requiredFields.some(field => !state[field]);
+    const missing = requiredFields.some((field) => !state[field]);
     if (missing) {
       resetMPJHD();
       navigate(redirectTo, { replace: true });
@@ -40,40 +39,34 @@ export default function Step7_HasilAkhir() {
   useEffect(() => {
     const kelompok = String(state.kelompok || '').toUpperCase();
 
-    if (kelompok === 'I') {
-      const hari = parseInt(state.jumlahHariTidakMasuk || '0');
-      const nilaiPokok = hitungNilaiKelompokI(hari);
-      dispatch({ type: 'SET_NILAI_POKOK', nilaiPokok });
-      dispatch({ type: 'SET_NILAI_AKHIR', nilaiPokok });
+    const nilaiPokok = kelompok === 'I'
+      ? hitungNilaiKelompokI(state.jumlahHariTidakMasuk || 0)
+      : tentukanNilaiPokok(
+          state.kelompok,
+          state.pasalUtama,
+          state.dampak || '',
+          state.jabatan || ''
+        );
 
-      const hasil = konversiGrade(nilaiPokok);
-      dispatch({ type: 'SET_HASIL_GRADE', grade: hasil.grade });
-      dispatch({ type: 'SET_HASIL_HUKUMAN', jenisHukuman: hasil.hukuman });
-    } else if (['II', 'III', 'IV', 'V', 'VI'].includes(kelompok)) {
-      const nilaiPokok = tentukanNilaiPokok(
-        state.kelompok,
-        state.pasalUtama,
-        state.dampak || '',
-        state.jabatan || ''
-      );
-      const nilaiTambahan = hitungFaktorTambahan(state);
-      const pengurangMeringankan = hitungFaktorMeringankan(state);
+    const nilaiTambahan = hitungFaktorTambahan(state);
+    const pengurangMeringankan = hitungFaktorMeringankan(state);
 
-      dispatch({ type: 'SET_NILAI_POKOK', nilaiPokok });
-      dispatch({ type: 'SET_NILAI_TAMBAHAN', nilaiTambahan });
-      dispatch({ type: 'SET_PENGURANG_MERINGANKAN', pengurangMeringankan });
+    dispatch({ type: 'SET_NILAI_POKOK', nilaiPokok });
+    dispatch({ type: 'SET_NILAI_TAMBAHAN', nilaiTambahan });
+    dispatch({ type: 'SET_PENGURANG_MERINGANKAN', pengurangMeringankan });
 
-      const { nilaiAkhir } = hitungNilaiAkhir({
-        nilaiPokok,
-        nilaiTambahan,
-        pengurangMeringankan,
-      });
-      dispatch({ type: 'SET_NILAI_AKHIR', nilaiAkhir });
+    const { nilaiAkhir } = hitungNilaiAkhir({
+      ...state,
+      nilaiPokok,
+      nilaiTambahan,
+      pengurangMeringankan,
+    });
 
-      const hasil = konversiGrade(nilaiAkhir);
-      dispatch({ type: 'SET_HASIL_GRADE', grade: hasil.grade });
-      dispatch({ type: 'SET_HASIL_HUKUMAN', jenisHukuman: hasil.hukuman });
-    }
+    dispatch({ type: 'SET_NILAI_AKHIR', nilaiAkhir });
+
+    const hasilGrade = konversiGrade(nilaiAkhir);
+    dispatch({ type: 'SET_HASIL_GRADE', grade: hasilGrade.grade });
+    dispatch({ type: 'SET_HASIL_HUKUMAN', jenisHukuman: hasilGrade.hukuman });
   }, [dispatch, state]);
 
   const renderValue = (val) => {
