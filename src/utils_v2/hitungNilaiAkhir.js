@@ -1,15 +1,48 @@
-// utils_v2/hitungNilaiAkhir.js
+import { hitungNilaiKelompokI } from './hitungNilaiKelompokI';
+import { tentukanNilaiPokok } from './tentukanNilaiPokok';
+import { hitungFaktorTambahan } from './hitungFaktorTambahan';
+import { hitungFaktorMeringankan } from './hitungFaktorMeringankan';
 
 /**
- * Menghitung nilai akhir MPJHD
- * Nilai Akhir = Nilai Pokok + Faktor Utama + Faktor Tambahan - Faktor Meringankan
+ * Menghitung nilai akhir MPJHD berdasarkan seluruh state.
+ * Untuk Kelompok I, hanya menggunakan jumlah hari.
+ * Untuk kelompok lain, menghitung dari: pokok + tambahan - meringankan.
  *
- * @param {number} nilaiPokok - Nilai pokok berdasarkan pasal dan dampak.
- * @param {number} faktorUtama - Nilai faktor utama (opsional).
- * @param {number} faktorTambahan - Nilai faktor tambahan (opsional).
- * @param {number} faktorMeringankan - Nilai faktor meringankan (opsional).
- * @returns {number} Nilai akhir sebelum dikunci dalam rentang hukuman.
+ * @param {object} state - Seluruh state dari context MPJHD
+ * @returns {object} hasil: { nilaiPokok, nilaiTambahan, pengurangMeringankan, nilaiAkhir }
  */
-export function hitungNilaiAkhir(nilaiPokok, faktorUtama = 0, faktorTambahan = 0, faktorMeringankan = 0) {
-  return nilaiPokok + faktorUtama + faktorTambahan - faktorMeringankan;
+export function hitungNilaiAkhirLengkap(state) {
+  const kelompok = String(state.kelompok || '').toUpperCase();
+
+  // Kelompok I: khusus, hanya pakai jumlah hari
+  if (kelompok === 'I') {
+    const jumlahHari = state.jumlahHariTidakMasuk || 0;
+    const nilaiPokok = hitungNilaiKelompokI(jumlahHari);
+    return {
+      nilaiPokok,
+      nilaiTambahan: 0,
+      pengurangMeringankan: 0,
+      nilaiAkhir: nilaiPokok, // langsung gunakan sebagai nilai akhir
+    };
+  }
+
+  // Kelompok lain: hitung semua komponen
+  const nilaiPokok = tentukanNilaiPokok(
+    state.kelompok,
+    state.pasalUtama,
+    state.dampak,
+    state.jabatan
+  );
+
+  const nilaiTambahan = hitungFaktorTambahan(state.faktorPembobotan, kelompok);
+  const pengurangMeringankan = hitungFaktorMeringankan(state.faktorMeringankan);
+
+  const nilaiAkhir = nilaiPokok + nilaiTambahan - pengurangMeringankan;
+
+  return {
+    nilaiPokok,
+    nilaiTambahan,
+    pengurangMeringankan,
+    nilaiAkhir,
+  };
 }
