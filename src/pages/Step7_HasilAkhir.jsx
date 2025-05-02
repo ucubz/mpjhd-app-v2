@@ -15,14 +15,22 @@ import { hitungNilaiAkhir } from '../utils_v2/hitungNilaiAkhir';
 import { konversiGrade } from '../utils_v2/konversiGrade';
 import { hitungNilaiKelompokI } from '../utils_v2/hitungNilaiKelompokI';
 
-// Custom Hook
+// Validator Hook
 function useRequireStep(requiredFields = [], redirectTo = '/step/1') {
   const { state } = useMPJHD();
   const resetMPJHD = useResetMPJHD();
   const navigate = useNavigate();
 
   useEffect(() => {
-    const missing = requiredFields.some((field) => !state[field]);
+    const isMissing = (field) => {
+      const val = state[field];
+      if (val === null || val === undefined) return true;
+      if (typeof val === 'string' && val.trim() === '') return true;
+      if (typeof val === 'object' && Object.keys(val).length === 0) return true;
+      return false;
+    };
+
+    const missing = requiredFields.some(isMissing);
     if (missing) {
       resetMPJHD();
       navigate(redirectTo, { replace: true });
@@ -31,22 +39,21 @@ function useRequireStep(requiredFields = [], redirectTo = '/step/1') {
 }
 
 export default function Step7_HasilAkhir() {
-  useRequireStep(['kelompok']);
+  useRequireStep([
+    'kelompok',
+    'pasalUtama',
+    'faktorPembobotan',
+    'faktorMeringankan',
+  ]);
 
   const { state, dispatch } = useMPJHD();
   const navigate = useNavigate();
+  const kelompok = String(state.kelompok || '').toUpperCase();
 
   useEffect(() => {
-    const kelompok = String(state.kelompok || '').toUpperCase();
-
- const nilaiPokok = kelompok === 'I'
-  ? hitungNilaiKelompokI(state.jumlahHariTidakMasuk || 0)
-  : tentukanNilaiPokok(
-      state.kelompok,
-      state.pasalUtama,
-      state.dampak,
-      state.jabatan
-    );
+    const nilaiPokok = kelompok === 'I'
+      ? hitungNilaiKelompokI(state.jumlahHariTidakMasuk || 0)
+      : tentukanNilaiPokok(state.kelompok, state.pasalUtama, state.dampak, state.jabatan);
 
     const nilaiTambahan = hitungFaktorTambahan(state);
     const pengurangMeringankan = hitungFaktorMeringankan(state);
@@ -67,7 +74,7 @@ export default function Step7_HasilAkhir() {
     const hasilGrade = konversiGrade(nilaiAkhir);
     dispatch({ type: 'SET_HASIL_GRADE', grade: hasilGrade.grade });
     dispatch({ type: 'SET_HASIL_HUKUMAN', jenisHukuman: hasilGrade.hukuman });
-  }, [dispatch, state]);
+  }, [dispatch, state, kelompok]);
 
   const renderValue = (val) => {
     if (typeof val === 'boolean') return val ? 'true' : 'false';
