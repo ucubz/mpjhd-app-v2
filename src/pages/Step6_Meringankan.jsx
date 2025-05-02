@@ -10,7 +10,11 @@ import { hitungNilaiAkhir } from '../utils_v2/hitungNilaiAkhir';
 export default function Step6_Meringankan() {
   const { state, dispatch } = useMPJHD();
   const navigate = useNavigate();
+
+  const kelompok = state.kelompok;
+  const isKelompokI = kelompok === 'I';
   const meringankan = state.faktorMeringankan;
+  const jumlahHari = state.jumlahHariTidakMasuk ?? '';
 
   const updateCheckbox = (field) => {
     dispatch({
@@ -18,6 +22,16 @@ export default function Step6_Meringankan() {
       field,
       value: !meringankan[field],
     });
+  };
+
+  const handleHariChange = (e) => {
+    const value = e.target.value;
+    const angka = parseInt(value);
+    if (!isNaN(angka)) {
+      dispatch({ type: 'SET', field: 'jumlahHariTidakMasuk', value: angka });
+    } else {
+      dispatch({ type: 'SET', field: 'jumlahHariTidakMasuk', value: '' });
+    }
   };
 
   const hitungPengurang = () => {
@@ -28,13 +42,18 @@ export default function Step6_Meringankan() {
   };
 
   const handleNext = () => {
-    const pengurang = hitungPengurang();
-    dispatch({ type: 'SET_PENGURANG_MERINGANKAN', pengurang });
+    if (isKelompokI) {
+      // nilaiAkhir akan dihitung di Step7
+      navigate('/step/7');
+    } else {
+      const pengurang = hitungPengurang();
+      dispatch({ type: 'SET_PENGURANG_MERINGANKAN', pengurang });
 
-    const hasil = hitungNilaiAkhir({ ...state, pengurangMeringankan: pengurang });
-    dispatch({ type: 'SET_NILAI_AKHIR', nilaiAkhir: hasil.nilaiAkhir });
+      const hasil = hitungNilaiAkhir({ ...state, pengurangMeringankan: pengurang });
+      dispatch({ type: 'SET_NILAI_AKHIR', nilaiAkhir: hasil.nilaiAkhir });
 
-    navigate('/step/7');
+      navigate('/step/7');
+    }
   };
 
   return (
@@ -45,28 +64,45 @@ export default function Step6_Meringankan() {
           <ResetButton />
         </div>
 
-        <h2 className="text-xl font-bold mb-6 text-center">Faktor Meringankan</h2>
+        <h2 className="text-xl font-bold mb-6 text-center">{
+          isKelompokI ? 'Jumlah Hari Tidak Masuk Kerja' : 'Faktor Meringankan'
+        }</h2>
 
-        <div className="space-y-4 mb-6">
-          <label className="flex items-center gap-3">
+        {isKelompokI ? (
+          <div className="mb-6">
+            <label className="block font-semibold mb-2">
+              Masukkan jumlah hari tidak masuk kerja tanpa keterangan:
+            </label>
             <input
-              type="checkbox"
-              checked={meringankan.kooperatif}
-              onChange={() => updateCheckbox('kooperatif')}
-              className="h-4 w-4"
+              type="number"
+              value={jumlahHari}
+              onChange={handleHariChange}
+              className="w-full border px-4 py-2 rounded-md dark:bg-gray-800 dark:text-white"
+              min={0}
             />
-            <span>Berperilaku baik dan/atau kooperatif selama proses pemeriksaan (nilai 5)</span>
-          </label>
-          <label className="flex items-center gap-3">
-            <input
-              type="checkbox"
-              checked={meringankan.inisiator}
-              onChange={() => updateCheckbox('inisiator')}
-              className="h-4 w-4"
-            />
-            <span>Inisiator pengungkapan pelanggaran signifikan (nilai 10)</span>
-          </label>
-        </div>
+          </div>
+        ) : (
+          <div className="space-y-4 mb-6">
+            <label className="flex items-center gap-3">
+              <input
+                type="checkbox"
+                checked={meringankan.kooperatif}
+                onChange={() => updateCheckbox('kooperatif')}
+                className="h-4 w-4"
+              />
+              <span>Berperilaku baik dan/atau kooperatif selama proses pemeriksaan (nilai 5)</span>
+            </label>
+            <label className="flex items-center gap-3">
+              <input
+                type="checkbox"
+                checked={meringankan.inisiator}
+                onChange={() => updateCheckbox('inisiator')}
+                className="h-4 w-4"
+              />
+              <span>Inisiator pengungkapan pelanggaran signifikan (nilai 10)</span>
+            </label>
+          </div>
+        )}
 
         <button
           onClick={handleNext}
