@@ -11,8 +11,9 @@ export default function Step6_Meringankan() {
   const { state, dispatch } = useMPJHD();
   const navigate = useNavigate();
 
-  const kelompok = state.kelompok;
+  const kelompok = String(state.kelompok || '').toUpperCase();
   const isKelompokI = kelompok === 'I';
+
   const meringankan = state.faktorMeringankan;
   const jumlahHari = state.jumlahHariTidakMasuk ?? '';
 
@@ -43,7 +44,6 @@ export default function Step6_Meringankan() {
 
   const handleNext = () => {
     if (isKelompokI) {
-      // nilaiAkhir akan dihitung di Step7
       navigate('/step/7');
     } else {
       const pengurang = hitungPengurang();
@@ -64,9 +64,9 @@ export default function Step6_Meringankan() {
           <ResetButton />
         </div>
 
-        <h2 className="text-xl font-bold mb-6 text-center">{
-          isKelompokI ? 'Jumlah Hari Tidak Masuk Kerja' : 'Faktor Meringankan'
-        }</h2>
+        <h2 className="text-xl font-bold mb-6 text-center">
+          {isKelompokI ? 'Jumlah Hari Tidak Masuk Kerja' : 'Faktor Meringankan'}
+        </h2>
 
         {isKelompokI ? (
           <div className="mb-6">
