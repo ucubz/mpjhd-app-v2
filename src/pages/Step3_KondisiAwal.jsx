@@ -70,13 +70,13 @@ const handleOptionChange = (val, field) => {
     dispatch({ type: 'SET_FAKTOR_UTAMA', field: 'nilai', value: nilai });
   }
 };
-  const handleNextStep = () => {
-    if (kelompok === 'VI') {
-      navigate('/step/5');
-    } else {
-      navigate('/step/4');
-    }
-  };
+ const handleNextStep = () => {
+  if (['II', 'VI'].includes(kelompok)) {
+    navigate('/step/5');
+  } else {
+    navigate('/step/4');
+  }
+};
 
   useEffect(() => {
     if (state.pasalUtama === 'Pasal 4 huruf f' || kelompok === 'I') {
