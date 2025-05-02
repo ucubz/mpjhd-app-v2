@@ -44,8 +44,8 @@ export default function Step7_HasilAkhir() {
       : tentukanNilaiPokok(
           state.kelompok,
           state.pasalUtama,
-          state.dampak || '',
-          state.jabatan || ''
+          state.dampak,
+          state.jabatan
         );
 
     const nilaiTambahan = hitungFaktorTambahan(state);
