@@ -7,8 +7,6 @@ import Stepper from '../components/Stepper';
 import BackButton from '../components/BackButton';
 import ResetButton from '../components/ResetButton';
 import Button from '../components/Button';
-import { Switch } from '@headlessui/react';
-import { hitungNilaiAkhir } from '../utils_v2/hitungNilaiAkhir';
 
 // --- CUSTOM HOOK ---
 function useRequireStep(requiredFields = [], redirectTo = '/step/1') {
@@ -53,26 +51,11 @@ export default function Step6_Meringankan() {
     });
   };
 
-  const hitungPengurang = () => {
-    let total = 0;
-    if (meringankan.kooperatif) total += 5;
-    if (meringankan.inisiator) total += 10;
-    return total;
-  };
-
   const handleNext = () => {
     if (isKelompokI) {
-      dispatch({ type: 'SET_PENGURANG_MERINGANKAN', pengurang: 0 }); // reset jika Kelompok I
-      navigate('/step/7');
-    } else {
-      const pengurang = hitungPengurang();
-      dispatch({ type: 'SET_PENGURANG_MERINGANKAN', pengurang });
-
-      const hasil = hitungNilaiAkhir({ ...state, pengurangMeringankan: pengurang });
-      dispatch({ type: 'SET_NILAI_AKHIR', nilaiAkhir: hasil.nilaiAkhir });
-
-      navigate('/step/7');
+      dispatch({ type: 'SET_PENGURANG_MERINGANKAN', pengurang: 0 }); // Set 0 untuk Kelompok I
     }
+    navigate('/step/7');
   };
 
   return (
@@ -101,48 +84,30 @@ export default function Step6_Meringankan() {
             />
           </div>
         ) : (
-          <div className="space-y-6 mb-6">
-            <Switch.Group>
-              <div className="flex items-center justify-between">
-                <Switch.Label className="font-medium dark:text-white">
-                  Berperilaku baik dan/atau kooperatif selama proses pemeriksaan (nilai 5)
-                </Switch.Label>
-                <Switch
-                  checked={meringankan.kooperatif}
-                  onChange={() => updateCheckbox('kooperatif')}
-                  className={`${
-                    meringankan.kooperatif ? 'bg-blue-600' : 'bg-gray-300'
-                  } relative inline-flex h-6 w-11 items-center rounded-full transition-colors`}
-                >
-                  <span
-                    className={`${
-                      meringankan.kooperatif ? 'translate-x-6' : 'translate-x-1'
-                    } inline-block h-4 w-4 transform rounded-full bg-white transition-transform`}
-                  />
-                </Switch>
-              </div>
-            </Switch.Group>
+          <div className="space-y-4 mb-6">
+            <label className="flex items-center gap-3">
+              <input
+                type="checkbox"
+                checked={meringankan.kooperatif}
+                onChange={() => updateCheckbox('kooperatif')}
+                className="h-4 w-4"
+              />
+              <span className="dark:text-white">
+                Berperilaku baik dan/atau kooperatif selama proses pemeriksaan (nilai 5)
+              </span>
+            </label>
 
-            <Switch.Group>
-              <div className="flex items-center justify-between">
-                <Switch.Label className="font-medium dark:text-white">
-                  Inisiator pengungkapan pelanggaran signifikan (nilai 10)
-                </Switch.Label>
-                <Switch
-                  checked={meringankan.inisiator}
-                  onChange={() => updateCheckbox('inisiator')}
-                  className={`${
-                    meringankan.inisiator ? 'bg-blue-600' : 'bg-gray-300'
-                  } relative inline-flex h-6 w-11 items-center rounded-full transition-colors`}
-                >
-                  <span
-                    className={`${
-                      meringankan.inisiator ? 'translate-x-6' : 'translate-x-1'
-                    } inline-block h-4 w-4 transform rounded-full bg-white transition-transform`}
-                  />
-                </Switch>
-              </div>
-            </Switch.Group>
+            <label className="flex items-center gap-3">
+              <input
+                type="checkbox"
+                checked={meringankan.inisiator}
+                onChange={() => updateCheckbox('inisiator')}
+                className="h-4 w-4"
+              />
+              <span className="dark:text-white">
+                Inisiator pengungkapan pelanggaran signifikan (nilai 10)
+              </span>
+            </label>
           </div>
         )}
 
