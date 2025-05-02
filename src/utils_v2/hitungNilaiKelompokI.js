@@ -1,17 +1,19 @@
 // utils_v2/hitungNilaiKelompokI.js
 
-export function hitungNilaiKelompokI(jumlahHari) {
-    if (jumlahHari === 3) return 10;
-    if (jumlahHari >= 4 && jumlahHari <= 6) return 20;
-    if (jumlahHari >= 7 && jumlahHari <= 10) return 30;
-    if (jumlahHari >= 11 && jumlahHari <= 13) return 40;
-    if (jumlahHari >= 14 && jumlahHari <= 16) return 50;
-    if (jumlahHari >= 17 && jumlahHari <= 20) return 60;
-    if (jumlahHari >= 21 && jumlahHari <= 24) return 70;
-    if (jumlahHari >= 25 && jumlahHari <= 27) return 80;
-    if (jumlahHari === 28) return 90;
-    if (jumlahHari >= 10 && jumlahHari % 10 === 0) return 90; // 10 hari berturut-turut
-  
-    return 0; // default jika tidak masuk kategori
-  }
-  
+export function hitungNilaiKelompokI(jumlahHari, apakahBerturut = false) {
+  const hari = parseInt(jumlahHari);
+  if (isNaN(hari) || hari <= 0) return 0;
+
+  if (apakahBerturut && hari === 10) return 90; // prioritas untuk 10 hari berturut-turut
+  if (hari === 3) return 10;
+  if (hari >= 4 && hari <= 6) return 20;
+  if (hari >= 7 && hari <= 10) return 30;
+  if (hari >= 11 && hari <= 13) return 40;
+  if (hari >= 14 && hari <= 16) return 50;
+  if (hari >= 17 && hari <= 20) return 60;
+  if (hari >= 21 && hari <= 24) return 70;
+  if (hari >= 25 && hari <= 27) return 80;
+  if (hari === 28) return 90;
+
+  return 0;
+}
