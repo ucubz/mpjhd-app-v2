@@ -5,6 +5,8 @@ import Card from '../components/Card';
 import Stepper from '../components/Stepper';
 import BackButton from '../components/BackButton';
 import ResetButton from '../components/ResetButton';
+import Button from '../components/Button';
+import { Switch } from '@headlessui/react';
 import { hitungNilaiAkhir } from '../utils_v2/hitungNilaiAkhir';
 
 export default function Step6_Meringankan() {
@@ -26,13 +28,12 @@ export default function Step6_Meringankan() {
   };
 
   const handleHariChange = (e) => {
-    const value = e.target.value;
-    const angka = parseInt(value);
-    if (!isNaN(angka)) {
-      dispatch({ type: 'SET', field: 'jumlahHariTidakMasuk', value: angka });
-    } else {
-      dispatch({ type: 'SET', field: 'jumlahHariTidakMasuk', value: '' });
-    }
+    const angka = parseInt(e.target.value);
+    dispatch({
+      type: 'SET',
+      field: 'jumlahHariTidakMasuk',
+      value: !isNaN(angka) ? angka : '',
+    });
   };
 
   const hitungPengurang = () => {
@@ -70,7 +71,7 @@ export default function Step6_Meringankan() {
 
         {isKelompokI ? (
           <div className="mb-6">
-            <label className="block font-semibold mb-2">
+            <label className="block font-semibold mb-2 dark:text-white">
               Masukkan jumlah hari tidak masuk kerja tanpa keterangan:
             </label>
             <input
@@ -82,34 +83,52 @@ export default function Step6_Meringankan() {
             />
           </div>
         ) : (
-          <div className="space-y-4 mb-6">
-            <label className="flex items-center gap-3">
-              <input
-                type="checkbox"
-                checked={meringankan.kooperatif}
-                onChange={() => updateCheckbox('kooperatif')}
-                className="h-4 w-4"
-              />
-              <span>Berperilaku baik dan/atau kooperatif selama proses pemeriksaan (nilai 5)</span>
-            </label>
-            <label className="flex items-center gap-3">
-              <input
-                type="checkbox"
-                checked={meringankan.inisiator}
-                onChange={() => updateCheckbox('inisiator')}
-                className="h-4 w-4"
-              />
-              <span>Inisiator pengungkapan pelanggaran signifikan (nilai 10)</span>
-            </label>
+          <div className="space-y-6 mb-6">
+            <Switch.Group>
+              <div className="flex items-center justify-between">
+                <Switch.Label className="font-medium dark:text-white">
+                  Berperilaku baik dan/atau kooperatif selama proses pemeriksaan (nilai 5)
+                </Switch.Label>
+                <Switch
+                  checked={meringankan.kooperatif}
+                  onChange={() => updateCheckbox('kooperatif')}
+                  className={`${
+                    meringankan.kooperatif ? 'bg-blue-600' : 'bg-gray-300'
+                  } relative inline-flex h-6 w-11 items-center rounded-full transition-colors`}
+                >
+                  <span
+                    className={`${
+                      meringankan.kooperatif ? 'translate-x-6' : 'translate-x-1'
+                    } inline-block h-4 w-4 transform rounded-full bg-white transition-transform`}
+                  />
+                </Switch>
+              </div>
+            </Switch.Group>
+
+            <Switch.Group>
+              <div className="flex items-center justify-between">
+                <Switch.Label className="font-medium dark:text-white">
+                  Inisiator pengungkapan pelanggaran signifikan (nilai 10)
+                </Switch.Label>
+                <Switch
+                  checked={meringankan.inisiator}
+                  onChange={() => updateCheckbox('inisiator')}
+                  className={`${
+                    meringankan.inisiator ? 'bg-blue-600' : 'bg-gray-300'
+                  } relative inline-flex h-6 w-11 items-center rounded-full transition-colors`}
+                >
+                  <span
+                    className={`${
+                      meringankan.inisiator ? 'translate-x-6' : 'translate-x-1'
+                    } inline-block h-4 w-4 transform rounded-full bg-white transition-transform`}
+                  />
+                </Switch>
+              </div>
+            </Switch.Group>
           </div>
         )}
 
-        <button
-          onClick={handleNext}
-          className="mt-4 w-full py-2 px-4 rounded-md bg-blue-600 text-white hover:bg-blue-700"
-        >
-          Lanjut
-        </button>
+        <Button onClick={handleNext}>Lanjut</Button>
 
         <div className="mt-12">
           <Stepper currentStep={6} totalSteps={7} />
