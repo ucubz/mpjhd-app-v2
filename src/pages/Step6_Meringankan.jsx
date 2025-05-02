@@ -1,4 +1,5 @@
 import { useNavigate } from 'react-router-dom';
+import { useEffect } from 'react';
 import { useMPJHD, useResetMPJHD } from '../context/MPJHDContext';
 import PageWrapper from '../components/PageWrapper';
 import Card from '../components/Card';
@@ -8,7 +9,6 @@ import ResetButton from '../components/ResetButton';
 import Button from '../components/Button';
 import { Switch } from '@headlessui/react';
 import { hitungNilaiAkhir } from '../utils_v2/hitungNilaiAkhir';
-import { useEffect } from 'react';
 
 // --- CUSTOM HOOK ---
 function useRequireStep(requiredFields = [], redirectTo = '/step/1') {
@@ -26,14 +26,13 @@ function useRequireStep(requiredFields = [], redirectTo = '/step/1') {
 }
 
 export default function Step6_Meringankan() {
-  useRequireStep(['kelompok']); // memastikan kelompok sudah terisi
+  useRequireStep(['kelompok']);
 
   const { state, dispatch } = useMPJHD();
   const navigate = useNavigate();
 
   const kelompok = String(state.kelompok || '').toUpperCase();
   const isKelompokI = kelompok === 'I';
-
   const meringankan = state.faktorMeringankan;
   const jumlahHari = state.jumlahHariTidakMasuk ?? '';
 
