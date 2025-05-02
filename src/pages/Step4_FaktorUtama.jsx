@@ -2,38 +2,44 @@ import { useEffect, useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { RadioGroup } from '@headlessui/react';
 import { CheckCircleIcon } from '@heroicons/react/24/solid';
-import { useMPJHD } from '../context/MPJHDContext';
+import { useMPJHD, useResetMPJHD } from '../context/MPJHDContext';
+import PageWrapper from '../components/PageWrapper';
+import Card from '../components/Card';
 import Stepper from '../components/Stepper';
+import BackButton from '../components/BackButton';
+import ResetButton from '../components/ResetButton';
+
+function useRequireStep(requiredFields = [], redirectTo = '/step/1') {
+  const { state } = useMPJHD();
+  const resetMPJHD = useResetMPJHD();
+  const navigate = useNavigate();
+
+  useEffect(() => {
+    const missing = requiredFields.some((field) => !state[field]);
+    if (missing) {
+      resetMPJHD();
+      navigate(redirectTo, { replace: true });
+    }
+  }, [state, requiredFields, navigate, redirectTo, resetMPJHD]);
+}
 
 export default function Step4_FaktorUtama() {
+  useRequireStep(['kelompok']);
+
   const { state, dispatch } = useMPJHD();
   const navigate = useNavigate();
   const kelompok = state.kelompok;
-
+  const faktor = state.faktorUtama;
   const [tipeDipilih, setTipeDipilih] = useState('');
 
-  const isIIIKhusus = kelompok === 'III Khusus';
   const isIII_Khusus_Bersama = kelompok === 'III Khusus Bersama';
   const isIII_Khusus_Individu = kelompok === 'III Khusus Individu';
+  const isIV = kelompok === 'IV';
 
-  const showPemecahIII = isIIIKhusus;
   const showPeran = isIII_Khusus_Bersama;
-  const showKerugian = isIII_Khusus_Individu || kelompok === 'IV';
-  const showReputasiVI = kelompok === 'VI';
-
-  const faktor = state.faktorUtama;
-
-  useEffect(() => {
-    const noFaktorToShow =
-      !showPemecahIII && !showPeran && !showKerugian && !showReputasiVI;
-    if (noFaktorToShow) {
-      navigate('/step/5');
-    }
-  }, [navigate, showPemecahIII, showPeran, showKerugian, showReputasiVI]);
+  const showKerugian = isIII_Khusus_Bersama || isIII_Khusus_Individu || isIV;
 
   const updateFaktor = (field, value) => {
-    dispatch({ type: 'SET_FAKTOR_UTAMA', field, value });
-
     let nilai = 0;
 
     if (field === 'peran') {
@@ -43,12 +49,12 @@ export default function Step4_FaktorUtama() {
     }
 
     if (field === 'jumlahKerugian') {
-      if (kelompok === 'III Khusus Individu' || kelompok === 'IV') {
+      if (isIII_Khusus_Individu || isIV) {
         if (value === '< 1 juta') nilai = 7.5;
         if (value === '1 - 10 juta') nilai = 15;
         if (value === '> 10 juta') nilai = 22.5;
         if (value === '> 100 juta') nilai = 30;
-      } else if (kelompok === 'III Khusus Bersama') {
+      } else if (isIII_Khusus_Bersama) {
         if (value === '< 1 juta') nilai = 2.5;
         if (value === '1 - 10 juta') nilai = 5;
         if (value === '> 10 juta') nilai = 7.5;
@@ -56,178 +62,108 @@ export default function Step4_FaktorUtama() {
       }
     }
 
-    if (field === 'reputasi') {
-      if (value === 'Tidak berdampak') nilai = 0;
-      if (value === 'Unit Kerja') nilai = 15;
-      if (value === 'Instansi/Tersangka') nilai = 30;
-    }
-
-    dispatch({
-      type: 'SET_FAKTOR_UTAMA',
-      field: 'nilai',
-      value,
-    });
+    dispatch({ type: 'SET_FAKTOR_UTAMA', field, value });
+    dispatch({ type: 'SET_FAKTOR_UTAMA', field: 'nilai', value: nilai });
   };
 
-  const handlePilihTipe = (val) => {
-    setTipeDipilih(val);
-    dispatch({ type: 'SET', field: 'tipeKelompokIII', value: val });
-    dispatch({
-      type: 'SET',
-      field: 'kelompok',
-      value: val === 'bersama' ? 'III Khusus Bersama' : 'III Khusus Individu',
-    });
-  };
-
-  const handleNext = () => {
-    navigate('/step/5');
-  };
+  const handleNext = () => navigate('/step/5');
 
   const isComplete =
-    (!showPemecahIII || tipeDipilih) &&
     (!showPeran || faktor.peran) &&
-    (!showKerugian || faktor.jumlahKerugian) &&
-    (!showReputasiVI || faktor.reputasi);
+    (!showKerugian || faktor.jumlahKerugian);
 
   return (
-    <div className="max-w-xl mx-auto py-10 px-4">
-      <button
-        onClick={() => {
-          if (confirm('Yakin ingin mereset dan kembali ke awal?')) {
-            dispatch({ type: 'RESET' });
-            navigate('/step/1');
-          }
-        }}
-        className="text-red-600 font-semibold mb-4"
-      >
-        Reset
-      </button>
-
-      <h2 className="text-xl font-bold mb-6">Faktor Pembobotan Utama</h2>
-
-      {showPemecahIII && (
-        <div className="mb-6">
-          <p className="font-semibold mb-2">Apakah pelanggaran dilakukan:</p>
-          <RadioGroup value={tipeDipilih} onChange={handlePilihTipe}>
-            <div className="space-y-2">
-              {['bersama', 'individu'].map((val) => (
-                <RadioGroup.Option key={val} value={val}
-                  className={({ checked }) =>
-                    `p-3 border rounded-xl ${checked ? 'bg-blue-100 border-blue-500' : 'border-gray-300'}`
-                  }>
-                  {({ checked }) => (
-                    <div className="flex items-center gap-2">
-                      {checked && <CheckCircleIcon className="h-5 w-5 text-blue-600" />}
-                      <span>{val === 'bersama' ? 'Bersama-sama' : 'Secara Individu'}</span>
-                    </div>
-                  )}
-                </RadioGroup.Option>
-              ))}
-            </div>
-          </RadioGroup>
+    <PageWrapper>
+      <Card>
+        <div className="flex justify-between items-center mb-6">
+          <BackButton label="Kembali ke Step 3" />
+          <ResetButton />
         </div>
-      )}
 
-      {showPeran && (
-        <div className="mb-6">
-          <p className="font-semibold mb-2">Peran Pelaku:</p>
-          <RadioGroup
-            value={faktor.peran}
-            onChange={(val) => updateFaktor('peran', val)}
-          >
-            <div className="space-y-2">
-              {['Pasif', 'Aktif', 'Inisiator'].map((val) => (
-                <RadioGroup.Option key={val} value={val}
-                  className={({ checked }) =>
-                    `p-3 border rounded-xl ${checked ? 'bg-blue-100 border-blue-500' : 'border-gray-300'}`
-                  }>
-                  {({ checked }) => (
-                    <div className="flex items-center gap-2">
-                      {checked && <CheckCircleIcon className="h-5 w-5 text-blue-600" />}
-                      <span>{val}</span>
-                    </div>
-                  )}
-                </RadioGroup.Option>
-              ))}
-            </div>
-          </RadioGroup>
-        </div>
-      )}
+        <h2 className="text-xl font-bold mb-6 text-center">Faktor Pembobotan Utama</h2>
 
-      {showKerugian && (
-        <div className="mb-6">
-          <p className="font-semibold mb-2">
-            {kelompok === 'IV'
-              ? 'Kerugian bagi pihak yang dilayani:'
-              : 'Jumlah uang yang diterima atau kerugian negara/pihak lain:'}
-          </p>
-          <RadioGroup
-            value={faktor.jumlahKerugian}
-            onChange={(val) => updateFaktor('jumlahKerugian', val)}
-          >
-            <div className="space-y-2">
-              {['< 1 juta', '1 - 10 juta', '> 10 juta', '> 100 juta'].map((val) => (
-                <RadioGroup.Option key={val} value={val}
-                  className={({ checked }) =>
-                    `p-3 border rounded-xl ${checked ? 'bg-blue-100 border-blue-500' : 'border-gray-300'}`
-                  }>
-                  {({ checked }) => (
-                    <div className="flex items-center gap-2">
-                      {checked && <CheckCircleIcon className="h-5 w-5 text-blue-600" />}
-                      <span>{val}</span>
-                    </div>
-                  )}
-                </RadioGroup.Option>
-              ))}
-            </div>
-          </RadioGroup>
-        </div>
-      )}
+        {showPeran && (
+          <div className="mb-6">
+            <p className="font-semibold mb-2">Peran Pelaku:</p>
+            <RadioGroup
+              value={faktor.peran}
+              onChange={(val) => updateFaktor('peran', val)}
+            >
+              <div className="space-y-2">
+                {['Pasif', 'Aktif', 'Inisiator'].map((val) => (
+                  <RadioGroup.Option
+                    key={val}
+                    value={val}
+                    className={({ checked }) =>
+                      `p-3 border rounded-xl ${
+                        checked ? 'bg-blue-100 border-blue-500' : 'border-gray-300'
+                      }`
+                    }
+                  >
+                    {({ checked }) => (
+                      <div className="flex items-center gap-2">
+                        {checked && <CheckCircleIcon className="h-5 w-5 text-blue-600" />}
+                        <span>{val}</span>
+                      </div>
+                    )}
+                  </RadioGroup.Option>
+                ))}
+              </div>
+            </RadioGroup>
+          </div>
+        )}
 
-      {showReputasiVI && (
-        <div className="mb-6">
-          <p className="font-semibold mb-2">Dampak terhadap reputasi atau pelaksanaan tugas:</p>
-          <RadioGroup
-            value={faktor.reputasi}
-            onChange={(val) => updateFaktor('reputasi', val)}
-          >
-            <div className="space-y-2">
-              {['Tidak berdampak', 'Unit Kerja', 'Instansi/Tersangka'].map((val) => (
-                <RadioGroup.Option key={val} value={val}
-                  className={({ checked }) =>
-                    `p-3 border rounded-xl ${checked ? 'bg-blue-100 border-blue-500' : 'border-gray-300'}`
-                  }>
-                  {({ checked }) => (
-                    <div className="flex items-center gap-2">
-                      {checked && <CheckCircleIcon className="h-5 w-5 text-blue-600" />}
-                      <span>{val}</span>
-                    </div>
-                  )}
-                </RadioGroup.Option>
-              ))}
-            </div>
-          </RadioGroup>
-        </div>
-      )}
+        {showKerugian && (
+          <div className="mb-6">
+            <p className="font-semibold mb-2">
+              {isIV
+                ? 'Kerugian bagi pihak yang dilayani:'
+                : 'Jumlah uang yang diterima atau kerugian negara/pihak lain:'}
+            </p>
+            <RadioGroup
+              value={faktor.jumlahKerugian}
+              onChange={(val) => updateFaktor('jumlahKerugian', val)}
+            >
+              <div className="space-y-2">
+                {['< 1 juta', '1 - 10 juta', '> 10 juta', '> 100 juta'].map((val) => (
+                  <RadioGroup.Option
+                    key={val}
+                    value={val}
+                    className={({ checked }) =>
+                      `p-3 border rounded-xl ${
+                        checked ? 'bg-blue-100 border-blue-500' : 'border-gray-300'
+                      }`
+                    }
+                  >
+                    {({ checked }) => (
+                      <div className="flex items-center gap-2">
+                        {checked && <CheckCircleIcon className="h-5 w-5 text-blue-600" />}
+                        <span>{val}</span>
+                      </div>
+                    )}
+                  </RadioGroup.Option>
+                ))}
+              </div>
+            </RadioGroup>
+          </div>
+        )}
 
-      {isComplete && (
         <button
           onClick={handleNext}
-          className="mt-4 px-4 py-2 bg-blue-600 text-white rounded-md"
+          disabled={!isComplete}
+          className={`mt-4 w-full py-2 px-4 rounded-md ${
+            isComplete
+              ? 'bg-blue-600 text-white hover:bg-blue-700'
+              : 'bg-gray-300 text-gray-600 cursor-not-allowed'
+          }`}
         >
           Lanjut
         </button>
-      )}
-      
-      <div className="mt-12">
-        <Stepper currentStep={4} totalSteps={7} />
-        <button
-          onClick={() => navigate('/step/3')}
-          className="mt-4 text-sm text-blue-600 underline"
-        >
-          Kembali
-        </button>
-      </div>
-    </div>
+
+        <div className="mt-12">
+          <Stepper currentStep={4} totalSteps={7} />
+        </div>
+      </Card>
+    </PageWrapper>
   );
 }
