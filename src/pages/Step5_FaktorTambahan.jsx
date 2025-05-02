@@ -1,5 +1,7 @@
 import { useNavigate } from 'react-router-dom';
 import { useMPJHD } from '../context/MPJHDContext';
+import PageWrapper from '../components/PageWrapper';
+import Card from '../components/Card';
 import Stepper from '../components/Stepper';
 import { Listbox } from '@headlessui/react';
 import { hitungFaktorTambahan } from '../utils_v2/hitungFaktorTambahan';
@@ -70,74 +72,81 @@ export default function Step5_FaktorTambahan() {
     .every((key) => faktor[key] !== null && faktor[key] !== '');
 
   const handleNext = () => {
-    const nilaiTambahan = hitungTotalTambahan(state);
+    const nilaiTambahan = hitungFaktorTambahan(state);
     dispatch({ type: 'SET_NILAI_TAMBAHAN', nilaiTambahan });
     navigate('/step/6');
   };
 
   return (
-    <div className="max-w-xl mx-auto py-10 px-4">
-      <button
-        onClick={() => {
-          if (confirm('Yakin ingin mereset dan kembali ke awal?')) {
-            dispatch({ type: 'RESET' });
-            navigate('/step/1');
-          }
-        }}
-        className="text-red-600 font-semibold mb-4"
-      >
-        Reset
-      </button>
+    <PageWrapper>
+      <Card>
+        <div className="flex justify-between items-center mb-6">
+          <button
+            onClick={() => {
+              if (confirm('Yakin ingin mereset dan kembali ke awal?')) {
+                dispatch({ type: 'RESET' });
+                navigate('/step/1');
+              }
+            }}
+            className="text-red-600 font-semibold"
+          >
+            Reset
+          </button>
+        </div>
 
-      <h2 className="text-xl font-bold mb-6">Faktor Pembobotan Tambahan</h2>
+        <h2 className="text-xl font-bold mb-6 text-center">Faktor Pembobotan Tambahan</h2>
 
-      <Dropdown
-        label="Banyaknya jenis pelanggaran"
-        field="banyakPasal"
-        value={faktor.banyakPasal}
-        onChange={updateField}
-        list={options.banyakPasal}
-      />
-      <Dropdown
-        label="Riwayat Hukuman Disiplin"
-        field="hukdis"
-        value={faktor.hukdis}
-        onChange={updateField}
-        list={options.hukdis}
-      />
-      <Dropdown
-        label="Faktor Kesengajaan"
-        field="kesengajaan"
-        value={faktor.kesengajaan}
-        onChange={updateField}
-        list={options.kesengajaan}
-      />
-      <Dropdown
-        label="Hambatan Pemeriksaan"
-        field="hambatan"
-        value={faktor.hambatan}
-        onChange={updateField}
-        list={options.hambatan}
-      />
+        <Dropdown
+          label="Banyaknya jenis pelanggaran"
+          field="banyakPasal"
+          value={faktor.banyakPasal}
+          onChange={updateField}
+          list={options.banyakPasal}
+        />
+        <Dropdown
+          label="Riwayat Hukuman Disiplin"
+          field="hukdis"
+          value={faktor.hukdis}
+          onChange={updateField}
+          list={options.hukdis}
+        />
+        <Dropdown
+          label="Faktor Kesengajaan"
+          field="kesengajaan"
+          value={faktor.kesengajaan}
+          onChange={updateField}
+          list={options.kesengajaan}
+        />
+        <Dropdown
+          label="Hambatan Pemeriksaan"
+          field="hambatan"
+          value={faktor.hambatan}
+          onChange={updateField}
+          list={options.hambatan}
+        />
 
-      {isComplete && (
         <button
           onClick={handleNext}
-          className="mt-4 px-4 py-2 bg-blue-600 text-white rounded-md"
+          disabled={!isComplete}
+          className={`mt-4 px-4 py-2 rounded-md w-full ${
+            isComplete
+              ? 'bg-blue-600 text-white hover:bg-blue-700'
+              : 'bg-gray-300 text-gray-600 cursor-not-allowed'
+          }`}
         >
           Lanjut
         </button>
-      )}
 
-      <div className="mt-12">
-        <Stepper currentStep={5} totalSteps={7} />
-        <button
-          onClick={() => navigate('/step/4')}
-          className="mt-4 text-sm text-blue-600 underline"
-        >
-          Kembali
-        </button>
-      </div>
-    </div>
+        <div className="mt-12">
+          <Stepper currentStep={5} totalSteps={7} />
+          <button
+            onClick={() => navigate('/step/4')}
+            className="mt-4 text-sm text-blue-600 underline"
+          >
+            Kembali
+          </button>
+        </div>
+      </Card>
+    </PageWrapper>
   );
 }
