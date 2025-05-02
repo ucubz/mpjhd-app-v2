@@ -1,3 +1,4 @@
+// Step7_HasilAkhir.jsx (versi debug)
 import { useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { useMPJHD, useResetMPJHD } from '../context/MPJHDContext';
@@ -14,7 +15,7 @@ import { hitungFaktorMeringankan } from '../utils_v2/hitungFaktorMeringankan';
 import { hitungNilaiAkhir } from '../utils_v2/hitungNilaiAkhir';
 import { konversiGrade } from '../utils_v2/konversiGrade';
 
-// Custom Hook
+// Custom hook
 function useRequireStep(requiredFields = [], redirectTo = '/step/1') {
   const { state } = useMPJHD();
   const resetMPJHD = useResetMPJHD();
@@ -35,27 +36,20 @@ export default function Step7_HasilAkhir() {
   const { state, dispatch } = useMPJHD();
   const navigate = useNavigate();
 
+  // Hitung dan set nilai
   useEffect(() => {
     const nilaiPokok = tentukanNilaiPokok(state);
     const nilaiTambahan = hitungFaktorTambahan(state);
     const pengurangMeringankan = hitungFaktorMeringankan(state);
+    const { nilaiAkhir } = hitungNilaiAkhir({ ...state, nilaiPokok, nilaiTambahan, pengurangMeringankan });
+    const hasil = konversiGrade(nilaiAkhir);
 
     dispatch({ type: 'SET_NILAI_POKOK', nilaiPokok });
     dispatch({ type: 'SET_NILAI_TAMBAHAN', nilaiTambahan });
     dispatch({ type: 'SET_PENGURANG_MERINGANKAN', pengurangMeringankan });
-
-    const { nilaiAkhir } = hitungNilaiAkhir({
-      ...state,
-      nilaiPokok,
-      nilaiTambahan,
-      pengurangMeringankan,
-    });
-
     dispatch({ type: 'SET_NILAI_AKHIR', nilaiAkhir });
-
-    const hasilGrade = konversiGrade(nilaiAkhir);
-    dispatch({ type: 'SET_HASIL_GRADE', grade: hasilGrade.grade });
-    dispatch({ type: 'SET_HASIL_HUKUMAN', jenisHukuman: hasilGrade.hukuman });
+    dispatch({ type: 'SET_HASIL_GRADE', grade: hasil.grade });
+    dispatch({ type: 'SET_HASIL_HUKUMAN', jenisHukuman: hasil.hukuman });
   }, [dispatch, state]);
 
   const renderValue = (val) => {
@@ -79,7 +73,7 @@ export default function Step7_HasilAkhir() {
           <ResetButton />
         </div>
 
-        <h2 className="text-xl font-bold mb-6 text-center">Debug: Cek Isi State</h2>
+        <h2 className="text-xl font-bold mb-6 text-center">Debug: Semua State dan Nilai</h2>
 
         <div className="overflow-auto">
           <table className="w-full text-sm border border-gray-300 dark:border-gray-600">
@@ -102,9 +96,11 @@ export default function Step7_HasilAkhir() {
           </table>
         </div>
 
-        <div className="mt-8">
+        <div className="mt-12">
           <Stepper currentStep={7} totalSteps={7} />
-          <Button className="mt-4" onClick={() => navigate('/step/6')}>Kembali</Button>
+          <div className="mt-4 flex justify-end">
+            <Button onClick={() => navigate('/step/6')}>Kembali</Button>
+          </div>
         </div>
       </Card>
     </PageWrapper>
