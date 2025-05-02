@@ -1,4 +1,4 @@
-// Step7_HasilAkhir.jsx - Debug Reset Version
+// Step7_HasilAkhir.jsx - Debug Final Version
 import { useMPJHD } from '../context/MPJHDContext';
 import { useNavigate } from 'react-router-dom';
 import PageWrapper from '../components/PageWrapper';
@@ -11,7 +11,6 @@ import ResetButton from '../components/ResetButton';
 import { tentukanNilaiPokok } from '../utils_v2/tentukanNilaiPokok';
 import { hitungFaktorTambahan } from '../utils_v2/hitungFaktorTambahan';
 import { hitungFaktorMeringankan } from '../utils_v2/hitungFaktorMeringankan';
-import { hitungNilaiAkhir } from '../utils_v2/hitungNilaiAkhir';
 import { konversiGrade } from '../utils_v2/konversiGrade';
 import { hitungNilaiKelompokI } from '../utils_v2/hitungNilaiKelompokI';
 
@@ -34,13 +33,7 @@ export default function Step7_HasilAkhir() {
   const nilaiTambahan = hitungFaktorTambahan(state.faktorPembobotan || {}, kelompok);
   const pengurangMeringankan = hitungFaktorMeringankan(state);
 
-  const { nilaiAkhir } = hitungNilaiAkhir({
-    ...state,
-    nilaiPokok,
-    nilaiTambahan,
-    pengurangMeringankan,
-  });
-
+  const nilaiAkhir = nilaiPokok + nilaiTambahan - pengurangMeringankan;
   const hasilGrade = konversiGrade(nilaiAkhir);
 
   const hasil = {
