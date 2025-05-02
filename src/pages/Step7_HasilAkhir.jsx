@@ -39,14 +39,14 @@ export default function Step7_HasilAkhir() {
   useEffect(() => {
     const kelompok = String(state.kelompok || '').toUpperCase();
 
-    const nilaiPokok = kelompok === 'I'
-      ? hitungNilaiKelompokI(state.jumlahHariTidakMasuk || 0)
-      : tentukanNilaiPokok(
-          state.kelompok,
-          state.pasalUtama,
-          state.dampak,
-          state.jabatan
-        );
+ const nilaiPokok = kelompok === 'I'
+  ? hitungNilaiKelompokI(state.jumlahHariTidakMasuk || 0)
+  : tentukanNilaiPokok(
+      state.kelompok,
+      state.pasalUtama,
+      state.dampak,
+      state.jabatan
+    );
 
     const nilaiTambahan = hitungFaktorTambahan(state);
     const pengurangMeringankan = hitungFaktorMeringankan(state);
