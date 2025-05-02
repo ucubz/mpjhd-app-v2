@@ -31,7 +31,10 @@ export default function Step7_HasilAkhir() {
         );
 
   const nilaiTambahan = hitungFaktorTambahan(state.faktorPembobotan || {}, kelompok);
-  const pengurangMeringankan = hitungFaktorMeringankan(state);
+  const pengurangMeringankan = hitungFaktorMeringankan(
+  state.faktorMeringankan?.kooperatif,
+  state.faktorMeringankan?.inisiator
+);
 
   const nilaiAkhir = nilaiPokok + nilaiTambahan - pengurangMeringankan;
   const hasilGrade = konversiGrade(nilaiAkhir);
