@@ -57,7 +57,7 @@ const daftarPasal = {
     { kode: 'Pasal 5 huruf g', deskripsi: 'Melakukan pungutan liar' },
     { kode: 'Pasal 5 huruf h', deskripsi: 'Kegiatan yang merugikan negara' },
     { kode: 'Pasal 5 huruf i', deskripsi: 'Tindak sewenang-wenang pada bawahan' },
-    { kode: 'Pasal Tindakan merugikan pihak dilayani' },
+    { kode: 'Pasal 5 huruf m', deskripsi: 'Melakukan tindakan atau tidak melakukan tindakan yang dapat merugikan pihak dilayani' },
     { kode: 'Pasal 5 huruf n angka 1', deskripsi: 'Memberikan dukungan kepada calon presiden/wakil presiden' },
     { kode: 'Pasal 5 huruf n angka 2', deskripsi: 'Mengikuti kampanye' },
     { kode: 'Pasal 5 huruf n angka 3', deskripsi: 'Peserta kampanye dengan atribut partai/PNS' },
