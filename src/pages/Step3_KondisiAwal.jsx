@@ -36,7 +36,7 @@ export default function Step3_KondisiAwal() {
   const [dialogMessage, setDialogMessage] = useState('');
 
   const kelompok = state.kelompok || 'Tidak Diketahui';
-  const isKelompokIII = ['III', 'III Umum', 'III Khusus'].includes(kelompok);
+  const isKelompokIII = kelompok === 'III';
   const isKelompokV = kelompok === 'V';
   const isKelompokVI = kelompok === 'VI';
 
@@ -52,10 +52,17 @@ export default function Step3_KondisiAwal() {
   const handleOptionChange = (val, field) => {
     dispatch({ type: 'SET', field, value: val });
 
-    if (kelompok === 'III' && field === 'adaKerugian') {
+    if (isKelompokIII && field === 'adaKerugian') {
       const newKelompok = val ? 'III Khusus' : 'III Umum';
       dispatch({ type: 'SET', field: 'kelompok', value: newKelompok });
     }
+		
+		if (val) {
+			navigate('/step/4'); //lanjut ke pemecahan kelompok III khusus
+			} else {
+				navigate('/step/5'); //langsung ke faktor tambahan
+				}
+			}
 
     if (kelompok === 'VI' && field === 'reputasi') {
       let nilai = 0;
