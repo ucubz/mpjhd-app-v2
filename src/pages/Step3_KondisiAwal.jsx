@@ -49,29 +49,27 @@ export default function Step3_KondisiAwal() {
     'Pejabat lainnya',
   ];
 
-  const handleOptionChange = (val, field) => {
-    dispatch({ type: 'SET', field, value: val });
+const handleOptionChange = (val, field) => {
+  dispatch({ type: 'SET', field, value: val });
 
-    if (isKelompokIII && field === 'adaKerugian') {
-      const newKelompok = val ? 'III Khusus' : 'III Umum';
-      dispatch({ type: 'SET', field: 'kelompok', value: newKelompok });
+  if (isKelompokIII && field === 'adaKerugian') {
+    const newKelompok = val ? 'III Khusus' : 'III Umum';
+    dispatch({ type: 'SET', field: 'kelompok', value: newKelompok });
+
+    if (val) {
+      navigate('/step/4');
+    } else {
+      navigate('/step/5');
     }
-		
-		if (val) {
-			navigate('/step/4'); //lanjut ke pemecahan kelompok III khusus
-			} else {
-				navigate('/step/5'); //langsung ke faktor tambahan
-				}
-			}
+  }
 
-    if (kelompok === 'VI' && field === 'reputasi') {
-      let nilai = 0;
-      if (val === 'Unit Kerja') nilai = 15;
-      if (val === 'Instansi/Tersangka') nilai = 30;
-      dispatch({ type: 'SET_FAKTOR_UTAMA', field: 'nilai', value: nilai });
-    }
-  };
-
+  if (kelompok === 'VI' && field === 'reputasi') {
+    let nilai = 0;
+    if (val === 'Unit Kerja') nilai = 15;
+    if (val === 'Instansi/Tersangka') nilai = 30;
+    dispatch({ type: 'SET_FAKTOR_UTAMA', field: 'nilai', value: nilai });
+  }
+};
   const handleNextStep = () => {
     if (kelompok === 'VI') {
       navigate('/step/5');
