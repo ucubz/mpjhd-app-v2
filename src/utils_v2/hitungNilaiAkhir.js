@@ -1,5 +1,3 @@
-// utils_v2/hitungNilaiAkhir.js
-
 import { hitungNilaiKelompokI } from './hitungNilaiKelompokI';
 import { tentukanNilaiPokok } from './tentukanNilaiPokok';
 import { hitungFaktorTambahan } from './hitungFaktorTambahan';
@@ -35,7 +33,10 @@ export function hitungNilaiAkhir(state) {
   );
 
   const nilaiTambahan = hitungFaktorTambahan(state.faktorPembobotan, kelompok);
-  const pengurangMeringankan = hitungFaktorMeringankan(state.faktorMeringankan);
+  const pengurangMeringankan = hitungFaktorMeringankan(
+    state.faktorMeringankan?.kooperatif,
+    state.faktorMeringankan?.inisiator
+  );
 
   const nilaiAkhir = nilaiPokok + nilaiTambahan - pengurangMeringankan;
 
