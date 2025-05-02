@@ -1,4 +1,5 @@
 // Step7_HasilAkhir.jsx
+import { useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { useMPJHD, useResetMPJHD } from '../context/MPJHDContext';
 import PageWrapper from '../components/PageWrapper';
@@ -7,7 +8,6 @@ import Stepper from '../components/Stepper';
 import Button from '../components/Button';
 import BackButton from '../components/BackButton';
 import ResetButton from '../components/ResetButton';
-import { useEffect } from 'react';
 
 import { tentukanNilaiPokok } from '../utils_v2/tentukanNilaiPokok';
 import { hitungFaktorTambahan } from '../utils_v2/hitungFaktorTambahan';
@@ -16,7 +16,7 @@ import { hitungNilaiAkhir } from '../utils_v2/hitungNilaiAkhir';
 import { konversiGrade } from '../utils_v2/konversiGrade';
 import { hitungNilaiKelompokI } from '../utils_v2/hitungNilaiKelompokI';
 
-// --- Custom Hook ---
+// Custom Hook
 function useRequireStep(requiredFields = [], redirectTo = '/step/1') {
   const { state } = useMPJHD();
   const resetMPJHD = useResetMPJHD();
@@ -34,25 +34,37 @@ function useRequireStep(requiredFields = [], redirectTo = '/step/1') {
 export default function Step7_HasilAkhir() {
   useRequireStep(['kelompok']);
 
-  const { state } = useMPJHD();
+  const { state, dispatch } = useMPJHD();
   const navigate = useNavigate();
-  const kelompok = String(state.kelompok || '').toUpperCase();
 
-  const nilaiPokok = kelompok === 'I'
-    ? hitungNilaiKelompokI(state.jumlahHariTidakMasuk || 0)
-    : tentukanNilaiPokok(kelompok, state.pasalUtama, state.dampak, state.jabatan);
+  useEffect(() => {
+    const kelompok = String(state.kelompok || '').toUpperCase();
 
-  const nilaiTambahan = kelompok !== 'I' ? hitungFaktorTambahan(state) : 0;
-  const pengurang = kelompok !== 'I' ? hitungFaktorMeringankan(state) : 0;
+    const nilaiPokok =
+      kelompok === 'I'
+        ? hitungNilaiKelompokI(state.jumlahHariTidakMasuk || 0)
+        : tentukanNilaiPokok(kelompok, state.pasalUtama, state.dampak, state.jabatan);
 
-  const { nilaiAkhir } = hitungNilaiAkhir({
-    ...state,
-    nilaiPokok,
-    nilaiTambahan,
-    pengurangMeringankan: pengurang,
-  });
+    const nilaiTambahan = hitungFaktorTambahan(state);
+    const pengurangMeringankan = hitungFaktorMeringankan(state);
 
-  const hasilGrade = konversiGrade(nilaiAkhir);
+    dispatch({ type: 'SET_NILAI_POKOK', nilaiPokok });
+    dispatch({ type: 'SET_NILAI_TAMBAHAN', nilaiTambahan });
+    dispatch({ type: 'SET_PENGURANG_MERINGANKAN', pengurangMeringankan });
+
+    const { nilaiAkhir } = hitungNilaiAkhir({
+      ...state,
+      nilaiPokok,
+      nilaiTambahan,
+      pengurangMeringankan,
+    });
+
+    dispatch({ type: 'SET_NILAI_AKHIR', nilaiAkhir });
+
+    const hasilGrade = konversiGrade(nilaiAkhir);
+    dispatch({ type: 'SET_HASIL_GRADE', grade: hasilGrade.grade });
+    dispatch({ type: 'SET_HASIL_HUKUMAN', jenisHukuman: hasilGrade.hukuman });
+  }, [dispatch, state]);
 
   const renderValue = (val) => {
     if (typeof val === 'boolean') return val ? 'true' : 'false';
@@ -75,9 +87,9 @@ export default function Step7_HasilAkhir() {
           <ResetButton />
         </div>
 
-        <h2 className="text-xl font-bold mb-6 text-center">Debug: Cek Isi State & Nilai</h2>
+        <h2 className="text-xl font-bold mb-6 text-center">Debug: Cek Isi State</h2>
 
-        <div className="overflow-auto mb-6">
+        <div className="overflow-auto">
           <table className="w-full text-sm border border-gray-300 dark:border-gray-600">
             <thead className="bg-gray-100 dark:bg-gray-700">
               <tr>
@@ -98,18 +110,12 @@ export default function Step7_HasilAkhir() {
           </table>
         </div>
 
-        <div className="bg-gray-50 dark:bg-gray-800 border rounded-md p-4 text-sm space-y-1 mb-8">
-          <p><strong>Kelompok:</strong> {kelompok}</p>
-          <p><strong>Nilai Pokok:</strong> {nilaiPokok}</p>
-          <p><strong>Nilai Tambahan:</strong> {nilaiTambahan}</p>
-          <p><strong>Pengurang Meringankan:</strong> {pengurang}</p>
-          <p><strong>Nilai Akhir:</strong> {nilaiAkhir}</p>
-          <p><strong>Grade Hukuman:</strong> {hasilGrade.grade}</p>
-          <p><strong>Jenis Hukuman:</strong> {hasilGrade.hukuman}</p>
+        <div className="mt-8">
+          <Stepper currentStep={7} totalSteps={7} />
+          <Button className="mt-4" onClick={() => navigate('/step/6')}>
+            Kembali
+          </Button>
         </div>
-
-        <Stepper currentStep={7} totalSteps={7} />
-        <Button className="mt-4" onClick={() => navigate('/step/6')}>Kembali</Button>
       </Card>
     </PageWrapper>
   );
