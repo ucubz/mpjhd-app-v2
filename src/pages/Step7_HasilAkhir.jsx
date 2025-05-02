@@ -1,4 +1,3 @@
-// Step 7 - Debug: Tampilkan Semua State dan Hitung Nilai
 import { useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { useMPJHD, useResetMPJHD } from '../context/MPJHDContext';
@@ -14,6 +13,7 @@ import { hitungFaktorTambahan } from '../utils_v2/hitungFaktorTambahan';
 import { hitungFaktorMeringankan } from '../utils_v2/hitungFaktorMeringankan';
 import { hitungNilaiAkhir } from '../utils_v2/hitungNilaiAkhir';
 import { konversiGrade } from '../utils_v2/konversiGrade';
+import { hitungNilaiKelompokI } from '../utils_v2/hitungNilaiKelompokI';
 
 // Custom Hook
 function useRequireStep(requiredFields = [], redirectTo = '/step/1') {
@@ -37,7 +37,12 @@ export default function Step7_HasilAkhir() {
   const navigate = useNavigate();
 
   useEffect(() => {
-    const nilaiPokok = tentukanNilaiPokok(state);
+    const kelompok = String(state.kelompok || '').toUpperCase();
+
+    const nilaiPokok = kelompok === 'I'
+      ? hitungNilaiKelompokI(state.jumlahHariTidakMasuk || 0)
+      : tentukanNilaiPokok(state);
+
     const nilaiTambahan = hitungFaktorTambahan(state);
     const pengurangMeringankan = hitungFaktorMeringankan(state);
 
@@ -80,7 +85,7 @@ export default function Step7_HasilAkhir() {
           <ResetButton />
         </div>
 
-        <h2 className="text-xl font-bold mb-6 text-center">Debug: Semua State dan Nilai</h2>
+        <h2 className="text-xl font-bold mb-6 text-center">Debug: Cek Isi State</h2>
 
         <div className="overflow-auto">
           <table className="w-full text-sm border border-gray-300 dark:border-gray-600">
@@ -105,9 +110,7 @@ export default function Step7_HasilAkhir() {
 
         <div className="mt-8">
           <Stepper currentStep={7} totalSteps={7} />
-          <Button className="mt-4" onClick={() => navigate('/step/6')}>
-            Kembali
-          </Button>
+          <Button className="mt-4" onClick={() => navigate('/step/6')}>Kembali</Button>
         </div>
       </Card>
     </PageWrapper>
