@@ -1,3 +1,5 @@
+// utils_v2/hitungNilaiAkhir.js
+
 import { hitungNilaiKelompokI } from './hitungNilaiKelompokI';
 import { tentukanNilaiPokok } from './tentukanNilaiPokok';
 import { hitungFaktorTambahan } from './hitungFaktorTambahan';
@@ -17,6 +19,11 @@ export function hitungNilaiAkhir(state) {
   if (kelompok === 'I') {
     const jumlahHari = state.jumlahHariTidakMasuk || 0;
     const nilaiPokok = hitungNilaiKelompokI(jumlahHari);
+
+    console.log('[DEBUG] Kelompok I');
+    console.log('[DEBUG] jumlahHariTidakMasuk:', jumlahHari);
+    console.log('[DEBUG] nilaiPokok:', nilaiPokok);
+
     return {
       nilaiPokok,
       nilaiTambahan: 0,
@@ -31,14 +38,20 @@ export function hitungNilaiAkhir(state) {
     state.dampak,
     state.jabatan
   );
-
   const nilaiTambahan = hitungFaktorTambahan(state.faktorPembobotan, kelompok);
-  const pengurangMeringankan = hitungFaktorMeringankan(
-    state.faktorMeringankan?.kooperatif,
-    state.faktorMeringankan?.inisiator
-  );
-
+  const pengurangMeringankan = hitungFaktorMeringankan(state.faktorMeringankan);
   const nilaiAkhir = nilaiPokok + nilaiTambahan - pengurangMeringankan;
+
+  console.log('[DEBUG] Kelompok:', kelompok);
+  console.log('[DEBUG] pasal:', state.pasalUtama);
+  console.log('[DEBUG] dampak:', state.dampak);
+  console.log('[DEBUG] jabatan:', state.jabatan);
+  console.log('[DEBUG] faktorPembobotan:', state.faktorPembobotan);
+  console.log('[DEBUG] faktorMeringankan:', state.faktorMeringankan);
+  console.log('[DEBUG] nilaiPokok:', nilaiPokok);
+  console.log('[DEBUG] nilaiTambahan:', nilaiTambahan);
+  console.log('[DEBUG] pengurangMeringankan:', pengurangMeringankan);
+  console.log('[DEBUG] nilaiAkhir:', nilaiAkhir);
 
   return {
     nilaiPokok,
