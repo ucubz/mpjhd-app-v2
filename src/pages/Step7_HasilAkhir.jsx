@@ -32,9 +32,9 @@ export default function Step7_HasilAkhir() {
 
   const nilaiTambahan = hitungFaktorTambahan(state.faktorPembobotan || {}, kelompok);
   const pengurangMeringankan = hitungFaktorMeringankan(
-  state.faktorMeringankan?.kooperatif,
-  state.faktorMeringankan?.inisiator
-);
+    state.faktorMeringankan?.kooperatif,
+    state.faktorMeringankan?.inisiator
+  );
 
   const nilaiAkhir = nilaiPokok + nilaiTambahan - pengurangMeringankan;
   const hasilGrade = konversiGrade(nilaiAkhir);
@@ -47,6 +47,25 @@ export default function Step7_HasilAkhir() {
     grade: hasilGrade.grade,
     jenisHukuman: hasilGrade.hukuman,
   };
+
+  // Rincian nilai tambahan khusus Kelompok II
+  const rincianTambahan = [];
+  if (kelompok === 'II') {
+    const { banyakPasal, hukdis, kesengajaan, hambatan } = state.faktorPembobotan || {};
+    const mapNilai = {
+      dua: 3.75, lebihDua: 7.5,
+      pernahSatu: 3.75, lebihSatu: 7.5,
+      lalai: 3.75, sengaja: 7.5,
+      tidakKooperatif: 3.75, menghalangi: 7.5,
+    };
+
+    rincianTambahan.push(
+      { label: 'Banyaknya pasal', nilai: mapNilai[banyakPasal] || 0 },
+      { label: 'Riwayat hukuman disiplin', nilai: mapNilai[hukdis] || 0 },
+      { label: 'Faktor kesengajaan', nilai: mapNilai[kesengajaan] || 0 },
+      { label: 'Hambatan pemeriksaan', nilai: mapNilai[hambatan] || 0 },
+    );
+  }
 
   const renderValue = (val) => {
     if (typeof val === 'boolean') return val ? 'true' : 'false';
@@ -65,7 +84,7 @@ export default function Step7_HasilAkhir() {
 
         <h2 className="text-xl font-bold mb-6 text-center">Debug: Perhitungan Nilai</h2>
 
-        <table className="w-full text-sm border border-gray-300 dark:border-gray-600">
+        <table className="w-full text-sm border border-gray-300 dark:border-gray-600 mb-6">
           <thead className="bg-gray-100 dark:bg-gray-700">
             <tr>
               <th className="border px-2 py-1">Nama</th>
@@ -82,9 +101,33 @@ export default function Step7_HasilAkhir() {
           </tbody>
         </table>
 
+        {kelompok === 'II' && (
+          <>
+            <h3 className="text-lg font-semibold mb-2">Rincian Faktor Tambahan (Kelompok II)</h3>
+            <table className="w-full text-sm border border-gray-300 dark:border-gray-600 mb-6">
+              <thead className="bg-gray-100 dark:bg-gray-700">
+                <tr>
+                  <th className="border px-2 py-1">Faktor</th>
+                  <th className="border px-2 py-1">Nilai</th>
+                </tr>
+              </thead>
+              <tbody>
+                {rincianTambahan.map((item) => (
+                  <tr key={item.label}>
+                    <td className="border px-2 py-1">{item.label}</td>
+                    <td className="border px-2 py-1">{item.nilai}</td>
+                  </tr>
+                ))}
+              </tbody>
+            </table>
+          </>
+        )}
+
         <div className="mt-8">
           <Stepper currentStep={7} totalSteps={7} />
-          <Button className="mt-4" onClick={() => navigate('/step/6')}>Kembali</Button>
+          <Button className="mt-4" onClick={() => navigate('/step/6')}>
+            Kembali
+          </Button>
         </div>
       </Card>
     </PageWrapper>
