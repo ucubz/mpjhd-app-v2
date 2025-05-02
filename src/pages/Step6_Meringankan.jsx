@@ -62,6 +62,7 @@ export default function Step6_Meringankan() {
 
   const handleNext = () => {
     if (isKelompokI) {
+      dispatch({ type: 'SET_PENGURANG_MERINGANKAN', pengurang: 0 }); // reset jika Kelompok I
       navigate('/step/7');
     } else {
       const pengurang = hitungPengurang();
