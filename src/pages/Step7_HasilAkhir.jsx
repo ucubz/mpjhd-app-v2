@@ -1,64 +1,47 @@
+// Step 7 - Cek Isi State MPJHD (sementara)
 import { useMPJHD } from '../context/MPJHDContext';
 import { useNavigate } from 'react-router-dom';
 import Stepper from '../components/Stepper';
-import { generateHTMLTable } from '../utils/generateHTMLTable';
-import { hitungNilaiAkhir } from '../utils_v2/hitungNilaiAkhir';
 
 export default function Step7_HasilAkhir() {
   const { state } = useMPJHD();
   const navigate = useNavigate();
-  const kelompok = state.kelompok;
-  const hasil = hitungNilaiAkhir(state);
 
-  const handleCopy = async () => {
-    const html = generateHTMLTable(kelompok, state);
-    await navigator.clipboard.write([
-      new ClipboardItem({ 'text/html': new Blob([html], { type: 'text/html' }) })
-    ]);
-    alert('Hasil telah disalin ke clipboard!');
+  const renderValue = (val) => {
+    if (typeof val === 'boolean') return val ? 'true' : 'false';
+    if (val === null || val === undefined) return '(kosong)';
+    if (typeof val === 'object') return JSON.stringify(val);
+    return val.toString();
   };
 
-  const formatNilai = (val) => (val ?? 0).toFixed(2);
+  const renderType = (val) => {
+    if (val === null) return 'null';
+    if (Array.isArray(val)) return 'array';
+    return typeof val;
+  };
 
   return (
     <div className="max-w-3xl mx-auto py-10 px-4">
-      <button
-        onClick={() => {
-          if (confirm('Yakin ingin mereset dan kembali ke awal?')) {
-            navigate('/step/1');
-          }
-        }}
-        className="text-red-600 font-semibold mb-4"
-      >
-        Reset
-      </button>
+      <h2 className="text-xl font-bold mb-6">Debug: Cek Isi State</h2>
 
-      <h2 className="text-xl font-bold mb-6">Hasil Rekapitulasi</h2>
-
-      <table className="w-full border border-gray-300 dark:border-gray-600 text-sm">
-        <tbody>
-          <tr><td className="p-2 font-semibold">Pasal yang dilanggar</td><td className="p-2">{state.pasalUtama}</td></tr>
-          <tr><td className="p-2 font-semibold">Kelompok</td><td className="p-2">{state.kelompok}</td></tr>
-          <tr><td className="p-2 font-semibold">Nilai Pokok</td><td className="p-2">{hasil.nilaiPokok}</td></tr>
-          <tr><td className="p-2 font-semibold">Nilai Tambahan</td><td className="p-2">{hasil.totalTambahan}</td></tr>
-          <tr><td className="p-2 font-semibold">Faktor Meringankan</td><td className="p-2">{hasil.totalMeringankan}</td></tr>
+      <table className="w-full text-sm border border-gray-300 dark:border-gray-600">
+        <thead className="bg-gray-100 dark:bg-gray-700">
           <tr>
-            <td className="p-2 font-semibold">Nilai Akhir</td>
-            <td className="p-2 font-bold">{formatNilai(hasil.nilaiAkhir)}</td>
+            <th className="border px-2 py-1">Nama State</th>
+            <th className="border px-2 py-1">Isi</th>
+            <th className="border px-2 py-1">Tipe</th>
           </tr>
-          <tr><td className="p-2 font-semibold">Grade</td><td className="p-2">{hasil.grade}</td></tr>
-          <tr><td className="p-2 font-semibold">Jenis Hukuman Disiplin</td><td className="p-2">{hasil.jenisHukuman}</td></tr>
+        </thead>
+        <tbody>
+          {Object.entries(state).map(([key, value]) => (
+            <tr key={key}>
+              <td className="border px-2 py-1 font-mono">{key}</td>
+              <td className="border px-2 py-1">{renderValue(value)}</td>
+              <td className="border px-2 py-1 text-gray-500">{renderType(value)}</td>
+            </tr>
+          ))}
         </tbody>
       </table>
-
-      <div className="mt-6">
-        <button
-          onClick={handleCopy}
-          className="bg-blue-600 text-white px-4 py-2 rounded-md"
-        >
-          Salin Tabel ke Clipboard
-        </button>
-      </div>
 
       <div className="mt-12">
         <Stepper currentStep={7} totalSteps={7} />
@@ -66,7 +49,7 @@ export default function Step7_HasilAkhir() {
           onClick={() => navigate('/step/6')}
           className="mt-4 text-sm text-blue-600 underline"
         >
-          Kembali
+          Kembali ke Step 6
         </button>
       </div>
     </div>
