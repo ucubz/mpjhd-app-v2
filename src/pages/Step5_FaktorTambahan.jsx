@@ -1,9 +1,13 @@
+import { useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
-import { useMPJHD } from '../context/MPJHDContext';
+import { Listbox } from '@headlessui/react';
+import { useMPJHD, useResetMPJHD } from '../context/MPJHDContext';
 import PageWrapper from '../components/PageWrapper';
 import Card from '../components/Card';
 import Stepper from '../components/Stepper';
-import { Listbox } from '@headlessui/react';
+import Button from '../components/Button';
+import BackButton from '../components/BackButton';
+import ResetButton from '../components/ResetButton';
 import { hitungFaktorTambahan } from '../utils_v2/hitungFaktorTambahan';
 
 const options = {
@@ -14,8 +18,8 @@ const options = {
   ],
   hukdis: [
     { label: 'Belum pernah dijatuhi hukuman disiplin', value: 'belumPernah' },
-    { label: 'Pernah satu kali dijatuhi hukdis', value: 'pernahSatu' },
-    { label: 'Lebih dari satu kali dijatuhi hukdis', value: 'lebihSatu' },
+    { label: 'Pernah satu kali dijatuhi hukuman', value: 'pernahSatu' },
+    { label: 'Lebih dari satu kali dijatuhi hukuman', value: 'lebihSatu' },
   ],
   kesengajaan: [
     { label: 'Terpaksa melakukan pelanggaran', value: 'terpaksa' },
@@ -28,6 +32,20 @@ const options = {
     { label: 'Menghalangi pemeriksaan', value: 'menghalangi' },
   ],
 };
+
+function useRequireStep(requiredFields = [], redirectTo = '/step/1') {
+  const { state } = useMPJHD();
+  const resetMPJHD = useResetMPJHD();
+  const navigate = useNavigate();
+
+  useEffect(() => {
+    const missing = requiredFields.some((field) => !state[field]);
+    if (missing) {
+      resetMPJHD();
+      navigate(redirectTo, { replace: true });
+    }
+  }, [state, requiredFields, navigate, redirectTo, resetMPJHD]);
+}
 
 function Dropdown({ label, field, value, onChange, list }) {
   return (
@@ -60,6 +78,8 @@ function Dropdown({ label, field, value, onChange, list }) {
 }
 
 export default function Step5_FaktorTambahan() {
+  useRequireStep(['kelompok'], '/step/1');
+
   const { state, dispatch } = useMPJHD();
   const navigate = useNavigate();
   const faktor = state.faktorPembobotan;
@@ -81,17 +101,8 @@ export default function Step5_FaktorTambahan() {
     <PageWrapper>
       <Card>
         <div className="flex justify-between items-center mb-6">
-          <button
-            onClick={() => {
-              if (confirm('Yakin ingin mereset dan kembali ke awal?')) {
-                dispatch({ type: 'RESET' });
-                navigate('/step/1');
-              }
-            }}
-            className="text-red-600 font-semibold"
-          >
-            Reset
-          </button>
+          <BackButton label="Kembali ke Step 4" />
+          <ResetButton />
         </div>
 
         <h2 className="text-xl font-bold mb-6 text-center">Faktor Pembobotan Tambahan</h2>
@@ -125,26 +136,16 @@ export default function Step5_FaktorTambahan() {
           list={options.hambatan}
         />
 
-        <button
+        <Button
           onClick={handleNext}
           disabled={!isComplete}
-          className={`mt-4 px-4 py-2 rounded-md w-full ${
-            isComplete
-              ? 'bg-blue-600 text-white hover:bg-blue-700'
-              : 'bg-gray-300 text-gray-600 cursor-not-allowed'
-          }`}
+          className="w-full mt-4"
         >
           Lanjut
-        </button>
+        </Button>
 
         <div className="mt-12">
           <Stepper currentStep={5} totalSteps={7} />
-          <button
-            onClick={() => navigate('/step/4')}
-            className="mt-4 text-sm text-blue-600 underline"
-          >
-            Kembali
-          </button>
         </div>
       </Card>
     </PageWrapper>
