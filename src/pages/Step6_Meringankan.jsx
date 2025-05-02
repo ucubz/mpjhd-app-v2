@@ -1,5 +1,5 @@
 import { useNavigate } from 'react-router-dom';
-import { useMPJHD } from '../context/MPJHDContext';
+import { useMPJHD, useResetMPJHD } from '../context/MPJHDContext';
 import PageWrapper from '../components/PageWrapper';
 import Card from '../components/Card';
 import Stepper from '../components/Stepper';
@@ -8,8 +8,26 @@ import ResetButton from '../components/ResetButton';
 import Button from '../components/Button';
 import { Switch } from '@headlessui/react';
 import { hitungNilaiAkhir } from '../utils_v2/hitungNilaiAkhir';
+import { useEffect } from 'react';
+
+// --- CUSTOM HOOK ---
+function useRequireStep(requiredFields = [], redirectTo = '/step/1') {
+  const { state } = useMPJHD();
+  const resetMPJHD = useResetMPJHD();
+  const navigate = useNavigate();
+
+  useEffect(() => {
+    const missing = requiredFields.some((field) => !state[field]);
+    if (missing) {
+      resetMPJHD();
+      navigate(redirectTo, { replace: true });
+    }
+  }, [state, requiredFields, navigate, redirectTo, resetMPJHD]);
+}
 
 export default function Step6_Meringankan() {
+  useRequireStep(['kelompok']); // memastikan kelompok sudah terisi
+
   const { state, dispatch } = useMPJHD();
   const navigate = useNavigate();
 
