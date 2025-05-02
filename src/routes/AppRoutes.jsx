@@ -6,7 +6,7 @@ import Step2 from '../pages/Step2_PilihPasal';
 import Step3 from '../pages/Step3_KondisiAwal';
 import Step4 from '../pages/Step4_FaktorUtama';
 import Step5 from '../pages/Step5_FaktorTambahan';
-import Step6 from '../pages/Step6_FaktorMeringankan';
+import Step6 from '../pages/Step6_Meringankan';
 import Step7 from '../pages/Step7_HasilAkhir';
 
 export default function AppRoutes() {
