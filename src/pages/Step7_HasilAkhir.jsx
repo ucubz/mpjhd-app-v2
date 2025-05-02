@@ -39,12 +39,20 @@ export default function Step7_HasilAkhir() {
   useEffect(() => {
     const kelompok = String(state.kelompok || '').toUpperCase();
 
-    const nilaiPokok = kelompok === 'I'
-      ? hitungNilaiKelompokI(state.jumlahHariTidakMasuk || 0)
-      : tentukanNilaiPokok(state);
+    const nilaiPokok =
+      kelompok === 'I'
+        ? hitungNilaiKelompokI(state.jumlahHariTidakMasuk || 0)
+        : tentukanNilaiPokok(
+            kelompok,
+            state.pasalUtama,
+            state.dampak,
+            state.jabatan
+          );
 
-    const nilaiTambahan = hitungFaktorTambahan(state);
-    const pengurangMeringankan = hitungFaktorMeringankan(state);
+    const nilaiTambahan =
+      kelompok !== 'I' ? hitungFaktorTambahan(state) : 0;
+    const pengurangMeringankan =
+      kelompok !== 'I' ? hitungFaktorMeringankan(state) : 0;
 
     dispatch({ type: 'SET_NILAI_POKOK', nilaiPokok });
     dispatch({ type: 'SET_NILAI_TAMBAHAN', nilaiTambahan });
@@ -87,6 +95,20 @@ export default function Step7_HasilAkhir() {
 
         <h2 className="text-xl font-bold mb-6 text-center">Debug: Cek Isi State</h2>
 
+        {/* Hasil Perhitungan */}
+        <div className="mb-6 bg-gray-50 dark:bg-gray-800 p-4 rounded-lg border dark:border-gray-600">
+          <h3 className="font-semibold text-lg mb-2">Hasil Perhitungan</h3>
+          <ul className="space-y-1 text-sm">
+            <li><strong>Nilai Pokok:</strong> {state.nilaiPokok ?? '(kosong)'}</li>
+            <li><strong>Nilai Tambahan:</strong> {state.nilaiTambahan ?? '(kosong)'}</li>
+            <li><strong>Pengurang Meringankan:</strong> {state.pengurangMeringankan ?? '(kosong)'}</li>
+            <li><strong>Nilai Akhir:</strong> {state.nilaiAkhir ?? '(kosong)'}</li>
+            <li><strong>Grade Hukuman:</strong> {state.grade ?? '(kosong)'}</li>
+            <li><strong>Jenis Hukuman:</strong> {state.jenisHukuman ?? '(kosong)'}</li>
+          </ul>
+        </div>
+
+        {/* Tabel Debug State */}
         <div className="overflow-auto">
           <table className="w-full text-sm border border-gray-300 dark:border-gray-600">
             <thead className="bg-gray-100 dark:bg-gray-700">
