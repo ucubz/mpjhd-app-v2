@@ -1,7 +1,10 @@
-// Step 6 - Faktor Meringankan
 import { useNavigate } from 'react-router-dom';
 import { useMPJHD } from '../context/MPJHDContext';
+import PageWrapper from '../components/PageWrapper';
+import Card from '../components/Card';
 import Stepper from '../components/Stepper';
+import BackButton from '../components/BackButton';
+import ResetButton from '../components/ResetButton';
 import { hitungNilaiAkhir } from '../utils_v2/hitungNilaiAkhir';
 
 export default function Step6_Meringankan() {
@@ -9,7 +12,7 @@ export default function Step6_Meringankan() {
   const navigate = useNavigate();
   const meringankan = state.faktorMeringankan;
 
-  const updateMeringankan = (field) => {
+  const updateCheckbox = (field) => {
     dispatch({
       type: 'SET_FAKTOR_MERINGANKAN',
       field,
@@ -35,58 +38,47 @@ export default function Step6_Meringankan() {
   };
 
   return (
-    <div className="max-w-xl mx-auto py-10 px-4">
-      <button
-        onClick={() => {
-          if (confirm('Yakin ingin mereset dan kembali ke awal?')) {
-            dispatch({ type: 'RESET' });
-            navigate('/step/1');
-          }
-        }}
-        className="text-red-600 font-semibold mb-4"
-      >
-        Reset
-      </button>
+    <PageWrapper>
+      <Card>
+        <div className="flex justify-between items-center mb-6">
+          <BackButton label="Kembali ke Step 5" />
+          <ResetButton />
+        </div>
 
-      <h2 className="text-xl font-bold mb-6">Faktor Meringankan</h2>
+        <h2 className="text-xl font-bold mb-6 text-center">Faktor Meringankan</h2>
 
-      <div className="space-y-4 mb-6">
-        <label className="flex items-center gap-3">
-          <input
-            type="checkbox"
-            checked={meringankan.kooperatif}
-            onChange={() => updateMeringankan('kooperatif')}
-            className="h-4 w-4"
-          />
-          <span>Berperilaku baik dan/atau kooperatif selama proses pemeriksaan (nilai 5)</span>
-        </label>
-        <label className="flex items-center gap-3">
-          <input
-            type="checkbox"
-            checked={meringankan.inisiator}
-            onChange={() => updateMeringankan('inisiator')}
-            className="h-4 w-4"
-          />
-          <span>Inisiator pengungkapan pelanggaran signifikan (nilai 10)</span>
-        </label>
-      </div>
+        <div className="space-y-4 mb-6">
+          <label className="flex items-center gap-3">
+            <input
+              type="checkbox"
+              checked={meringankan.kooperatif}
+              onChange={() => updateCheckbox('kooperatif')}
+              className="h-4 w-4"
+            />
+            <span>Berperilaku baik dan/atau kooperatif selama proses pemeriksaan (nilai 5)</span>
+          </label>
+          <label className="flex items-center gap-3">
+            <input
+              type="checkbox"
+              checked={meringankan.inisiator}
+              onChange={() => updateCheckbox('inisiator')}
+              className="h-4 w-4"
+            />
+            <span>Inisiator pengungkapan pelanggaran signifikan (nilai 10)</span>
+          </label>
+        </div>
 
-      <button
-        onClick={handleNext}
-        className="mt-4 px-4 py-2 bg-blue-600 text-white rounded-md"
-      >
-        Lanjut
-      </button>
-
-      <div className="mt-12">
-        <Stepper currentStep={6} totalSteps={7} />
         <button
-          onClick={() => navigate('/step/5')}
-          className="mt-4 text-sm text-blue-600 underline"
+          onClick={handleNext}
+          className="mt-4 w-full py-2 px-4 rounded-md bg-blue-600 text-white hover:bg-blue-700"
         >
-          Kembali
+          Lanjut
         </button>
-      </div>
-    </div>
+
+        <div className="mt-12">
+          <Stepper currentStep={6} totalSteps={7} />
+        </div>
+      </Card>
+    </PageWrapper>
   );
 }
