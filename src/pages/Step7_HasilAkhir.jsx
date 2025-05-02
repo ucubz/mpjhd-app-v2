@@ -1,6 +1,6 @@
-import { useEffect } from 'react';
+// Step7_HasilAkhir.jsx - Debug Reset Version
+import { useMPJHD } from '../context/MPJHDContext';
 import { useNavigate } from 'react-router-dom';
-import { useMPJHD, useResetMPJHD } from '../context/MPJHDContext';
 import PageWrapper from '../components/PageWrapper';
 import Card from '../components/Card';
 import Stepper from '../components/Stepper';
@@ -15,71 +15,48 @@ import { hitungNilaiAkhir } from '../utils_v2/hitungNilaiAkhir';
 import { konversiGrade } from '../utils_v2/konversiGrade';
 import { hitungNilaiKelompokI } from '../utils_v2/hitungNilaiKelompokI';
 
-function useRequireStep(requiredFields = [], redirectTo = '/step/1') {
-  const { state } = useMPJHD();
-  const resetMPJHD = useResetMPJHD();
-  const navigate = useNavigate();
-
-  useEffect(() => {
-    const missing = requiredFields.some((field) => !state[field]);
-    if (missing) {
-      resetMPJHD();
-      navigate(redirectTo, { replace: true });
-    }
-  }, [state, requiredFields, navigate, redirectTo, resetMPJHD]);
-}
-
 export default function Step7_HasilAkhir() {
-  useRequireStep(['kelompok']);
-
-  const { state, dispatch } = useMPJHD();
+  const { state } = useMPJHD();
   const navigate = useNavigate();
 
-  useEffect(() => {
-    const kelompok = String(state.kelompok || '').toUpperCase();
+  const kelompok = String(state.kelompok || '').toUpperCase();
 
-    const nilaiPokok =
-      kelompok === 'I'
-        ? hitungNilaiKelompokI(state.jumlahHariTidakMasuk || 0)
-        : tentukanNilaiPokok(
-            kelompok,
-            state.pasalUtama,
-            state.dampak || '',
-            state.jabatan || ''
-          );
+  const nilaiPokok =
+    kelompok === 'I'
+      ? hitungNilaiKelompokI(state.jumlahHariTidakMasuk || 0)
+      : tentukanNilaiPokok(
+          state.kelompok,
+          state.pasalUtama,
+          state.dampak || '',
+          state.jabatan || ''
+        );
 
-    const nilaiTambahan = hitungFaktorTambahan(state.faktorPembobotan || {}, kelompok);
-    const pengurangMeringankan = hitungFaktorMeringankan(state);
+  const nilaiTambahan = hitungFaktorTambahan(state.faktorPembobotan || {}, kelompok);
+  const pengurangMeringankan = hitungFaktorMeringankan(state);
 
-    dispatch({ type: 'SET_NILAI_POKOK', nilaiPokok });
-    dispatch({ type: 'SET_NILAI_TAMBAHAN', nilaiTambahan });
-    dispatch({ type: 'SET_PENGURANG_MERINGANKAN', pengurangMeringankan });
+  const { nilaiAkhir } = hitungNilaiAkhir({
+    ...state,
+    nilaiPokok,
+    nilaiTambahan,
+    pengurangMeringankan,
+  });
 
-    const { nilaiAkhir } = hitungNilaiAkhir({
-      ...state,
-      nilaiPokok,
-      nilaiTambahan,
-      pengurangMeringankan,
-    });
+  const hasilGrade = konversiGrade(nilaiAkhir);
 
-    dispatch({ type: 'SET_NILAI_AKHIR', nilaiAkhir });
-
-    const hasilGrade = konversiGrade(nilaiAkhir);
-    dispatch({ type: 'SET_HASIL_GRADE', grade: hasilGrade.grade });
-    dispatch({ type: 'SET_HASIL_HUKUMAN', jenisHukuman: hasilGrade.hukuman });
-  }, [dispatch, state]);
+  const hasil = {
+    nilaiPokok,
+    nilaiTambahan,
+    pengurangMeringankan,
+    nilaiAkhir,
+    grade: hasilGrade.grade,
+    jenisHukuman: hasilGrade.hukuman,
+  };
 
   const renderValue = (val) => {
     if (typeof val === 'boolean') return val ? 'true' : 'false';
     if (val === null || val === undefined) return '(kosong)';
     if (typeof val === 'object') return JSON.stringify(val);
     return val.toString();
-  };
-
-  const renderType = (val) => {
-    if (val === null) return 'null';
-    if (Array.isArray(val)) return 'array';
-    return typeof val;
   };
 
   return (
@@ -90,28 +67,24 @@ export default function Step7_HasilAkhir() {
           <ResetButton />
         </div>
 
-        <h2 className="text-xl font-bold mb-6 text-center">Debug: Cek Isi State</h2>
+        <h2 className="text-xl font-bold mb-6 text-center">Debug: Perhitungan Nilai</h2>
 
-        <div className="overflow-auto">
-          <table className="w-full text-sm border border-gray-300 dark:border-gray-600">
-            <thead className="bg-gray-100 dark:bg-gray-700">
-              <tr>
-                <th className="border px-2 py-1">Nama State</th>
-                <th className="border px-2 py-1">Isi</th>
-                <th className="border px-2 py-1">Tipe</th>
+        <table className="w-full text-sm border border-gray-300 dark:border-gray-600">
+          <thead className="bg-gray-100 dark:bg-gray-700">
+            <tr>
+              <th className="border px-2 py-1">Nama</th>
+              <th className="border px-2 py-1">Isi</th>
+            </tr>
+          </thead>
+          <tbody>
+            {Object.entries(hasil).map(([key, val]) => (
+              <tr key={key}>
+                <td className="border px-2 py-1 font-mono">{key}</td>
+                <td className="border px-2 py-1">{renderValue(val)}</td>
               </tr>
-            </thead>
-            <tbody>
-              {Object.entries(state).map(([key, value]) => (
-                <tr key={key}>
-                  <td className="border px-2 py-1 font-mono">{key}</td>
-                  <td className="border px-2 py-1">{renderValue(value)}</td>
-                  <td className="border px-2 py-1 text-gray-500">{renderType(value)}</td>
-                </tr>
-              ))}
-            </tbody>
-          </table>
-        </div>
+            ))}
+          </tbody>
+        </table>
 
         <div className="mt-8">
           <Stepper currentStep={7} totalSteps={7} />
