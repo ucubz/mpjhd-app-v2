@@ -1,3 +1,5 @@
+// utils_v2/hitungNilaiAkhir.js
+
 import { hitungNilaiKelompokI } from './hitungNilaiKelompokI';
 import { tentukanNilaiPokok } from './tentukanNilaiPokok';
 import { hitungFaktorTambahan } from './hitungFaktorTambahan';
@@ -11,10 +13,9 @@ import { hitungFaktorMeringankan } from './hitungFaktorMeringankan';
  * @param {object} state - Seluruh state dari context MPJHD
  * @returns {object} hasil: { nilaiPokok, nilaiTambahan, pengurangMeringankan, nilaiAkhir }
  */
-export function hitungNilaiAkhirLengkap(state) {
+export function hitungNilaiAkhir(state) {
   const kelompok = String(state.kelompok || '').toUpperCase();
 
-  // Kelompok I: khusus, hanya pakai jumlah hari
   if (kelompok === 'I') {
     const jumlahHari = state.jumlahHariTidakMasuk || 0;
     const nilaiPokok = hitungNilaiKelompokI(jumlahHari);
@@ -22,11 +23,10 @@ export function hitungNilaiAkhirLengkap(state) {
       nilaiPokok,
       nilaiTambahan: 0,
       pengurangMeringankan: 0,
-      nilaiAkhir: nilaiPokok, // langsung gunakan sebagai nilai akhir
+      nilaiAkhir: nilaiPokok,
     };
   }
 
-  // Kelompok lain: hitung semua komponen
   const nilaiPokok = tentukanNilaiPokok(
     state.kelompok,
     state.pasalUtama,
