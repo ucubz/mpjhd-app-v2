@@ -71,7 +71,7 @@ const handleOptionChange = (val, field) => {
   }
 };
  const handleNextStep = () => {
-  if (['II', 'VI'].includes(kelompok)) {
+  if (['II', 'V', 'VI'].includes(kelompok)) {
     navigate('/step/5');
   } else {
     navigate('/step/4');
