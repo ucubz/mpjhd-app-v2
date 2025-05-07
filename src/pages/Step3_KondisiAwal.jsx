@@ -29,54 +29,55 @@ export default function Step3_KondisiAwal() {
   // Cek: harus sudah pilih pasalUtama & kelompok
   useRequireStep(['pasalUtama', 'kelompok'], '/step/1');
 
-  const { state, dispatch } = useMPJHD();
-  const navigate = useNavigate();
+  const { state, dispatch } = useMPJHD(); // Mengambil state global dan fungsi dispatch untuk mengubah state
+  const navigate = useNavigate(); // Fungsi navigasi untuk berpindah halaman
 
-  const [isDialogOpen, setIsDialogOpen] = useState(false);
-  const [dialogMessage, setDialogMessage] = useState('');
+  const [isDialogOpen, setIsDialogOpen] = useState(false); // State untuk mengatur apakah dialog terbuka
+  const [dialogMessage, setDialogMessage] = useState(''); // State untuk pesan yang ditampilkan di dialog
 
-  const kelompok = state.kelompok || 'Tidak Diketahui';
-  const isKelompokIII = kelompok === 'III';
-  const isKelompokV = kelompok === 'V';
-  const isKelompokVI = kelompok === 'VI';
+  const kelompok = state.kelompok || 'Tidak Diketahui'; // Nilai kelompok dari state global, default 'Tidak Diketahui'
+  const isKelompokIII = kelompok === 'III'; // Boolean untuk mengecek apakah kelompok adalah 'III'
+  const isKelompokV = kelompok === 'V'; // Boolean untuk mengecek apakah kelompok adalah 'V'
+  const isKelompokVI = kelompok === 'VI'; // Boolean untuk mengecek apakah kelompok adalah 'VI'
 
-  const dampakOptions = ['Unit Kerja', 'Instansi', 'Negara'];
-  const reputasiOptions = ['Tidak Berdampak', 'Unit Kerja', 'Instansi/Tersangka'];
+  const dampakOptions = ['Unit Kerja', 'Instansi', 'Negara']; // Opsi untuk dampak pelanggaran
+  const reputasiOptions = ['Tidak Berdampak', 'Unit Kerja', 'Instansi/Tersangka']; // Opsi untuk dampak terhadap reputasi
   const jabatanOptions = [
     'Pejabat Administrator',
     'Pejabat Fungsional',
     'Pejabat Pimpinan Tinggi',
     'Pejabat lainnya',
-  ];
+  ]; // Opsi untuk jabatan pelaku
 
-const handleOptionChange = (val, field) => {
-  dispatch({ type: 'SET', field, value: val });
+  const handleOptionChange = (val, field) => {
+    dispatch({ type: 'SET', field, value: val });
 
-  if (isKelompokIII && field === 'adaKerugian') {
-    const newKelompok = val ? 'III Khusus' : 'III Umum';
-    dispatch({ type: 'SET', field: 'kelompok', value: newKelompok });
+    if (isKelompokIII && field === 'adaKerugian') {
+      const newKelompok = val ? 'III Khusus' : 'III Umum';
+      dispatch({ type: 'SET', field: 'kelompok', value: newKelompok });
 
-    if (val) {
-      navigate('/step/4');
-    } else {
-      navigate('/step/5');
+      if (val) {
+        navigate('/step/4');
+      } else {
+        navigate('/step/5');
+      }
     }
-  }
 
-  if (kelompok === 'VI' && field === 'reputasi') {
-    let nilai = 0;
-    if (val === 'Unit Kerja') nilai = 15;
-    if (val === 'Instansi/Tersangka') nilai = 30;
-    dispatch({ type: 'SET_FAKTOR_UTAMA', field: 'nilai', value: nilai });
-  }
-};
- const handleNextStep = () => {
-  if (['II', 'V', 'VI'].includes(kelompok)) {
-    navigate('/step/5');
-  } else {
-    navigate('/step/4');
-  }
-};
+    if (kelompok === 'VI' && field === 'reputasi') {
+      let nilai = 0;
+      if (val === 'Unit Kerja') nilai = 15;
+      if (val === 'Instansi/Tersangka') nilai = 30;
+      dispatch({ type: 'SET_FAKTOR_UTAMA', field: 'nilai', value: nilai });
+    }
+  };
+
+  const handleNextStep = () => {
+    if (['II', 'V', 'VI'].includes(kelompok)) {
+      navigate('/step/5');
+    } else {
+      navigate('/step/4');
+    }
+  };
 
   useEffect(() => {
     if (state.pasalUtama === 'Pasal 4 huruf f' || kelompok === 'I') {
