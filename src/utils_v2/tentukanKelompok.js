@@ -16,7 +16,7 @@ export function tentukanKelompok(pasal) {
     if (pasal.includes('Pasal 5 huruf m')) return 'IV';
     if (
       pasal.includes('Pasal 4 huruf e') ||
-      ['Pasal 5 angka 2', 'Pasal 5 angka 3', 'Pasal 5 angka 4', 'Pasal 5 angka 5', 'Pasal 5 angka 6', 'Pasal 5 angka 7']
+      ['Pasal 5 huruf n angka 2', 'Pasal 5 huruf n angka 3', 'Pasal 5 huruf n angka 4', 'Pasal 5 huruf n angka 5', 'Pasal 5 huruf n angka 6', 'Pasal 5 huruf n angka 7']
         .some(p => pasal.includes(p))
     ) return 'V';
     if (pasal.includes('Terkait Izin Perkawinan') || pasal.includes('Terkait Izin Perceraian')) return 'VI';
