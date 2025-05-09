@@ -7,30 +7,38 @@ import Button from '../components/Button';
 import BackButton from '../components/BackButton';
 import ResetButton from '../components/ResetButton';
 
+import { tentukanNilaiPokok } from '../utils_v2/tentukanNilaiPokok';
+import { hitungFaktorTambahan } from '../utils_v2/hitungFaktorTambahan';
+import { hitungFaktorMeringankan } from '../utils_v2/hitungFaktorMeringankan';
 import { konversiGrade } from '../utils_v2/konversiGrade';
-import { hitungNilaiAkhir } from '../utils_v2/hitungNilaiAkhir';
-import { hitungFaktorTambahanRinci } from '../utils_v2/hitungFaktorTambahan';
+import { hitungNilaiKelompokI } from '../utils_v2/hitungNilaiKelompokI';
 
 export default function Step7_HasilAkhir() {
   const { state } = useMPJHD();
   const navigate = useNavigate();
-
   const kelompok = String(state.kelompok || '').toUpperCase();
-  const tipeKelompokIII = state.tipeKelompokIII || '';
 
-  const {
-    nilaiPokok,
-    nilaiUtama,
-    nilaiTambahan,
-    pengurangMeringankan,
-    nilaiAkhir,
-  } = hitungNilaiAkhir(state);
+  const nilaiPokok =
+    kelompok === 'I'
+      ? hitungNilaiKelompokI(state.jumlahHariTidakMasuk || 0)
+      : tentukanNilaiPokok(
+          state.kelompok,
+          state.pasalUtama,
+          state.dampak || '',
+          state.jabatan || ''
+        );
 
+  const nilaiTambahan = hitungFaktorTambahan(state.faktorPembobotan || {}, kelompok);
+  const pengurangMeringankan = hitungFaktorMeringankan(
+    state.faktorMeringankan?.kooperatif,
+    state.faktorMeringankan?.inisiator
+  );
+
+  const nilaiAkhir = nilaiPokok + nilaiTambahan - pengurangMeringankan;
   const hasilGrade = konversiGrade(nilaiAkhir);
 
   const hasil = {
     nilaiPokok,
-    nilaiUtama,
     nilaiTambahan,
     pengurangMeringankan,
     nilaiAkhir,
@@ -45,25 +53,26 @@ export default function Step7_HasilAkhir() {
     return val.toString();
   };
 
-  const tampilkanTabelRincian =
-    kelompok === 'III' && ['individu', 'umum'].includes(tipeKelompokIII);
+  const tampilkanRincian = ['II', 'III', 'III UMUM', 'III KHUSUS INDIVIDU', 'IV', 'V', 'VI'].includes(kelompok);
+  const rincianTambahan = (() => {
+    const { banyakPasal, hukdis, kesengajaan, hambatan } = state.faktorPembobotan || {};
+    const key = kelompok.replaceAll(' ', '_').toUpperCase();
+    const map = {
+      II: { dua: 3.75, lebihDua: 7.5, pernahSatu: 3.75, lebihSatu: 7.5, lalai: 3.75, sengaja: 7.5, tidakKooperatif: 3.75, menghalangi: 7.5 },
+      III_UMUM: { dua: 2.5, lebihDua: 5, pernahSatu: 15, lalai: 2.5, sengaja: 5, tidakKooperatif: 2.5, menghalangi: 5 },
+      III_KHUSUS_INDIVIDU: { dua: 1.25, lebihDua: 2.5, pernahSatu: 1.25, lebihSatu: 2.5, lalai: 1.25, sengaja: 2.5, tidakKooperatif: 1.25, menghalangi: 2.5 },
+      IV: { dua: 1.25, lebihDua: 2.5, pernahSatu: 1.25, lebihSatu: 2.5, lalai: 1.25, sengaja: 2.5, tidakKooperatif: 1.25, menghalangi: 2.5 },
+      V: { dua: 3.75, lebihDua: 7.5, pernahSatu: 3.75, lebihSatu: 7.5, lalai: 3.75, sengaja: 7.5, tidakKooperatif: 3.75, menghalangi: 7.5 },
+      VI: { pernahSatu: 2.5, lebihSatu: 5, tidakKooperatif: 2.5, menghalangi: 5 },
+    }[key] || {};
 
-  const rincianTambahan = tampilkanTabelRincian
-    ? hitungFaktorTambahanRinci(
-        state.faktorPembobotan,
-        `III_${tipeKelompokIII.toUpperCase()}`
-      )
-    : {};
-
-  const faktorMeringankan = state.faktorMeringankan || {};
-  const rincianMeringankan = [];
-
-  if (faktorMeringankan.kooperatif) {
-    rincianMeringankan.push({ label: 'Kooperatif saat diperiksa', nilai: 5 });
-  }
-  if (faktorMeringankan.inisiator) {
-    rincianMeringankan.push({ label: 'Pelaku adalah inisiator', nilai: 10 });
-  }
+    return [
+      { label: 'Banyaknya pasal', nilai: map[banyakPasal] || 0 },
+      { label: 'Riwayat hukuman disiplin', nilai: map[hukdis] || 0 },
+      { label: 'Faktor kesengajaan', nilai: map[kesengajaan] || 0 },
+      { label: 'Hambatan pemeriksaan', nilai: map[hambatan] || 0 },
+    ];
+  })();
 
   return (
     <PageWrapper>
@@ -92,11 +101,9 @@ export default function Step7_HasilAkhir() {
           </tbody>
         </table>
 
-        {tampilkanTabelRincian && (
+        {tampilkanRincian && (
           <>
-            <h3 className="text-lg font-semibold mb-2">
-              Rincian Faktor Tambahan (Kelompok III - {tipeKelompokIII})
-            </h3>
+            <h3 className="text-lg font-semibold mb-2">Rincian Faktor Tambahan (Kelompok {kelompok})</h3>
             <table className="w-full text-sm border border-gray-300 dark:border-gray-600 mb-6">
               <thead className="bg-gray-100 dark:bg-gray-700">
                 <tr>
@@ -105,31 +112,7 @@ export default function Step7_HasilAkhir() {
                 </tr>
               </thead>
               <tbody>
-                {Object.entries(rincianTambahan).map(([label, nilai]) => (
-                  <tr key={label}>
-                    <td className="border px-2 py-1">
-                      {label.replace(/([A-Z])/g, ' $1')}
-                    </td>
-                    <td className="border px-2 py-1">{nilai}</td>
-                  </tr>
-                ))}
-              </tbody>
-            </table>
-          </>
-        )}
-
-        {rincianMeringankan.length > 0 && (
-          <>
-            <h3 className="text-lg font-semibold mb-2">Rincian Faktor Meringankan</h3>
-            <table className="w-full text-sm border border-gray-300 dark:border-gray-600 mb-6">
-              <thead className="bg-gray-100 dark:bg-gray-700">
-                <tr>
-                  <th className="border px-2 py-1">Faktor</th>
-                  <th className="border px-2 py-1">Nilai</th>
-                </tr>
-              </thead>
-              <tbody>
-                {rincianMeringankan.map((item) => (
+                {rincianTambahan.map((item) => (
                   <tr key={item.label}>
                     <td className="border px-2 py-1">{item.label}</td>
                     <td className="border px-2 py-1">{item.nilai}</td>

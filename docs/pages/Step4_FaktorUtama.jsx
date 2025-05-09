@@ -1,4 +1,4 @@
-import { useEffect } from 'react'
+import { useEffect, useState } from 'react'
 import { useNavigate } from 'react-router-dom'
 import { RadioGroup } from '@headlessui/react'
 import { CheckCircleIcon } from '@heroicons/react/24/solid'
@@ -29,49 +29,65 @@ export default function Step4_FaktorUtama() {
   const { state, dispatch } = useMPJHD()
   const navigate = useNavigate()
   const kelompok = state.kelompok
-  const tipe = state.tipeKelompokIII
   const faktor = state.faktorUtama
+  const [tipeDipilih, setTipeDipilih] = useState(state.tipeKelompokIII || '')
 
-  const isKelompokIII = kelompok === 'III'
+  const isIII_Khusus = kelompok === 'III Khusus'
+  const isIII_Khusus_Bersama = kelompok === 'III Khusus Bersama'
+  const isIII_Khusus_Individu = kelompok === 'III Khusus Individu'
   const isIV = kelompok === 'IV'
 
-  const showPemecah = isKelompokIII && !tipe
-  const showPeran = isKelompokIII && tipe === 'bersama'
-  const showKerugian =
-    (isKelompokIII && tipe === 'individu') || isIV
+  const showPemecah = isIII_Khusus
+  const showPeran = isIII_Khusus_Bersama
+  const showKerugian = isIII_Khusus_Bersama || isIII_Khusus_Individu || isIV
+
+  useEffect(() => {
+    if (kelompok === 'III Umum') {
+      navigate('/step/5')
+    }
+  }, [kelompok, navigate])
 
   const updateFaktor = (field, value) => {
     let nilai = 0
 
     if (field === 'peran') {
-      const v = value.toLowerCase()
-      if (v === 'pasif') nilai = 5
-      if (v === 'aktif') nilai = 10
-      if (v === 'inisiator') nilai = 15
-      dispatch({ type: 'SET_FAKTOR_UTAMA', field, value: v })
+      if (value === 'Pasif') nilai = 10
+      if (value === 'Aktif') nilai = 20
+      if (value === 'Inisiator') nilai = 30
     }
 
     if (field === 'jumlahKerugian') {
-      if (tipe === 'individu' || isIV) {
+      if (isIII_Khusus_Individu || isIV) {
         if (value === '< 1 juta') nilai = 7.5
         if (value === '1 - 10 juta') nilai = 15
         if (value === '> 10 juta') nilai = 22.5
         if (value === '> 100 juta') nilai = 30
+      } else if (isIII_Khusus_Bersama) {
+        if (value === '< 1 juta') nilai = 2.5
+        if (value === '1 - 10 juta') nilai = 5
+        if (value === '> 10 juta') nilai = 7.5
+        if (value === '> 100 juta') nilai = 10
       }
-      dispatch({ type: 'SET_FAKTOR_UTAMA', field, value })
     }
 
+    dispatch({ type: 'SET_FAKTOR_UTAMA', field, value })
     dispatch({ type: 'SET_FAKTOR_UTAMA', field: 'nilai', value: nilai })
   }
 
   const handlePilihTipe = (val) => {
+    setTipeDipilih(val)
     dispatch({ type: 'SET', field: 'tipeKelompokIII', value: val })
+    dispatch({
+      type: 'SET',
+      field: 'kelompok',
+      value: val === 'bersama' ? 'III Khusus Bersama' : 'III Khusus Individu',
+    })
   }
 
   const handleNext = () => navigate('/step/5')
 
   const isComplete =
-    (!showPemecah || tipe) &&
+    (!showPemecah || tipeDipilih) &&
     (!showPeran || faktor.peran) &&
     (!showKerugian || faktor.jumlahKerugian)
 
@@ -85,11 +101,10 @@ export default function Step4_FaktorUtama() {
 
         <h2 className="text-xl font-bold mb-6 text-center">Faktor Pembobotan Utama</h2>
 
-        {/* Pertanyaan pemecah untuk Kelompok III */}
         {showPemecah && (
           <div className="mb-6">
             <p className="font-semibold mb-2">Apakah pelanggaran dilakukan:</p>
-            <RadioGroup value={tipe || ''} onChange={handlePilihTipe}>
+            <RadioGroup value={tipeDipilih} onChange={handlePilihTipe}>
               <div className="space-y-2">
                 <RadioGroup.Option value="bersama" className={({ checked }) =>
                   `p-3 border rounded-xl ${checked ? 'bg-blue-100 border-blue-500' : 'border-gray-300'}`
@@ -116,12 +131,11 @@ export default function Step4_FaktorUtama() {
           </div>
         )}
 
-        {/* Pertanyaan Peran: hanya untuk III bersama */}
         {showPeran && (
           <div className="mb-6">
             <p className="font-semibold mb-2">Peran Pelaku:</p>
             <RadioGroup
-              value={faktor.peran || ''}
+              value={faktor.peran}
               onChange={(val) => updateFaktor('peran', val)}
             >
               <div className="space-y-2">
@@ -146,7 +160,6 @@ export default function Step4_FaktorUtama() {
           </div>
         )}
 
-        {/* Pertanyaan jumlah kerugian: hanya untuk III individu dan IV */}
         {showKerugian && (
           <div className="mb-6">
             <p className="font-semibold mb-2">
@@ -155,7 +168,7 @@ export default function Step4_FaktorUtama() {
                 : 'Jumlah uang yang diterima atau kerugian negara/pihak lain:'}
             </p>
             <RadioGroup
-              value={faktor.jumlahKerugian || ''}
+              value={faktor.jumlahKerugian}
               onChange={(val) => updateFaktor('jumlahKerugian', val)}
             >
               <div className="space-y-2">

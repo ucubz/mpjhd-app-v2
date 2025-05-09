@@ -1,27 +1,29 @@
 import { createContext, useContext, useReducer } from 'react';
 
 const initialState = {
-  kategori: null,             // KEWAJIBAN / LARANGAN
+  kategori: null,
   pasalUtama: null,
   kelompok: null,
-  dampak: null,               // Unit Kerja / Instansi / Negara
-  jabatan: null,              // Untuk pasal 4 huruf e (Kelompok V)
-  adaKerugian: null,          // true / false
-  jumlahKerugian: 0,
-  tipeKelompokIII: null,      // bersama / individu
+  dampak: null,
+  jabatan: null,
+  adaKerugian: null,
+  tipeKelompokIII: null,
+  jumlahHariTidakMasuk: '',
+  tipeHariTidakMasuk: '',
 
   faktorUtama: {
     peran: null,
-    jumlahKerugian: null,
+    jumlahKerugian: '',
     reputasi: null,
     nilai: 0,
   },
 
   faktorPembobotan: {
-    banyakPasal: null,
-    hukdis: null,
-    kesengajaan: null,
-    hambatan: null,
+    banyakPasal: '',
+    hukdis: '',
+    kesengajaan: '',
+    hambatan: '',
+    jumlahKerugian: '',
   },
 
   faktorMeringankan: {
@@ -34,8 +36,9 @@ const initialState = {
   nilaiAkhir: 0,
   grade: '',
   jenisHukuman: '',
-  isFinished: false,     // Untuk proteksi refresh sebelum selesai
+  isFinished: false,
 };
+
 
 function reducer(state, action) {
   switch (action.type) {
@@ -72,7 +75,13 @@ function reducer(state, action) {
     case 'RESET':
       return initialState;
 
-    default:
+    case 'SET_JUMLAH_HARI_TIDAK_MASUK':
+      return { ...state, jumlahHariTidakMasuk: action.value };
+    
+    case 'SET_TIPE_HARI_TIDAK_MASUK':
+      return { ...state, tipeHariTidakMasuk: action.value };
+      
+      default:
       return state;
   }
 }

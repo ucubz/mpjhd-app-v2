@@ -51,7 +51,18 @@ export default function Step3_KondisiAwal() {
 
   const handleOptionChange = (val, field) => {
     dispatch({ type: 'SET', field, value: val });
-   
+
+    if (isKelompokIII && field === 'adaKerugian') {
+      const newKelompok = val ? 'III Khusus' : 'III Umum';
+      dispatch({ type: 'SET', field: 'kelompok', value: newKelompok });
+
+      if (val) {
+        navigate('/step/4');
+      } else {
+        navigate('/step/5');
+      }
+    }
+
     if (kelompok === 'VI' && field === 'reputasi') {
       let nilai = 0;
       if (val === 'Unit Kerja') nilai = 15;
@@ -61,27 +72,12 @@ export default function Step3_KondisiAwal() {
   };
 
   const handleNextStep = () => {
-    if (kelompok === 'III') {
-      const adaKerugian = state.adaKerugian;
-  
-      if (adaKerugian === true) {
-        dispatch({ type: 'SET', field: 'tipeKelompokIII', value: '' }); // kosong dulu
-        navigate('/step/4');
-      } else if (adaKerugian === false) {
-        dispatch({ type: 'SET', field: 'tipeKelompokIII', value: 'umum' });
-        navigate('/step/5');
-      }
-      return;
-    }
-  
     if (['II', 'V', 'VI'].includes(kelompok)) {
       navigate('/step/5');
     } else {
       navigate('/step/4');
     }
   };
-  
-  
 
   useEffect(() => {
     if (state.pasalUtama === 'Pasal 4 huruf f' || kelompok === 'I') {
