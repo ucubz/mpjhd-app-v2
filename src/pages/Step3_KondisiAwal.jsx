@@ -16,18 +16,20 @@ function useRequireStep(requiredFields = [], redirectTo = '/step/1') {
   const navigate = useNavigate();
 
   useEffect(() => {
-    const missing = requiredFields.some(field => !state[field]);
+    const missing = requiredFields.some((field) => !state[field]);
     if (missing) {
       resetMPJHD();
       navigate(redirectTo, { replace: true });
     }
   }, [state, requiredFields, navigate, redirectTo, resetMPJHD]);
 }
+
 // --- END CUSTOM HOOK ---
 
 export default function Step3_KondisiAwal() {
   // Cek: harus sudah pilih pasalUtama & kelompok
   useRequireStep(['pasalUtama', 'kelompok'], '/step/1');
+
 
   const { state, dispatch } = useMPJHD(); // Mengambil state global dan fungsi dispatch untuk mengubah state
   const navigate = useNavigate(); // Fungsi navigasi untuk berpindah halaman

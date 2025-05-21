@@ -18,6 +18,24 @@ import BackButton from '../components/BackButton';
 import ResetButton from '../components/ResetButton';
 import { hitungFaktorTambahan, nilaiMap, getAvailableOptions } from '../utils_v2/hitungFaktorTambahan';
 
+// --- CUSTOM HOOK: cek state step sebelumnya ---
+function useRequireStep(requiredFields = [], redirectTo = '/step/1') {
+  const { state } = useMPJHD();
+  const resetMPJHD = useResetMPJHD();
+  const navigate = useNavigate();
+
+  useEffect(() => {
+    const missing = requiredFields.some((field) => !state[field]);
+    if (missing) {
+      resetMPJHD();
+      navigate(redirectTo, { replace: true });
+    }
+  }, [state, requiredFields, navigate, redirectTo, resetMPJHD]);
+}
+
+// --- END CUSTOM HOOK ---
+
+
 const options = {
   banyakPasal: [
     { label: 'Hanya satu pasal yang dilanggar', value: 'satu' },
@@ -48,19 +66,6 @@ const jumlahKerugianOptions = [
   '> 100 juta',
 ];
 
-function useRequireStep(requiredFields = [], redirectTo = '/step/1') {
-  const { state } = useMPJHD();
-  const resetMPJHD = useResetMPJHD();
-  const navigate = useNavigate();
-
-  useEffect(() => {
-    const missing = requiredFields.some((field) => !state[field]);
-    if (missing) {
-      resetMPJHD();
-      navigate(redirectTo, { replace: true });
-    }
-  }, [state, requiredFields, navigate, redirectTo, resetMPJHD]);
-}
 
 function FancyListbox({ label, field, value, onChange, list, kelompokAktif }) {
   const selected = list.find((x) => x.value === value) || null;
@@ -111,6 +116,7 @@ function FancyListbox({ label, field, value, onChange, list, kelompokAktif }) {
 
 export default function Step5_FaktorTambahan() {
   useRequireStep(['kelompok'], '/step/1');
+
 
   const { state, dispatch } = useMPJHD();
   const navigate = useNavigate();

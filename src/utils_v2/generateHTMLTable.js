@@ -111,7 +111,7 @@ export function generateHTMLTable(kelompok, state) {
   <tbody>
     <tr><td style="${tdRight}">1.</td><td style="${tdLeft}" colspan="3">Nilai Pokok</td><td style="${tdRight}">${state.nilaiPokok ?? ''}</td></tr>
     <tr><td style="${tdRight}">2.</td><td style="${tdLeft}" colspan="3">Nilai Tambahan</td><td style="${tdRight}">${state.nilaiTambahan ?? ''}</td></tr>
-    <tr><td style="${tdRight}">2.1.</td><td style="${tdLeft}" colspan="3">Faktor Pembobotan Utama</td><td style="${tdRight}">${state.faktorUtama ?? ''}</td></tr>
+    <tr><td style="${tdRight}">2.1.</td><td style="${tdLeft}" colspan="3">Faktor Pembobotan Utama</td><td style="${tdRight}">${state.faktorUtama.nilai ?? ''}</td></tr>
     <tr><td style="${tdRight}">2.2.</td><td style="${tdLeft}" colspan="3">Faktor Pembobotan Tambahan</td><td style="${tdRight}"></td></tr>
     <tr><td style="${tdRight}"></td><td style="${tdIndent}" colspan="2">Jumlah Pasal</td><td style="${tdRight}">${state.faktorTambahanJumlahPasal ?? 0}</td><td style="${tdRight}"></td></tr>
     <tr><td style="${tdRight}"></td><td style="${tdIndent}" colspan="2">Rekam Jejak</td><td style="${tdRight}">${state.faktorTambahanRekamJejak ?? 0}</td><td style="${tdRight}"></td></tr>
@@ -127,27 +127,34 @@ export function generateHTMLTable(kelompok, state) {
   // =======================
   // Kelompok III Khusus Bersama
   function generateTableKelompokIIIKhususBersama(state) {
+    // Pastikan mapping handleCopyTable sudah benar:
+    // - state.faktorPeran     (should be state.faktorUtama.peran)
+    // - state.faktorTambahanJumlahUang (should be dari hasil hitungFaktorTambahanRinci)
+    const faktorPeran = state.faktorUtama?.peran ?? state.faktorPeran ?? '';
+    const jumlahUang = state.faktorTambahanJumlahUang ?? 0;
+  
     return `
-  <table style="${baseTableStyle}" border="1">
-  <thead>
-    <tr>
-      <th style="${thStyle}">No</th>
-      <th style="${thStyle}" colspan="3">Unsur Unsur</th>
-      <th style="${thStyle}">Jumlah</th>
-    </tr>
-  </thead>
-  <tbody>
-    <tr><td style="${tdRight}">1.</td><td style="${tdLeft}" colspan="3">Nilai Pokok</td><td style="${tdRight}">${state.nilaiPokok ?? ''}</td></tr>
-    <tr><td style="${tdRight}">2.</td><td style="${tdLeft}" colspan="3">Nilai Tambahan</td><td style="${tdRight}">${state.nilaiTambahan ?? ''}</td></tr>
-    <tr><td style="${tdRight}">2.1.</td><td style="${tdLeft}" colspan="3">Faktor Pembobotan Peran</td><td style="${tdRight}">${state.faktorPeran ?? ''}</td></tr>
-    <tr><td style="${tdRight}">2.2.</td><td style="${tdLeft}" colspan="3">Faktor Pembobotan Tambahan</td><td style="${tdRight}"></td></tr>
-    <tr><td style="${tdRight}"></td><td style="${tdIndent}" colspan="2">Jumlah Uang Diterima</td><td style="${tdRight}">${state.faktorTambahanJumlahUang ?? 0}</td><td style="${tdRight}"></td></tr>
-    <tr><td style="${tdRight}">2.3.</td><td style="${tdIndent}" colspan="2">Faktor Pembobotan yang Meringankan</td><td style="${tdRight}">(${state.faktorMeringankanNilai ?? 0})</td><td style="${tdRight}"></td></tr>
-    <tr><td style="${tdRight}">3.</td><td style="${tdLeft}" colspan="3">Nilai Akhir</td><td style="${tdRight}">${state.nilaiAkhir ?? ''}</td></tr>
-  </tbody>
-  </table>
+    <table style="${baseTableStyle}" border="1">
+    <thead>
+      <tr>
+        <th style="${thStyle}">No</th>
+        <th style="${thStyle}" colspan="3">Unsur Unsur</th>
+        <th style="${thStyle}">Jumlah</th>
+      </tr>
+    </thead>
+    <tbody>
+      <tr><td style="${tdRight}">1.</td><td style="${tdLeft}" colspan="3">Nilai Pokok</td><td style="${tdRight}">${state.nilaiPokok ?? ''}</td></tr>
+      <tr><td style="${tdRight}">2.</td><td style="${tdLeft}" colspan="3">Nilai Tambahan</td><td style="${tdRight}">${state.nilaiTambahan ?? ''}</td></tr>
+      <tr><td style="${tdRight}">2.1.</td><td style="${tdLeft}" colspan="3">Faktor Pembobotan Peran</td><td style="${tdRight}">${faktorPeran}</td></tr>
+      <tr><td style="${tdRight}">2.2.</td><td style="${tdLeft}" colspan="3">Faktor Pembobotan Tambahan</td><td style="${tdRight}"></td></tr>
+      <tr><td style="${tdRight}"></td><td style="${tdIndent}" colspan="2">Jumlah Uang Diterima</td><td style="${tdRight}">${jumlahUang}</td><td style="${tdRight}"></td></tr>
+      <tr><td style="${tdRight}">2.3.</td><td style="${tdIndent}" colspan="2">Faktor Pembobotan yang Meringankan</td><td style="${tdRight}">(${state.faktorMeringankanNilai ?? 0})</td><td style="${tdRight}"></td></tr>
+      <tr><td style="${tdRight}">3.</td><td style="${tdLeft}" colspan="3">Nilai Akhir</td><td style="${tdRight}">${state.nilaiAkhir ?? ''}</td></tr>
+    </tbody>
+    </table>
     `;
   }
+  
   
   // =======================
   // Kelompok IV
@@ -170,7 +177,7 @@ export function generateHTMLTable(kelompok, state) {
   <tbody>
     <tr><td style="${tdRight}">1.</td><td style="${tdLeft}" colspan="3">Nilai Pokok</td><td style="${tdRight}">${state.nilaiPokok ?? ''}</td></tr>
     <tr><td style="${tdRight}">2.</td><td style="${tdLeft}" colspan="3">Nilai Tambahan</td><td style="${tdRight}">${state.nilaiTambahan ?? ''}</td></tr>
-    <tr><td style="${tdRight}">2.1.</td><td style="${tdLeft}" colspan="3">Faktor Pembobotan Utama</td><td style="${tdRight}">${state.faktorUtama ?? ''}</td></tr>
+    <tr><td style="${tdRight}">2.1.</td><td style="${tdLeft}" colspan="3">Faktor Pembobotan Utama</td><td style="${tdRight}">${state.faktorUtama.nilai ?? ''}</td></tr>
     <tr><td style="${tdRight}">2.2.</td><td style="${tdLeft}" colspan="3">Faktor Pembobotan Tambahan</td><td style="${tdRight}"></td></tr>
     <tr><td style="${tdRight}"></td><td style="${tdIndent}" colspan="2">Rekam Jejak</td><td style="${tdRight}">${state.faktorTambahanRekamJejak ?? 0}</td><td style="${tdRight}"></td></tr>
     <tr><td style="${tdRight}"></td><td style="${tdIndent}" colspan="2">Hambatan Pemeriksaan</td><td style="${tdRight}">${state.faktorTambahanHambatan ?? 0}</td><td style="${tdRight}"></td></tr>

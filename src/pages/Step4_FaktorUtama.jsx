@@ -9,22 +9,26 @@ import Stepper from '../components/Stepper'
 import BackButton from '../components/BackButton'
 import ResetButton from '../components/ResetButton'
 
+// --- CUSTOM HOOK: cek state step sebelumnya ---
 function useRequireStep(requiredFields = [], redirectTo = '/step/1') {
-  const { state } = useMPJHD()
-  const resetMPJHD = useResetMPJHD()
-  const navigate = useNavigate()
+  const { state } = useMPJHD();
+  const resetMPJHD = useResetMPJHD();
+  const navigate = useNavigate();
 
   useEffect(() => {
-    const missing = requiredFields.some((field) => !state[field])
+    const missing = requiredFields.some((field) => !state[field]);
     if (missing) {
-      resetMPJHD()
-      navigate(redirectTo, { replace: true })
+      resetMPJHD();
+      navigate(redirectTo, { replace: true });
     }
-  }, [state, requiredFields, navigate, redirectTo, resetMPJHD])
+  }, [state, requiredFields, navigate, redirectTo, resetMPJHD]);
 }
 
+// --- END CUSTOM HOOK ---
+
 export default function Step4_FaktorUtama() {
-  useRequireStep(['kelompok'])
+  useRequireStep(['kelompok'], '/step/1');
+
 
   const { state, dispatch } = useMPJHD()
   const navigate = useNavigate()

@@ -9,23 +9,24 @@ import Stepper from '../components/Stepper';
 import BackButton from '../components/BackButton';
 import ResetButton from '../components/ResetButton';
 import { tentukanKelompok } from '../utils_v2/tentukanKelompok';
-
-// --- Custom hook untuk cek state step sebelumnya ---
 import { useEffect } from 'react';
+
+// --- CUSTOM HOOK: cek state step sebelumnya ---
 function useRequireStep(requiredFields = [], redirectTo = '/step/1') {
   const { state } = useMPJHD();
   const resetMPJHD = useResetMPJHD();
   const navigate = useNavigate();
 
   useEffect(() => {
-    const missing = requiredFields.some(field => !state[field]);
+    const missing = requiredFields.some((field) => !state[field]);
     if (missing) {
       resetMPJHD();
       navigate(redirectTo, { replace: true });
     }
   }, [state, requiredFields, navigate, redirectTo, resetMPJHD]);
 }
-// --- End custom hook ---
+
+// --- END CUSTOM HOOK ---
 
 const daftarPasal = {
   pasal3: [

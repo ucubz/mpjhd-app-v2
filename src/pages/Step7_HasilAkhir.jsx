@@ -1,4 +1,4 @@
-import { useMPJHD } from '../context/MPJHDContext';
+import { useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
 import PageWrapper from '../components/PageWrapper';
 import Card from '../components/Card';
@@ -6,12 +6,34 @@ import Stepper from '../components/Stepper';
 import Button from '../components/Button';
 import BackButton from '../components/BackButton';
 import ResetButton from '../components/ResetButton';
-
+import { useMPJHD, useResetMPJHD } from '../context/MPJHDContext';
 import { konversiGrade } from '../utils_v2/konversiGrade';
 import { hitungNilaiAkhir } from '../utils_v2/hitungNilaiAkhir';
 import { hitungFaktorTambahanRinci } from '../utils_v2/hitungFaktorTambahan';
+import { generateHTMLTable } from '../utils/generateHTMLTable'; // pastikan path sesuai
+
+function useRequireStep(requiredFields = [], redirectTo = '/step/1') {
+  const { state } = useMPJHD();
+  const resetMPJHD = useResetMPJHD();
+  const navigate = useNavigate();
+
+  useEffect(() => {
+    const missing = requiredFields.some((field) => !state[field]);
+    if (missing) {
+      resetMPJHD();
+      navigate(redirectTo, { replace: true });
+    }
+  }, [state, requiredFields, navigate, redirectTo, resetMPJHD]);
+}
+
+function capitalize(str) {
+  if (!str) return '';
+  return str.charAt(0).toUpperCase() + str.slice(1);
+}
 
 export default function Step7_HasilAkhir() {
+  useRequireStep(['kelompok', 'pasalUtama'], '/step/1');
+
   const { state } = useMPJHD();
   const navigate = useNavigate();
 
@@ -45,15 +67,17 @@ export default function Step7_HasilAkhir() {
     return val.toString();
   };
 
-  const tampilkanTabelRincian =
-    kelompok === 'III' && ['individu', 'umum'].includes(tipeKelompokIII);
+  const tampilkanTabelRincian = kelompok !== 'I';
 
   const rincianTambahan = tampilkanTabelRincian
-    ? hitungFaktorTambahanRinci(
-        state.faktorPembobotan,
-        `III_${tipeKelompokIII.toUpperCase()}`
-      )
-    : {};
+  ? hitungFaktorTambahanRinci(
+      state.faktorPembobotan,
+      kelompok === 'III' 
+        ? `III_${tipeKelompokIII.toUpperCase()}`
+        : kelompok
+    )
+  : {};
+
 
   const faktorMeringankan = state.faktorMeringankan || {};
   const rincianMeringankan = [];
@@ -65,6 +89,41 @@ export default function Step7_HasilAkhir() {
     rincianMeringankan.push({ label: 'Pelaku adalah inisiator', nilai: 10 });
   }
 
+  // ----------- TOMBOL COPY TABEL -----------
+  const handleCopyTable = async () => {
+    const html = generateHTMLTable(state.kelompok, {
+      ...state,
+      nilaiPokok,
+      nilaiUtama,
+      nilaiTambahan,
+      pengurangMeringankan,
+      faktorMeringankanNilai: pengurangMeringankan,
+      nilaiAkhir,
+      grade: hasilGrade.grade,
+      jenisHukuman: hasilGrade.hukuman,
+      rincianTambahan,
+      // Untuk semua varian kelompok III (umum, individu, bersama):
+      faktorTambahanJumlahPasal: rincianTambahan.banyakPasal ?? 0,
+      faktorTambahanRekamJejak: rincianTambahan.hukdis ?? 0,
+      faktorTambahanKesengajaan: rincianTambahan.kesengajaan ?? 0,
+      faktorTambahanHambatan: rincianTambahan.hambatan ?? 0,
+      // Khusus III Khusus Bersama:
+      faktorPeran: state.faktorUtama?.peran ?? state.faktorPeran ?? '',
+      faktorTambahanJumlahUang: rincianTambahan.jumlahKerugian ?? 0,
+      // Pengurang meringankan:
+      // tambahkan mapping jika ada field lain yg perlu
+    });
+    try {
+      const blob = new Blob([html], { type: 'text/html' });
+      const clipboardItem = new window.ClipboardItem({ 'text/html': blob });
+      await navigator.clipboard.write([clipboardItem]);
+      alert('✅ Tabel berhasil disalin dalam format tabel (HTML) ke clipboard!');
+    } catch (err) {
+      alert('❌ Gagal menyalin. Coba gunakan browser terbaru (Chrome/Edge).');
+    }
+  };
+  // ------------------------------------------
+
   return (
     <PageWrapper>
       <Card>
@@ -74,6 +133,10 @@ export default function Step7_HasilAkhir() {
         </div>
 
         <h2 className="text-xl font-bold mb-6 text-center">Debug: Perhitungan Nilai</h2>
+
+        <div className="flex justify-end mb-4">
+          <Button onClick={handleCopyTable}>Salin Tabel ke Clipboard</Button>
+        </div>
 
         <table className="w-full text-sm border border-gray-300 dark:border-gray-600 mb-6">
           <thead className="bg-gray-100 dark:bg-gray-700">
@@ -95,8 +158,14 @@ export default function Step7_HasilAkhir() {
         {tampilkanTabelRincian && (
           <>
             <h3 className="text-lg font-semibold mb-2">
-              Rincian Faktor Tambahan (Kelompok III - {tipeKelompokIII})
+              Rincian Faktor Tambahan
+              {kelompok === 'III' && tipeKelompokIII
+                ? ` (Kelompok III - ${capitalize(tipeKelompokIII)})`
+                : kelompok !== 'I'
+                  ? ` (Kelompok ${kelompok})`
+                  : ''}
             </h3>
+
             <table className="w-full text-sm border border-gray-300 dark:border-gray-600 mb-6">
               <thead className="bg-gray-100 dark:bg-gray-700">
                 <tr>

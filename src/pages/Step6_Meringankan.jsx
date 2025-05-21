@@ -8,7 +8,7 @@ import BackButton from '../components/BackButton';
 import ResetButton from '../components/ResetButton';
 import Button from '../components/Button';
 
-// --- Custom Hook untuk validasi step ---
+// --- CUSTOM HOOK: cek state step sebelumnya ---
 function useRequireStep(requiredFields = [], redirectTo = '/step/1') {
   const { state } = useMPJHD();
   const resetMPJHD = useResetMPJHD();
@@ -23,8 +23,11 @@ function useRequireStep(requiredFields = [], redirectTo = '/step/1') {
   }, [state, requiredFields, navigate, redirectTo, resetMPJHD]);
 }
 
+// --- END CUSTOM HOOK ---
+
 export default function Step6_Meringankan() {
-  useRequireStep(['kelompok']);
+  useRequireStep(['kelompok'], '/step/1');
+
 
   const { state, dispatch } = useMPJHD();
   const navigate = useNavigate();
