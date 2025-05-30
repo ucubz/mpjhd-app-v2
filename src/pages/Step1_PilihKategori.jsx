@@ -10,7 +10,7 @@ import ResetButton from '../components/ResetButton';
 
 const pilihan = [
   { label: 'Pasal 3 - Kewajiban', value: 'pasal3' },
-  { label: 'Pasal 4 - Larangan', value: 'pasal4' },
+  { label: 'Pasal 4 - Kewajiban', value: 'pasal4' },
   { label: 'Pasal 5 - Larangan', value: 'pasal5' },
   { label: 'Izin Perkawinan atau Perceraian', value: 'izin' },
 ];
