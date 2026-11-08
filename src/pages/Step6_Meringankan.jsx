@@ -7,6 +7,8 @@ import Stepper from '../components/Stepper';
 import BackButton from '../components/BackButton';
 import ResetButton from '../components/ResetButton';
 import Button from '../components/Button';
+import { hitungNilaiKelompokI } from '../utils_v2/hitungNilaiKelompokI';
+import { NILAI_KOOPERATIF, NILAI_INISIATOR } from '../utils_v2/hitungFaktorMeringankan';
 
 // --- CUSTOM HOOK: cek state step sebelumnya ---
 function useRequireStep(requiredFields = [], redirectTo = '/step/1') {
@@ -54,11 +56,13 @@ export default function Step6_Meringankan() {
     });
   };
 
+  const hariValid = Number.isInteger(jumlahHari) && jumlahHari > 0;
+  const berturut = state.tipeHariTidakMasuk === 'berturut';
+  const nilaiHari = hariValid ? hitungNilaiKelompokI(jumlahHari, berturut) : 0;
+  const canNext = !isKelompokI || hariValid;
+
   const handleNext = () => {
-    if (isKelompokI) {
-      dispatch({ type: 'SET_PENGURANG_MERINGANKAN', pengurang: 0 });
-    }
-    navigate('/step/7');
+    if (canNext) navigate('/step/7');
   };
 
   return (
@@ -83,8 +87,28 @@ export default function Step6_Meringankan() {
               value={jumlahHari}
               onChange={handleHariChange}
               className="w-full border px-4 py-2 rounded-md dark:bg-gray-800 dark:text-white"
-              min={0}
+              min={1}
             />
+            {jumlahHari === 10 && (
+              <label className="mt-3 flex items-start gap-3 cursor-pointer">
+                <input
+                  type="checkbox"
+                  checked={berturut}
+                  onChange={(e) =>
+                    dispatch({ type: 'SET_TIPE_HARI_TIDAK_MASUK', value: e.target.checked ? 'berturut' : '' })
+                  }
+                  className="h-4 w-4 mt-1 accent-blue-600"
+                />
+                <span className="text-sm leading-relaxed dark:text-white">
+                  Tidak masuk 10 hari kerja secara berturut-turut
+                </span>
+              </label>
+            )}
+            {hariValid && nilaiHari === 0 && (
+              <p className="mt-3 text-sm text-amber-700 dark:text-amber-300">
+                Tidak masuk kurang dari 3 hari tidak diatur dalam tabel PMK 123/2023.
+              </p>
+            )}
           </div>
         ) : (
           <div className="space-y-4 mb-6">
@@ -96,7 +120,7 @@ export default function Step6_Meringankan() {
                 className="h-4 w-4 mt-1 accent-blue-600"
               />
               <span className="text-sm leading-relaxed dark:text-white">
-                Berperilaku baik dan/atau kooperatif selama proses pemeriksaan (nilai 5)
+                Berperilaku baik dan/atau kooperatif selama proses pemeriksaan (nilai {NILAI_KOOPERATIF})
               </span>
             </label>
 
@@ -108,14 +132,17 @@ export default function Step6_Meringankan() {
                 className="h-4 w-4 mt-1 accent-blue-600"
               />
               <span className="text-sm leading-relaxed dark:text-white">
-                Inisiator pengungkapan pelanggaran signifikan (nilai 10)
+                Inisiator pengungkapan pelanggaran signifikan (nilai {NILAI_INISIATOR})
               </span>
             </label>
+            <p className="text-xs leading-relaxed text-gray-600 dark:text-gray-300">
+              Catatan: faktor inisiator berlaku bila pelanggaran dilakukan bersama-sama oleh lebih dari satu
+              Terperiksa dan diungkap/dilaporkan kepada UKI atau Inspektorat Jenderal.
+            </p>
           </div>
-
         )}
 
-        <Button onClick={handleNext}>Lanjut</Button>
+        <Button onClick={handleNext} disabled={!canNext}>Lanjut</Button>
 
         <div className="mt-12">
           <Stepper currentStep={6} totalSteps={7} />

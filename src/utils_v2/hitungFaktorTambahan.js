@@ -1,3 +1,5 @@
+import { NILAI_KERUGIAN_BERSAMA } from './opsiFaktor';
+
 /**
  * Map nilai pembobotan tambahan berdasarkan kelompok dan jenis faktor.
  */
@@ -22,7 +24,7 @@ export const nilaiMap = {
     lebihDua: 5,
     belumPernah: 0,
     pernahSatu: 15,
-    lebihSatu: 0,
+    // TODO(keputusan): opsi "lebih dari satu kali" dihapus untuk III Umum (nilai di PMK tidak jelas)
     terpaksa: 0,
     lalai: 2.5,
     sengaja: 5,
@@ -44,17 +46,8 @@ export const nilaiMap = {
     tidakKooperatif: 1.25,
     menghalangi: 2.5,
   },
-  III_BERSAMA: {
-    // Jumlah kerugian
-    '< 1 juta': 2.5,
-    '1 - 10 juta': 5,
-    '> 10 juta': 7.5,
-    '> 100 juta': 10,
-    // Peran
-    Pasif: 10,
-    Aktif: 20,
-    Inisiator: 30,
-  },
+  // III Bersama: tidak memakai empat faktor; tambahannya hanya jumlah uang/kerugian
+  // (lihat NILAI_KERUGIAN_BERSAMA di opsiFaktor.js)
   IV: {
     satu: 0,
     dua: 1.25,
@@ -93,6 +86,13 @@ export const nilaiMap = {
   },
 };
 
+/** Faktor mana saja yang ditanyakan/dihitung untuk kelompok aktif. */
+export function faktorYangDipakai(kelompok) {
+  if (kelompok === 'III_BERSAMA') return [];
+  if (kelompok === 'VI') return ['hukdis', 'hambatan'];
+  return ['banyakPasal', 'hukdis', 'kesengajaan', 'hambatan'];
+}
+
 /**
  * Menghitung total faktor tambahan berdasarkan kelompok dan pilihan faktor.
  * @param {Object} data - Data pilihan faktor (banyakPasal, hukdis, kesengajaan, hambatan).
@@ -100,17 +100,10 @@ export const nilaiMap = {
  * @returns {number} Total nilai faktor tambahan.
  */
 export function hitungFaktorTambahan(data, kelompok) {
+  if (kelompok === 'III_BERSAMA') return NILAI_KERUGIAN_BERSAMA[data?.jumlahKerugian] ?? 0;
   const map = nilaiMap[kelompok];
   if (!map) return 0;
-
-  let tambahan = 0;
-
-  tambahan += map[data.banyakPasal] ?? 0;
-  tambahan += map[data.hukdis] ?? 0;
-  tambahan += map[data.kesengajaan] ?? 0;
-  tambahan += map[data.hambatan] ?? 0;
-
-  return tambahan;
+  return faktorYangDipakai(kelompok).reduce((total, f) => total + (map[data?.[f]] ?? 0), 0);
 }
 
 /**
@@ -122,7 +115,13 @@ export function hitungFaktorTambahan(data, kelompok) {
  * @returns {Object} Rincian nilai per faktor
  */
 export function hitungFaktorTambahanRinci(data, kelompok) {
+  if (kelompok === 'III_BERSAMA') {
+    return { jumlahKerugian: NILAI_KERUGIAN_BERSAMA[data?.jumlahKerugian] ?? 0 };
+  }
   const map = nilaiMap[kelompok] || {};
+  if (kelompok === 'VI') {
+    return { hukdis: map[data.hukdis] ?? 0, hambatan: map[data.hambatan] ?? 0 };
+  }
 
   return {
     banyakPasal: map[data.banyakPasal] ?? 0,

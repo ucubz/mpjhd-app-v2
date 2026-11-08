@@ -8,6 +8,7 @@ import Card from '../components/Card';
 import Stepper from '../components/Stepper';
 import BackButton from '../components/BackButton';
 import ResetButton from '../components/ResetButton';
+import { pasalBelumDiatur } from '../utils_v2/tentukanNilaiPokok';
 
 // --- CUSTOM HOOK: cek state step sebelumnya ---
 function useRequireStep(requiredFields = [], redirectTo = '/step/1') {
@@ -53,13 +54,6 @@ export default function Step3_KondisiAwal() {
 
   const handleOptionChange = (val, field) => {
     dispatch({ type: 'SET', field, value: val });
-   
-    if (kelompok === 'VI' && field === 'reputasi') {
-      let nilai = 0;
-      if (val === 'Unit Kerja') nilai = 15;
-      if (val === 'Instansi/Tersangka') nilai = 30;
-      dispatch({ type: 'SET_FAKTOR_UTAMA', field: 'nilai', value: nilai });
-    }
   };
 
   const handleNextStep = () => {
@@ -86,12 +80,13 @@ export default function Step3_KondisiAwal() {
   
 
   useEffect(() => {
+    // replace: supaya tombol Kembali dari Step 4/6 tidak memantul kembali ke halaman ini
     if (state.pasalUtama === 'Pasal 4 huruf f' || kelompok === 'I') {
-      navigate('/step/6');
+      navigate('/step/6', { replace: true });
       return;
     }
     if (kelompok === 'IV') {
-      navigate('/step/4');
+      navigate('/step/4', { replace: true });
       return;
     }
     if (['II', 'V', 'VI'].includes(kelompok)) {
@@ -151,6 +146,28 @@ export default function Step3_KondisiAwal() {
         </div>
 
         <h2 className="text-xl font-bold mb-6 text-center">Kondisi Awal</h2>
+
+        {kelompok === 'Tidak Memiliki Kelompok' && (
+          <div className="rounded-xl border border-amber-400 bg-amber-50 p-4 text-sm text-amber-900">
+            <p className="mb-3">
+              {state.pasalUtama} tidak memiliki nilai pokok pada PMK 123/2023 (tidak dihitung dengan metode ini).
+              Silakan pilih pasal lain.
+            </p>
+            <button
+              onClick={() => navigate('/step/2')}
+              className="w-full rounded-md bg-blue-600 px-4 py-2 text-white hover:bg-blue-700"
+            >
+              Pilih pasal lain
+            </button>
+          </div>
+        )}
+
+        {pasalBelumDiatur(state.pasalUtama) && (
+          <div className="mb-4 rounded-xl border border-amber-400 bg-amber-50 p-3 text-sm text-amber-900">
+            {state.pasalUtama} belum memiliki nilai pokok pada tabel PMK 123/2023. Nilai pokok dihitung 0;
+            mohon verifikasi hasil akhir secara manual.
+          </div>
+        )}
 
         {/* Kelompok II */}
         {kelompok === 'II' && (

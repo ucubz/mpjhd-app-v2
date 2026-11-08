@@ -8,9 +8,10 @@ import BackButton from '../components/BackButton';
 import ResetButton from '../components/ResetButton';
 import { useMPJHD, useResetMPJHD } from '../context/MPJHDContext';
 import { konversiGrade } from '../utils_v2/konversiGrade';
-import { hitungNilaiAkhir } from '../utils_v2/hitungNilaiAkhir';
+import { hitungNilaiAkhir, kunciKelompokAktif } from '../utils_v2/hitungNilaiAkhir';
 import { hitungFaktorTambahanRinci } from '../utils_v2/hitungFaktorTambahan';
-import { generateHTMLTable } from '../utils/generateHTMLTable'; // pastikan path sesuai
+import { generateHTMLTable } from '../utils_v2/generateHTMLTable';
+import { NILAI_KOOPERATIF, NILAI_INISIATOR } from '../utils_v2/hitungFaktorMeringankan';
 
 function useRequireStep(requiredFields = [], redirectTo = '/step/1') {
   const { state } = useMPJHD();
@@ -46,9 +47,14 @@ export default function Step7_HasilAkhir() {
     nilaiTambahan,
     pengurangMeringankan,
     nilaiAkhir,
+    tingkat,
+    tidakDiatur,
+    peringatan,
   } = hitungNilaiAkhir(state);
 
-  const hasilGrade = konversiGrade(nilaiAkhir);
+  const hasilGrade = tidakDiatur
+    ? { grade: '-', hukuman: 'Tidak diatur dalam tabel PMK 123/2023' }
+    : konversiGrade(nilaiAkhir);
 
   const hasil = {
     nilaiPokok,
@@ -56,6 +62,7 @@ export default function Step7_HasilAkhir() {
     nilaiTambahan,
     pengurangMeringankan,
     nilaiAkhir,
+    tingkat,
     grade: hasilGrade.grade,
     jenisHukuman: hasilGrade.hukuman,
   };
@@ -72,9 +79,7 @@ export default function Step7_HasilAkhir() {
   const rincianTambahan = tampilkanTabelRincian
   ? hitungFaktorTambahanRinci(
       state.faktorPembobotan,
-      kelompok === 'III' 
-        ? `III_${tipeKelompokIII.toUpperCase()}`
-        : kelompok
+      kunciKelompokAktif(state)
     )
   : {};
 
@@ -83,19 +88,26 @@ export default function Step7_HasilAkhir() {
   const rincianMeringankan = [];
 
   if (faktorMeringankan.kooperatif) {
-    rincianMeringankan.push({ label: 'Kooperatif saat diperiksa', nilai: 5 });
+    rincianMeringankan.push({ label: 'Kooperatif saat diperiksa', nilai: NILAI_KOOPERATIF });
   }
   if (faktorMeringankan.inisiator) {
-    rincianMeringankan.push({ label: 'Pelaku adalah inisiator', nilai: 10 });
+    rincianMeringankan.push({ label: 'Pelaku adalah inisiator', nilai: NILAI_INISIATOR });
   }
+
+  // Kunci jenis tabel untuk generateHTMLTable
+  const kunciTabel =
+    kelompok === 'III'
+      ? { umum: 'III Umum', individu: 'III Khusus Individual', bersama: 'III Khusus Bersama' }[tipeKelompokIII] || 'III Umum'
+      : kelompok;
 
   // ----------- TOMBOL COPY TABEL -----------
   const handleCopyTable = async () => {
-    const html = generateHTMLTable(state.kelompok, {
+    const html = generateHTMLTable(kunciTabel, {
       ...state,
       nilaiPokok,
       nilaiUtama,
       nilaiTambahan,
+      nilaiTambahanTotal: nilaiUtama + nilaiTambahan - pengurangMeringankan,
       pengurangMeringankan,
       faktorMeringankanNilai: pengurangMeringankan,
       nilaiAkhir,
@@ -108,7 +120,6 @@ export default function Step7_HasilAkhir() {
       faktorTambahanKesengajaan: rincianTambahan.kesengajaan ?? 0,
       faktorTambahanHambatan: rincianTambahan.hambatan ?? 0,
       // Khusus III Khusus Bersama:
-      faktorPeran: state.faktorUtama?.peran ?? state.faktorPeran ?? '',
       faktorTambahanJumlahUang: rincianTambahan.jumlahKerugian ?? 0,
       // Pengurang meringankan:
       // tambahkan mapping jika ada field lain yg perlu
@@ -134,9 +145,19 @@ export default function Step7_HasilAkhir() {
 
         <h2 className="text-xl font-bold mb-6 text-center">Debug: Perhitungan Nilai</h2>
 
-        <div className="flex justify-end mb-4">
-          <Button onClick={handleCopyTable}>Salin Tabel ke Clipboard</Button>
-        </div>
+        {kelompok !== 'I' && (
+          <div className="flex justify-end mb-4">
+            <Button onClick={handleCopyTable} className="!w-auto">Salin Tabel ke Clipboard</Button>
+          </div>
+        )}
+
+        {peringatan.length > 0 && (
+          <div className="mb-4 rounded-xl border border-amber-400 bg-amber-50 p-3 text-sm text-amber-900">
+            {peringatan.map((p) => (
+              <p key={p}>{p}</p>
+            ))}
+          </div>
+        )}
 
         <table className="w-full text-sm border border-gray-300 dark:border-gray-600 mb-6">
           <thead className="bg-gray-100 dark:bg-gray-700">

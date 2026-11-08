@@ -2,6 +2,8 @@ import { createContext, useContext, useReducer } from 'react';
 
 const initialState = {
   kategori: null,
+  jenisPilihanUtama: null,
+  reputasi: null,
   pasalUtama: null,
   kelompok: null,
   dampak: null,
@@ -40,8 +42,24 @@ const initialState = {
 };
 
 
+// Semua isian setelah pemilihan pasal; dikosongkan setiap pasal/kategori berganti
+// supaya sisa pilihan dari jalur lain tidak ikut terhitung.
+function kosongkanHilir(state) {
+  return {
+    ...initialState,
+    kategori: state.kategori,
+    jenisPilihanUtama: state.jenisPilihanUtama,
+  };
+}
+
 function reducer(state, action) {
   switch (action.type) {
+    case 'PILIH_KATEGORI':
+      return { ...initialState, jenisPilihanUtama: action.value, ...(action.pasalUtama ? { pasalUtama: action.pasalUtama, kelompok: action.kelompok } : {}) };
+
+    case 'PILIH_PASAL':
+      return { ...kosongkanHilir(state), pasalUtama: action.pasal, kelompok: action.kelompok };
+
     case 'SET':
       return { ...state, [action.field]: action.value };
 
@@ -81,7 +99,7 @@ function reducer(state, action) {
     case 'SET_TIPE_HARI_TIDAK_MASUK':
       return { ...state, tipeHariTidakMasuk: action.value };
       
-      default:
+    default:
       return state;
   }
 }

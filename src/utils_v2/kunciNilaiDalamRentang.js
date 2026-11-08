@@ -1,40 +1,19 @@
-import { rentangNilaiHukumanDisiplin } from './rentangNilaiHukumanDisiplin';
+import { tentukanRentang } from './rentangNilaiHukumanDisiplin';
 
 /**
- * Mengunci nilai akhir dalam rentang hukuman yang diperbolehkan
- * berdasarkan nilai pokok (nilaiAwal).
+ * Mengunci Nilai Akhir pada tingkat hukuman milik Nilai Pokok.
+ *  - Nilai Akhir <= Nilai Pokok -> jenis hukuman terendah tingkat itu (Nilai Pokok + 1)
+ *    TODO(keputusan): PMK diam untuk Nilai Akhir == Nilai Pokok; diperlakukan sama dengan "di bawah".
+ *  - Nilai Akhir melewati batas tingkat -> jenis hukuman tertinggi tingkat itu.
  *
- * @param {number|string} nilaiAwal - Nilai pokok (penentu rentang)
- * @param {number|string} nilaiHitung - Hasil nilai akhir sebelum dikunci
- * @returns {number} Nilai akhir yang telah dikunci dalam rentang
+ * @param {number|string} nilaiPokok
+ * @param {number|string} nilaiHitung - Nilai Akhir sebelum dikunci
+ * @returns {number}
  */
-export function kunciNilaiDalamRentang(nilaiAwal, nilaiHitung) {
-  nilaiAwal = Number(nilaiAwal);
-  nilaiHitung = Number(nilaiHitung);
-
-  const range = rentangNilaiHukumanDisiplin.find(
-    (r) => nilaiAwal >= r.min && nilaiAwal <= r.max
-  );
-
-  console.log('== [kunciNilaiDalamRentang] Debug ==');
-  console.log('nilaiAwal (pokok):', nilaiAwal);
-  console.log('nilaiHitung (sebelum dikunci):', nilaiHitung);
-  console.log('Rentang ditemukan:', range);
-
-  if (!range) {
-    console.warn('⚠️ Tidak ada rentang cocok dengan nilaiAwal. Nilai tidak dikunci.');
-    return nilaiHitung;
-  }
-
-  if (nilaiHitung < range.min) {
-    console.log(`Nilai terlalu kecil, dikunci ke batas bawah ${range.min}`);
-    return range.min;
-  }
-
-  if (nilaiHitung > range.max) {
-    console.log(`Nilai terlalu besar, dikunci ke batas atas ${range.max}`);
-    return range.max;
-  }
-
-  return nilaiHitung;
+export function kunciNilaiDalamRentang(nilaiPokok, nilaiHitung) {
+  const hitung = Number(nilaiHitung) || 0;
+  const { min, max } = tentukanRentang(nilaiPokok);
+  if (hitung < min) return min;
+  if (hitung > max) return max;
+  return hitung;
 }

@@ -20,14 +20,11 @@ export default function Step1_PilihKategori() {
   const { dispatch } = useMPJHD();
 
  const handleSelect = (val) => {
-  dispatch({ type: 'SET', field: 'jenisPilihanUtama', value: val });
   if (val === 'izin') {
-    dispatch({ type: 'SET', field: 'kelompok', value: 'VI' });
-    dispatch({ type: 'SET', field: 'pasalUtama', value: 'terkait Perkawinan/Perceraian' });
-    setTimeout(() => {
-      navigate('/step/3');
-    }, 0);
+    dispatch({ type: 'PILIH_KATEGORI', value: val, kelompok: 'VI', pasalUtama: 'terkait Perkawinan/Perceraian' });
+    navigate('/step/3');
   } else {
+    dispatch({ type: 'PILIH_KATEGORI', value: val });
     navigate('/step/2');
   }
 };

@@ -16,7 +16,8 @@ import Stepper from '../components/Stepper';
 import Button from '../components/Button';
 import BackButton from '../components/BackButton';
 import ResetButton from '../components/ResetButton';
-import { hitungFaktorTambahan, nilaiMap, getAvailableOptions } from '../utils_v2/hitungFaktorTambahan';
+import { nilaiMap, getAvailableOptions, faktorYangDipakai } from '../utils_v2/hitungFaktorTambahan';
+import { KERUGIAN_OPTIONS, NILAI_KERUGIAN_BERSAMA } from '../utils_v2/opsiFaktor';
 
 // --- CUSTOM HOOK: cek state step sebelumnya ---
 function useRequireStep(requiredFields = [], redirectTo = '/step/1') {
@@ -58,14 +59,6 @@ const options = {
     { label: 'Menghalangi pemeriksaan', value: 'menghalangi' },
   ],
 };
-
-const jumlahKerugianOptions = [
-  '< 1 juta',
-  '1 - 10 juta',
-  '> 10 juta',
-  '> 100 juta',
-];
-
 
 function FancyListbox({ label, field, value, onChange, list, kelompokAktif }) {
   const selected = list.find((x) => x.value === value) || null;
@@ -126,29 +119,23 @@ export default function Step5_FaktorTambahan() {
 
   const isKelompokIII = kelompok === 'III';
   const isBersama = isKelompokIII && tipe === 'bersama';
-  const isIndividuOrUmum = isKelompokIII && (tipe === 'individu' || tipe === 'umum');
 
   const kelompokAktif = isKelompokIII ? `III_${tipe?.toUpperCase()}` : kelompok;
 
-  const showEmpatFaktor = !isKelompokIII || isIndividuOrUmum;
+  const faktorDipakai = faktorYangDipakai(kelompokAktif);
+  const showFaktor = (f) => faktorDipakai.includes(f);
   const showJumlahKerugian = isBersama;
 
-  const isComplete =
-    (showEmpatFaktor &&
-      ['banyakPasal', 'hukdis', 'kesengajaan', 'hambatan'].every(
-        (key) => faktor[key] !== null && faktor[key] !== ''
-      )) ||
-    (showJumlahKerugian && faktor.jumlahKerugian);
+  const isComplete = isBersama
+    ? Boolean(faktor.jumlahKerugian)
+    : faktorDipakai.every((key) => faktor[key] !== null && faktor[key] !== undefined && faktor[key] !== '');
 
   const updateField = (field, value) => {
     dispatch({ type: 'SET_FAKTOR_PEMBOBOTAN', field, value });
   };
 
-  const handleNext = () => {
-    const nilaiTambahan = hitungFaktorTambahan(faktor, kelompokAktif);
-    dispatch({ type: 'SET_NILAI_TAMBAHAN', nilaiTambahan });
-    navigate('/step/6');
-  };
+  // Nilai dihitung ulang di Step 7 (hitungNilaiAkhir); halaman ini hanya menyimpan pilihan.
+  const handleNext = () => navigate('/step/6');
 
   return (
     <PageWrapper>
@@ -160,8 +147,8 @@ export default function Step5_FaktorTambahan() {
 
         <h2 className="text-xl font-bold mb-6 text-center">Faktor Pembobotan Tambahan</h2>
 
-        {showEmpatFaktor && (
-          <>
+        <>
+            {showFaktor('banyakPasal') && (
             <FancyListbox
               label="Banyaknya jenis pelanggaran"
               field="banyakPasal"
@@ -170,6 +157,8 @@ export default function Step5_FaktorTambahan() {
               list={getAvailableOptions(options.banyakPasal, kelompokAktif)}
               kelompokAktif={kelompokAktif}
             />
+            )}
+            {showFaktor('hukdis') && (
             <FancyListbox
               label="Riwayat Hukuman Disiplin"
               field="hukdis"
@@ -178,6 +167,8 @@ export default function Step5_FaktorTambahan() {
               list={getAvailableOptions(options.hukdis, kelompokAktif)}
               kelompokAktif={kelompokAktif}
             />
+            )}
+            {showFaktor('kesengajaan') && (
             <FancyListbox
               label="Faktor Kesengajaan"
               field="kesengajaan"
@@ -186,6 +177,8 @@ export default function Step5_FaktorTambahan() {
               list={getAvailableOptions(options.kesengajaan, kelompokAktif)}
               kelompokAktif={kelompokAktif}
             />
+            )}
+            {showFaktor('hambatan') && (
             <FancyListbox
               label="Hambatan Pemeriksaan"
               field="hambatan"
@@ -194,8 +187,8 @@ export default function Step5_FaktorTambahan() {
               list={getAvailableOptions(options.hambatan, kelompokAktif)}
               kelompokAktif={kelompokAktif}
             />
+            )}
           </>
-        )}
 
         {showJumlahKerugian && (
           <div className="mb-6">
@@ -207,10 +200,10 @@ export default function Step5_FaktorTambahan() {
               onChange={(val) => updateField('jumlahKerugian', val)}
             >
               <div className="space-y-2">
-                {jumlahKerugianOptions.map((val) => (
+                {KERUGIAN_OPTIONS.map((opt) => (
                   <RadioGroup.Option
-                    key={val}
-                    value={val}
+                    key={opt.value}
+                    value={opt.value}
                     className={({ checked }) =>
                       `p-3 border rounded-xl cursor-pointer ${
                         checked ? 'bg-blue-100 border-blue-500' : 'border-gray-300'
@@ -221,7 +214,7 @@ export default function Step5_FaktorTambahan() {
                       <div className="flex items-center gap-2">
                         {checked && <CheckCircleIcon className="h-5 w-5 text-blue-600" />}
                         <span>
-                          {val} (nilai: {nilaiMap['III_BERSAMA']?.[val] ?? 0})
+                          {opt.label} (nilai: {NILAI_KERUGIAN_BERSAMA[opt.value]})
                         </span>
                       </div>
                     )}
