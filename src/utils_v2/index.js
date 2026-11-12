@@ -2,7 +2,7 @@
 
 export * from './hitungFaktorMeringankan';
 export * from './hitungFaktorTambahan';
-export * from './hitungFaktorUtama';
+export * from './opsiFaktor';
 export * from './hitungNilaiAkhir';
 export * from './konversiGrade';
 export * from './mpjhdHelper';
@@ -18,4 +18,3 @@ export * from './daftarGradeHukumanDisiplin';
 
 // Opsional (kalau dipakai)
 export * from './kunciNilaiDalamRentang';
-export * from './cariKelompokPasal';

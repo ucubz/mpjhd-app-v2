@@ -8,6 +8,10 @@ import Card from '../components/Card'
 import Stepper from '../components/Stepper'
 import BackButton from '../components/BackButton'
 import ResetButton from '../components/ResetButton'
+import {
+  KERUGIAN_OPTIONS, KERUGIAN_IV_OPTIONS, PERAN_OPTIONS,
+  NILAI_KERUGIAN_INDIVIDU, NILAI_KERUGIAN_IV, NILAI_PERAN,
+} from '../utils_v2/opsiFaktor'
 
 // --- CUSTOM HOOK: cek state step sebelumnya ---
 function useRequireStep(requiredFields = [], redirectTo = '/step/1') {
@@ -44,29 +48,13 @@ export default function Step4_FaktorUtama() {
   const showKerugian =
     (isKelompokIII && tipe === 'individu') || isIV
 
+  // Hanya menyimpan pilihan; nilainya dihitung di utils_v2/opsiFaktor.js
   const updateFaktor = (field, value) => {
-    let nilai = 0
-
-    if (field === 'peran') {
-      const v = value.toLowerCase()
-      if (v === 'pasif') nilai = 5
-      if (v === 'aktif') nilai = 10
-      if (v === 'inisiator') nilai = 15
-      dispatch({ type: 'SET_FAKTOR_UTAMA', field, value: v })
-    }
-
-    if (field === 'jumlahKerugian') {
-      if (tipe === 'individu' || isIV) {
-        if (value === '< 1 juta') nilai = 7.5
-        if (value === '1 - 10 juta') nilai = 15
-        if (value === '> 10 juta') nilai = 22.5
-        if (value === '> 100 juta') nilai = 30
-      }
-      dispatch({ type: 'SET_FAKTOR_UTAMA', field, value })
-    }
-
-    dispatch({ type: 'SET_FAKTOR_UTAMA', field: 'nilai', value: nilai })
+    dispatch({ type: 'SET_FAKTOR_UTAMA', field, value })
   }
+
+  const opsiKerugian = isIV ? KERUGIAN_IV_OPTIONS : KERUGIAN_OPTIONS
+  const nilaiKerugian = isIV ? NILAI_KERUGIAN_IV : NILAI_KERUGIAN_INDIVIDU
 
   const handlePilihTipe = (val) => {
     dispatch({ type: 'SET', field: 'tipeKelompokIII', value: val })
@@ -129,10 +117,10 @@ export default function Step4_FaktorUtama() {
               onChange={(val) => updateFaktor('peran', val)}
             >
               <div className="space-y-2">
-                {['Pasif', 'Aktif', 'Inisiator'].map((val) => (
+                {PERAN_OPTIONS.map((opt) => (
                   <RadioGroup.Option
-                    key={val}
-                    value={val}
+                    key={opt.value}
+                    value={opt.value}
                     className={({ checked }) =>
                       `p-3 border rounded-xl ${checked ? 'bg-blue-100 border-blue-500' : 'border-gray-300'}`
                     }
@@ -140,7 +128,7 @@ export default function Step4_FaktorUtama() {
                     {({ checked }) => (
                       <div className="flex items-center gap-2">
                         {checked && <CheckCircleIcon className="h-5 w-5 text-blue-600" />}
-                        <span>{val}</span>
+                        <span>{opt.label} (nilai: {NILAI_PERAN[opt.value]})</span>
                       </div>
                     )}
                   </RadioGroup.Option>
@@ -163,10 +151,10 @@ export default function Step4_FaktorUtama() {
               onChange={(val) => updateFaktor('jumlahKerugian', val)}
             >
               <div className="space-y-2">
-                {['< 1 juta', '1 - 10 juta', '> 10 juta', '> 100 juta'].map((val) => (
+                {opsiKerugian.map((opt) => (
                   <RadioGroup.Option
-                    key={val}
-                    value={val}
+                    key={opt.value}
+                    value={opt.value}
                     className={({ checked }) =>
                       `p-3 border rounded-xl ${checked ? 'bg-blue-100 border-blue-500' : 'border-gray-300'}`
                     }
@@ -174,7 +162,7 @@ export default function Step4_FaktorUtama() {
                     {({ checked }) => (
                       <div className="flex items-center gap-2">
                         {checked && <CheckCircleIcon className="h-5 w-5 text-blue-600" />}
-                        <span>{val}</span>
+                        <span>{opt.label} (nilai: {nilaiKerugian[opt.value]})</span>
                       </div>
                     )}
                   </RadioGroup.Option>

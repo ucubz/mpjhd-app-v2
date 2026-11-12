@@ -1,99 +1,64 @@
 import { hitungNilaiKelompokI } from './hitungNilaiKelompokI';
-import { tentukanNilaiPokok } from './tentukanNilaiPokok';
+import { tentukanNilaiPokok, pasalBelumDiatur } from './tentukanNilaiPokok';
 import { hitungFaktorTambahan } from './hitungFaktorTambahan';
 import { hitungFaktorMeringankan } from './hitungFaktorMeringankan';
+import { hitungFaktorUtama } from './opsiFaktor';
 import { kunciNilaiDalamRentang } from './kunciNilaiDalamRentang';
+import { tentukanRentang } from './rentangNilaiHukumanDisiplin';
 
-// Pemetaan nilai peran (khusus Kelompok III bersama)
-const peranMap = {
-  pasif: 5,
-  aktif: 10,
-  inisiator: 15,
-};
+/** Kunci kelompok untuk tabel faktor tambahan, mis. 'II', 'III_BERSAMA'. */
+export function kunciKelompokAktif(state) {
+  const kelompok = String(state.kelompok || '').toUpperCase();
+  if (kelompok === 'III') return `III_${String(state.tipeKelompokIII || '').toUpperCase()}`;
+  return kelompok;
+}
 
 /**
- * Menghitung nilai akhir MPJHD berdasarkan seluruh state.
- * Rumus: Nilai Pokok + Faktor Utama + Faktor Tambahan - Meringankan
+ * Nilai Akhir = Nilai Pokok + Faktor Utama (atau Peran) + Faktor Tambahan - Faktor Meringankan,
+ * lalu dikunci pada tingkat hukuman milik Nilai Pokok (PMK 123/2023, Lampiran II).
  *
- * @param {object} state - Seluruh state dari context MPJHD
- * @returns {object} hasil: { nilaiPokok, nilaiUtama, nilaiTambahan, pengurangMeringankan, nilaiSebelumKunci, nilaiAkhir }
+ * @returns {{nilaiPokok, nilaiUtama, nilaiTambahan, pengurangMeringankan,
+ *            nilaiSebelumKunci, nilaiAkhir, tingkat, tidakDiatur, peringatan:string[]}}
  */
 export function hitungNilaiAkhir(state) {
   const kelompok = String(state.kelompok || '').toUpperCase();
-  const tipeKelompokIII = state.tipeKelompokIII || '';
+  const peringatan = [];
 
-  // ======= Kelompok I (khusus absen) =======
+  // ======= Kelompok I (tidak masuk kerja): nilai langsung dari tabel hari =======
   if (kelompok === 'I') {
-    const apakahBerturut = state.tipeHariTidakMasuk === 'berturut';
-    const nilaiPokok = Number(hitungNilaiKelompokI(state.jumlahHariTidakMasuk || 0, apakahBerturut)) || 0;
-    const nilaiUtama = 0;
-    const nilaiTambahan = 0;
-    const pengurangMeringankan = 0;
-    const nilaiSebelumKunci = nilaiPokok;
-    const nilaiAkhir = kunciNilaiDalamRentang(nilaiPokok, nilaiSebelumKunci);
-
-    console.log('[DEBUG] Kelompok I');
-    console.log('[DEBUG] jumlahHariTidakMasuk:', state.jumlahHariTidakMasuk);
-    console.log('[DEBUG] tipeHariTidakMasuk:', state.tipeHariTidakMasuk);
-    console.log('[DEBUG] nilaiPokok:', nilaiPokok);
-    console.log('[DEBUG] nilaiAkhir:', nilaiAkhir);
-
+    const berturut = state.tipeHariTidakMasuk === 'berturut';
+    const nilai = Number(hitungNilaiKelompokI(state.jumlahHariTidakMasuk || 0, berturut)) || 0;
+    const tidakDiatur = nilai === 0;
+    if (tidakDiatur) {
+      peringatan.push('Jumlah hari tersebut tidak diatur dalam tabel PMK 123/2023 (minimal 3 hari).');
+    }
     return {
-      nilaiPokok,
-      nilaiUtama,
-      nilaiTambahan,
-      pengurangMeringankan,
-      nilaiSebelumKunci,
-      nilaiAkhir,
+      nilaiPokok: nilai,
+      nilaiUtama: 0,
+      nilaiTambahan: 0,
+      pengurangMeringankan: 0,
+      nilaiSebelumKunci: nilai,
+      nilaiAkhir: nilai,
+      tingkat: tidakDiatur ? '' : tentukanRentang(nilai).tingkat,
+      tidakDiatur,
+      peringatan,
     };
   }
 
-  // ======= Kelompok lainnya =======
-  const nilaiPokok = Number(
-    tentukanNilaiPokok(
-      state.kelompok,
-      state.pasalUtama,
-      state.dampak,
-      state.jabatan
-    )
-  ) || 0;
-
-  let nilaiUtama = 0;
-  let nilaiTambahan = 0;
-
-  if (kelompok === 'III' && tipeKelompokIII === 'bersama') {
-    const peranStr = String(state.faktorUtama?.peran || '').toLowerCase();
-    nilaiUtama = peranMap[peranStr] || 0;
-    nilaiTambahan = Number(state.faktorUtama?.jumlahKerugian) || 0;
-  } else {
-    nilaiUtama = Number(state.faktorUtama?.nilai) || 0;
-    nilaiTambahan = Number(hitungFaktorTambahan(state.faktorPembobotan, kelompok === 'III' ? `III_${tipeKelompokIII?.toUpperCase()}` : kelompok)) || 0;
+  // ======= Kelompok II - VI =======
+  const nilaiPokok =
+    Number(tentukanNilaiPokok(state.kelompok, state.pasalUtama, state.dampak, state.jabatan)) || 0;
+  if (pasalBelumDiatur(state.pasalUtama)) {
+    peringatan.push(`${state.pasalUtama} belum memiliki nilai pokok pada PMK 123/2023; nilai pokok dipakai 0.`);
   }
 
-  const pengurangMeringankan = Number(
-    hitungFaktorMeringankan(
-      state.faktorMeringankan?.kooperatif,
-      state.faktorMeringankan?.inisiator
-    )
-  ) || 0;
+  const nilaiUtama = Number(hitungFaktorUtama(state)) || 0;
+  const nilaiTambahan = Number(hitungFaktorTambahan(state.faktorPembobotan || {}, kunciKelompokAktif(state))) || 0;
+  const pengurangMeringankan =
+    Number(hitungFaktorMeringankan(state.faktorMeringankan?.kooperatif, state.faktorMeringankan?.inisiator)) || 0;
 
   const nilaiSebelumKunci = nilaiPokok + nilaiUtama + nilaiTambahan - pengurangMeringankan;
   const nilaiAkhir = kunciNilaiDalamRentang(nilaiPokok, nilaiSebelumKunci);
-
-  // === DEBUG OUTPUT ===
-  console.log('== [kunciNilaiDalamRentang] Debug ==');
-  console.log('nilaiAwal (pokok):', nilaiPokok);
-  console.log('nilaiHitung (sebelum dikunci):', nilaiSebelumKunci);
-  console.log('Rentang ditemukan:', kunciNilaiDalamRentang(nilaiPokok, nilaiSebelumKunci, true)); // jika fungsi mendukung debug
-
-  console.log('[DEBUG] Kelompok:', kelompok);
-  console.log('[DEBUG] tipeKelompokIII:', tipeKelompokIII);
-  console.log('[DEBUG] nilaiPokok:', nilaiPokok);
-  console.log('[DEBUG] nilaiUtama:', nilaiUtama);
-  console.log('[DEBUG] nilaiTambahan:', nilaiTambahan);
-  console.log('[DEBUG] pengurangMeringankan:', pengurangMeringankan);
-  console.log('[DEBUG] nilaiSebelumKunci:', nilaiSebelumKunci);
-  console.log('[DEBUG] nilaiAkhir (terkunci):', nilaiAkhir);
 
   return {
     nilaiPokok,
@@ -102,5 +67,8 @@ export function hitungNilaiAkhir(state) {
     pengurangMeringankan,
     nilaiSebelumKunci,
     nilaiAkhir,
+    tingkat: tentukanRentang(nilaiPokok).tingkat,
+    tidakDiatur: false,
+    peringatan,
   };
 }

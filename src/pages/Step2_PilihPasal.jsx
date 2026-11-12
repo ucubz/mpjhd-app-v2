@@ -88,8 +88,7 @@ export default function Step2_PilihPasal() {
 
   const handleSelect = (pasal) => {
     const kelompok = tentukanKelompok(pasal);
-    dispatch({ type: 'SET', field: 'pasalUtama', value: pasal });
-    dispatch({ type: 'SET', field: 'kelompok', value: kelompok });
+    dispatch({ type: 'PILIH_PASAL', pasal, kelompok });
     navigate('/step/3');
   };
 
@@ -106,7 +105,12 @@ export default function Step2_PilihPasal() {
         <h2 className="text-xl font-bold mb-6 text-center">Pilih Pasal yang Dilanggar</h2>
         <RadioGroup onChange={handleSelect}>
           <div className="space-y-3">
-            {pasalList.map((item) => (
+            {pasalList.map((item) => item.kode === 'Pasal 5 huruf n' ? (
+              // Induk dari angka 1-7: bukan pilihan sendiri, hanya judul
+              <p key={item.kode} className="px-1 pt-2 text-sm font-semibold text-gray-700 dark:text-gray-200">
+                {item.kode}: {item.deskripsi}
+              </p>
+            ) : (
               <RadioGroup.Option
                 key={item.kode}
                 value={item.kode}
