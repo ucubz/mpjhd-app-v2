@@ -49,7 +49,7 @@ export function hitungNilaiAkhir(state) {
   const nilaiPokok =
     Number(tentukanNilaiPokok(state.kelompok, state.pasalUtama, state.dampak, state.jabatan)) || 0;
   if (pasalBelumDiatur(state.pasalUtama)) {
-    peringatan.push(`${state.pasalUtama} belum memiliki nilai pokok pada PMK 123/2023; nilai pokok dipakai 0.`);
+    peringatan.push(`${state.pasalUtama} tidak diatur dalam PMK 123/2023; dimasukkan ke Kelompok V dengan nilai pokok 30 (angka terendah Kelompok V).`);
   }
 
   const nilaiUtama = Number(hitungFaktorUtama(state)) || 0;

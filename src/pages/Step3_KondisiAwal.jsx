@@ -147,25 +147,10 @@ export default function Step3_KondisiAwal() {
 
         <h2 className="text-xl font-bold mb-6 text-center">Kondisi Awal</h2>
 
-        {kelompok === 'Tidak Memiliki Kelompok' && (
-          <div className="rounded-xl border border-amber-400 bg-amber-50 p-4 text-sm text-amber-900">
-            <p className="mb-3">
-              {state.pasalUtama} tidak memiliki nilai pokok pada PMK 123/2023 (tidak dihitung dengan metode ini).
-              Silakan pilih pasal lain.
-            </p>
-            <button
-              onClick={() => navigate('/step/2')}
-              className="w-full rounded-md bg-blue-600 px-4 py-2 text-white hover:bg-blue-700"
-            >
-              Pilih pasal lain
-            </button>
-          </div>
-        )}
-
         {pasalBelumDiatur(state.pasalUtama) && (
           <div className="mb-4 rounded-xl border border-amber-400 bg-amber-50 p-3 text-sm text-amber-900">
-            {state.pasalUtama} belum memiliki nilai pokok pada tabel PMK 123/2023. Nilai pokok dihitung 0;
-            mohon verifikasi hasil akhir secara manual.
+            {state.pasalUtama} tidak diatur dalam tabel PMK 123/2023. Dimasukkan ke Kelompok V dengan nilai pokok 30
+            (angka terendah Kelompok V); mohon verifikasi hasil akhir secara manual.
           </div>
         )}
 
