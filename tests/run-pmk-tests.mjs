@@ -71,9 +71,9 @@ cek('H  Kel VI, reputasi Unit Kerja', mk({ kelompok: 'VI', pasalUtama: 'terkait 
 
 console.log('\n--- Batas tingkat hukuman ---');
 const III = { kelompok: 'III', pasalUtama: 'Pasal 5 huruf a', tipeKelompokIII: 'umum' };
-cek('Pokok 60, hasil sama dengan pokok -> tetap 60', mk({ ...III, faktorPembobotan: nol }), 60, 'Grade 06');
+cek('Pokok 60, hasil sama dengan pokok -> tingkat Berat', mk({ ...III, faktorPembobotan: nol }), 61, 'Grade 07');
 cek('Pokok 60, hasil di bawah pokok -> pokok+1', mk({ ...III, faktorPembobotan: nol, faktorMeringankan: { kooperatif: true, inisiator: true } }), 61, 'Grade 07');
-cek('Pokok 30, hasil sama dengan pokok -> tetap 30', mk({ kelompok: 'III', pasalUtama: 'Pasal 4 huruf a', tipeKelompokIII: 'umum', faktorPembobotan: nol }), 30, 'Grade 03');
+cek('Pokok 30, hasil sama dengan pokok -> tingkat Sedang', mk({ kelompok: 'III', pasalUtama: 'Pasal 4 huruf a', tipeKelompokIII: 'umum', faktorPembobotan: nol }), 31, 'Grade 04');
 cek('Pokok 30, hasil di bawah pokok -> pokok+1', mk({ kelompok: 'II', pasalUtama: 'Pasal 3 huruf b', dampak: 'Instansi', faktorPembobotan: nol, faktorMeringankan: { kooperatif: true, inisiator: true } }), 31, 'Grade 04');
 const maks = { banyakPasal: 'lebihDua', hukdis: 'lebihSatu', kesengajaan: 'sengaja', hambatan: 'menghalangi' };
 cek('Pokok 0 + faktor maks. -> maks. Ringan', mk({ kelompok: 'II', pasalUtama: 'Pasal 3 huruf c', dampak: 'Unit Kerja', faktorPembobotan: maks }), 30, 'Grade 03');
