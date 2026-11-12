@@ -2,9 +2,9 @@
 
 const JABATAN_NILAI_30 = ['Pejabat Administrator', 'Pejabat Fungsional'];
 
-// Pasal yang ada di aplikasi tetapi belum punya nilai pokok pada tabel PMK 123/2023
-// TODO(keputusan): sementara nilai pokok 0 + peringatan di layar.
-export const PASAL_BELUM_DIATUR = ['Pasal 3 huruf g', 'Pasal 3 huruf h', 'Pasal 4 huruf i'];
+// Pasal yang tidak diatur di tabel PMK 123/2023. Keputusan pengguna: masuk Kelompok V,
+// nilai pokok mengikuti angka terendah Kelompok V (30), dengan peringatan di layar.
+export const PASAL_BELUM_DIATUR = ['Pasal 5 huruf n angka 1'];
 
 export function pasalBelumDiatur(pasal = '') {
   return PASAL_BELUM_DIATUR.some((p) => pasal === p);
@@ -19,7 +19,7 @@ export function pasalBelumDiatur(pasal = '') {
  */
 export function tentukanNilaiPokok(kelompok, pasal = '', dampak = '', jabatan = '') {
   if (!kelompok) return 0;
-  if (pasalBelumDiatur(pasal)) return 0;
+  if (pasal === 'Pasal 5 huruf n angka 1') return 30;
 
   if (kelompok === 'I') return 0;
   if (kelompok === 'VI') return 60;
@@ -39,6 +39,7 @@ export function tentukanNilaiPokok(kelompok, pasal = '', dampak = '', jabatan = 
   if (kelompok === 'III') {
     if (['Pasal 4 huruf a', 'Pasal 4 huruf b'].includes(pasal)) return 30;
     if (['a', 'b', 'c', 'd', 'e', 'k', 'l'].some((h) => pasal === `Pasal 5 huruf ${h}`)) return 60;
+    if (pasal === 'Pasal 4 huruf i') return 60;
     return 0;
   }
 

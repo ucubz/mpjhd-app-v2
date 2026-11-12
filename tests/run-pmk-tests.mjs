@@ -71,10 +71,10 @@ cek('H  Kel VI, reputasi Unit Kerja', mk({ kelompok: 'VI', pasalUtama: 'terkait 
 
 console.log('\n--- Batas tingkat hukuman ---');
 const III = { kelompok: 'III', pasalUtama: 'Pasal 5 huruf a', tipeKelompokIII: 'umum' };
-cek('Pokok 60, faktor 0 -> min. Berat', mk({ ...III, faktorPembobotan: nol }), 61, 'Grade 07');
-cek('Pokok 60, meringankan 15 -> tetap Berat', mk({ ...III, faktorPembobotan: nol, faktorMeringankan: { kooperatif: true, inisiator: true } }), 61, 'Grade 07');
-cek('Pokok 30, faktor 0 -> min. Sedang', mk({ kelompok: 'III', pasalUtama: 'Pasal 4 huruf a', tipeKelompokIII: 'umum', faktorPembobotan: nol }), 31, 'Grade 04');
-cek('Pokok 30, meringankan 15 -> tetap Sedang', mk({ kelompok: 'II', pasalUtama: 'Pasal 3 huruf b', dampak: 'Instansi', faktorPembobotan: nol, faktorMeringankan: { kooperatif: true, inisiator: true } }), 31, 'Grade 04');
+cek('Pokok 60, hasil sama dengan pokok -> tetap 60', mk({ ...III, faktorPembobotan: nol }), 60, 'Grade 06');
+cek('Pokok 60, hasil di bawah pokok -> pokok+1', mk({ ...III, faktorPembobotan: nol, faktorMeringankan: { kooperatif: true, inisiator: true } }), 61, 'Grade 07');
+cek('Pokok 30, hasil sama dengan pokok -> tetap 30', mk({ kelompok: 'III', pasalUtama: 'Pasal 4 huruf a', tipeKelompokIII: 'umum', faktorPembobotan: nol }), 30, 'Grade 03');
+cek('Pokok 30, hasil di bawah pokok -> pokok+1', mk({ kelompok: 'II', pasalUtama: 'Pasal 3 huruf b', dampak: 'Instansi', faktorPembobotan: nol, faktorMeringankan: { kooperatif: true, inisiator: true } }), 31, 'Grade 04');
 const maks = { banyakPasal: 'lebihDua', hukdis: 'lebihSatu', kesengajaan: 'sengaja', hambatan: 'menghalangi' };
 cek('Pokok 0 + faktor maks. -> maks. Ringan', mk({ kelompok: 'II', pasalUtama: 'Pasal 3 huruf c', dampak: 'Unit Kerja', faktorPembobotan: maks }), 30, 'Grade 03');
 cek('Pokok 30 + faktor maks. -> maks. Sedang', mk({ kelompok: 'II', pasalUtama: 'Pasal 3 huruf c', dampak: 'Instansi', faktorPembobotan: maks }), 60, 'Grade 06');
@@ -85,8 +85,15 @@ cekSama('Pasal 4 huruf e, Pejabat Pimpinan Tinggi', tentukanNilaiPokok('V', 'Pas
 cekSama('Pasal 5 huruf n angka 2', tentukanNilaiPokok('V', 'Pasal 5 huruf n angka 2'), 30);
 for (const n of [3, 4, 5, 6, 7]) cekSama(`Pasal 5 huruf n angka ${n}`, tentukanNilaiPokok('V', `Pasal 5 huruf n angka ${n}`), 60);
 cekSama('Pasal 3 huruf g masuk kelompok', tentukanKelompok('Pasal 3 huruf g'), 'II');
+cekSama('Pasal 3 huruf h masuk kelompok', tentukanKelompok('Pasal 3 huruf h'), 'II');
+cekSama('Pasal 3 huruf g, dampak Negara', tentukanNilaiPokok('II', 'Pasal 3 huruf g', 'Negara'), 60);
+cekSama('Pasal 3 huruf h, dampak Instansi', tentukanNilaiPokok('II', 'Pasal 3 huruf h', 'Instansi'), 30);
+cekSama('Pasal 3 huruf g, dampak Unit Kerja', tentukanNilaiPokok('II', 'Pasal 3 huruf g', 'Unit Kerja'), 0);
 cekSama('Pasal 4 huruf i masuk kelompok', tentukanKelompok('Pasal 4 huruf i'), 'III');
-cekSama('Pasal 5 huruf n angka 1 tidak dihitung', tentukanKelompok('Pasal 5 huruf n angka 1'), 'Tidak Memiliki Kelompok');
+cekSama('Pasal 4 huruf i nilai pokok', tentukanNilaiPokok('III', 'Pasal 4 huruf i'), 60);
+cekSama('Pasal 5 huruf n angka 1 masuk kelompok', tentukanKelompok('Pasal 5 huruf n angka 1'), 'V');
+cekSama('Pasal 5 huruf n angka 1 nilai pokok', tentukanNilaiPokok('V', 'Pasal 5 huruf n angka 1'), 30);
+cekSama('III Umum hukdis pernah = 15', hitungNilaiAkhir(mk({ kelompok: 'III', pasalUtama: 'Pasal 5 huruf a', tipeKelompokIII: 'umum', faktorPembobotan: { ...nol, hukdis: 'pernahSatu' } })).nilaiTambahan, 15);
 
 console.log('\n--- Tidak ada kebocoran antar-jalur ---');
 const bocor = mk({ kelompok: 'II', pasalUtama: 'Pasal 4 huruf c', dampak: 'Instansi', faktorPembobotan: nol,

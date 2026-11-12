@@ -164,7 +164,11 @@ export default function Step5_FaktorTambahan() {
               field="hukdis"
               value={faktor.hukdis}
               onChange={updateField}
-              list={getAvailableOptions(options.hukdis, kelompokAktif)}
+              list={getAvailableOptions(options.hukdis, kelompokAktif).map((o) =>
+                kelompokAktif === 'III_UMUM' && o.value === 'pernahSatu'
+                  ? { ...o, label: 'Pernah dijatuhi hukuman disiplin (satu kali atau lebih)' }
+                  : o
+              )}
               kelompokAktif={kelompokAktif}
             />
             )}

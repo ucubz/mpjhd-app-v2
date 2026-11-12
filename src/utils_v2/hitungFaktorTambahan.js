@@ -24,7 +24,7 @@ export const nilaiMap = {
     lebihDua: 5,
     belumPernah: 0,
     pernahSatu: 15,
-    // TODO(keputusan): opsi "lebih dari satu kali" dihapus untuk III Umum (nilai di PMK tidak jelas)
+    // Keputusan pengguna: hanya dua opsi; "pernah" berlaku untuk satu kali atau lebih
     terpaksa: 0,
     lalai: 2.5,
     sengaja: 5,
