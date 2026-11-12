@@ -1,25 +1,21 @@
 // src/components/BackButton.jsx
+import { useNavigate } from 'react-router-dom';
 
-import { useNavigate } from 'react-router-dom'
-
-export default function BackButton({ label = "Kembali", className = "" }) {
-  const navigate = useNavigate()
-
+// Selalu kembali ke halaman sebelumnya yang benar-benar dilalui (alur tiap kelompok berbeda-beda).
+export default function BackButton({ label = 'Kembali', className = '' }) {
+  const navigate = useNavigate();
   return (
     <button
       type="button"
       onClick={() => navigate(-1)}
-      className={`
-        w-24 inline-flex items-center gap-2
-        rounded-md justify-center
-        px-3 py-1.5 text-sm font-semibold
-        shadow-inner shadow-white/10
-        transition-all focus:outline-none focus-visible:ring-2 focus-visible:ring-white
-        bg-gray-500 hover:bg-gray-600 dark:bg-gray-600 dark:hover:bg-gray-700 text-white
-        ${className}
-      `}
+      className={[
+        'inline-flex items-center justify-center rounded-lg px-3 py-1.5 text-sm font-semibold',
+        'bg-gray-100 text-gray-700 hover:bg-gray-200 dark:bg-gray-700 dark:text-gray-100 dark:hover:bg-gray-600',
+        'transition-colors focus:outline-none focus-visible:ring-2 focus-visible:ring-blue-400',
+        className,
+      ].join(' ')}
     >
-      {label}
+      ← {label}
     </button>
-  )
+  );
 }

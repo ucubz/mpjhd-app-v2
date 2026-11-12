@@ -1,106 +1,79 @@
-import { useEffect } from 'react';
+import { useEffect, useState } from 'react';
 import { useNavigate } from 'react-router-dom';
-import PageWrapper from '../components/PageWrapper';
-import Card from '../components/Card';
-import Stepper from '../components/Stepper';
+import StepLayout from '../components/StepLayout';
 import Button from '../components/Button';
-import BackButton from '../components/BackButton';
-import ResetButton from '../components/ResetButton';
 import { useMPJHD, useResetMPJHD } from '../context/MPJHDContext';
+import useRequireStep from '../hooks/useRequireStep';
 import { konversiGrade } from '../utils_v2/konversiGrade';
 import { hitungNilaiAkhir, kunciKelompokAktif } from '../utils_v2/hitungNilaiAkhir';
 import { hitungFaktorTambahanRinci } from '../utils_v2/hitungFaktorTambahan';
 import { generateHTMLTable } from '../utils_v2/generateHTMLTable';
 import { NILAI_KOOPERATIF, NILAI_INISIATOR } from '../utils_v2/hitungFaktorMeringankan';
+import { formatNilai } from '../utils_v2/formatNilai';
 
-function useRequireStep(requiredFields = [], redirectTo = '/step/1') {
-  const { state } = useMPJHD();
-  const resetMPJHD = useResetMPJHD();
-  const navigate = useNavigate();
+const WARNA_TINGKAT = {
+  Ringan: 'bg-emerald-100 text-emerald-800 dark:bg-emerald-900/50 dark:text-emerald-200',
+  Sedang: 'bg-amber-100 text-amber-800 dark:bg-amber-900/50 dark:text-amber-200',
+  Berat: 'bg-red-100 text-red-800 dark:bg-red-900/50 dark:text-red-200',
+};
 
-  useEffect(() => {
-    const missing = requiredFields.some((field) => !state[field]);
-    if (missing) {
-      resetMPJHD();
-      navigate(redirectTo, { replace: true });
-    }
-  }, [state, requiredFields, navigate, redirectTo, resetMPJHD]);
-}
+const LABEL_FAKTOR = {
+  banyakPasal: 'Banyaknya jenis pelanggaran',
+  hukdis: 'Riwayat hukuman disiplin',
+  kesengajaan: 'Faktor kesengajaan',
+  hambatan: 'Hambatan pemeriksaan',
+  jumlahKerugian: 'Jumlah uang/kerugian',
+};
 
-function capitalize(str) {
-  if (!str) return '';
-  return str.charAt(0).toUpperCase() + str.slice(1);
+function Baris({ label, nilai, tebal = false, indent = false }) {
+  return (
+    <tr className="border-t border-gray-200 dark:border-gray-700">
+      <td className={`py-2 pr-3 ${indent ? 'pl-4 text-gray-600 dark:text-gray-300' : ''} ${tebal ? 'font-semibold' : ''}`}>
+        {label}
+      </td>
+      <td className={`py-2 text-right tabular-nums ${tebal ? 'font-semibold' : ''}`}>{nilai}</td>
+    </tr>
+  );
 }
 
 export default function Step7_HasilAkhir() {
   useRequireStep(['kelompok', 'pasalUtama'], '/step/1');
 
-  const { state } = useMPJHD();
+  const { state, dispatch } = useMPJHD();
+  const resetMPJHD = useResetMPJHD();
   const navigate = useNavigate();
+  const [pesanSalin, setPesanSalin] = useState('');
+
+  // Setelah sampai hasil, peringatan "perubahan belum disimpan" saat menutup tab dimatikan
+  useEffect(() => {
+    dispatch({ type: 'SET_FINISHED', value: true });
+    return () => dispatch({ type: 'SET_FINISHED', value: false });
+  }, [dispatch]);
 
   const kelompok = String(state.kelompok || '').toUpperCase();
   const tipeKelompokIII = state.tipeKelompokIII || '';
 
-  const {
-    nilaiPokok,
-    nilaiUtama,
-    nilaiTambahan,
-    pengurangMeringankan,
-    nilaiAkhir,
-    tingkat,
-    tidakDiatur,
-    peringatan,
-  } = hitungNilaiAkhir(state);
+  const hasil = hitungNilaiAkhir(state);
+  const { nilaiPokok, nilaiUtama, nilaiTambahan, pengurangMeringankan, nilaiSebelumKunci, nilaiAkhir, tingkat, tidakDiatur, peringatan } = hasil;
 
   const hasilGrade = tidakDiatur
     ? { grade: '-', hukuman: 'Tidak diatur dalam tabel PMK 123/2023' }
     : konversiGrade(nilaiAkhir);
 
-  const hasil = {
-    nilaiPokok,
-    nilaiUtama,
-    nilaiTambahan,
-    pengurangMeringankan,
-    nilaiAkhir,
-    tingkat,
-    grade: hasilGrade.grade,
-    jenisHukuman: hasilGrade.hukuman,
-  };
+  const rincianTambahan =
+    kelompok !== 'I' ? hitungFaktorTambahanRinci(state.faktorPembobotan, kunciKelompokAktif(state)) : {};
 
-  const renderValue = (val) => {
-    if (typeof val === 'boolean') return val ? 'true' : 'false';
-    if (val === null || val === undefined) return '(kosong)';
-    if (typeof val === 'object') return JSON.stringify(val);
-    return val.toString();
-  };
+  const meringankan = state.faktorMeringankan || {};
+  const disesuaikan = !tidakDiatur && kelompok !== 'I' && nilaiSebelumKunci !== nilaiAkhir;
 
-  const tampilkanTabelRincian = kelompok !== 'I';
+  const labelUtama = kelompok === 'III' && tipeKelompokIII === 'bersama' ? 'Faktor peran' : 'Faktor pembobotan utama';
+  const adaFaktorUtama = ['III', 'IV', 'VI'].includes(kelompok) && tipeKelompokIII !== 'umum';
 
-  const rincianTambahan = tampilkanTabelRincian
-  ? hitungFaktorTambahanRinci(
-      state.faktorPembobotan,
-      kunciKelompokAktif(state)
-    )
-  : {};
-
-
-  const faktorMeringankan = state.faktorMeringankan || {};
-  const rincianMeringankan = [];
-
-  if (faktorMeringankan.kooperatif) {
-    rincianMeringankan.push({ label: 'Kooperatif saat diperiksa', nilai: NILAI_KOOPERATIF });
-  }
-  if (faktorMeringankan.inisiator) {
-    rincianMeringankan.push({ label: 'Pelaku adalah inisiator', nilai: NILAI_INISIATOR });
-  }
-
-  // Kunci jenis tabel untuk generateHTMLTable
   const kunciTabel =
     kelompok === 'III'
       ? { umum: 'III Umum', individu: 'III Khusus Individual', bersama: 'III Khusus Bersama' }[tipeKelompokIII] || 'III Umum'
       : kelompok;
 
-  // ----------- TOMBOL COPY TABEL -----------
   const handleCopyTable = async () => {
     const html = generateHTMLTable(kunciTabel, {
       ...state,
@@ -114,129 +87,92 @@ export default function Step7_HasilAkhir() {
       grade: hasilGrade.grade,
       jenisHukuman: hasilGrade.hukuman,
       rincianTambahan,
-      // Untuk semua varian kelompok III (umum, individu, bersama):
       faktorTambahanJumlahPasal: rincianTambahan.banyakPasal ?? 0,
       faktorTambahanRekamJejak: rincianTambahan.hukdis ?? 0,
       faktorTambahanKesengajaan: rincianTambahan.kesengajaan ?? 0,
       faktorTambahanHambatan: rincianTambahan.hambatan ?? 0,
-      // Khusus III Khusus Bersama:
       faktorTambahanJumlahUang: rincianTambahan.jumlahKerugian ?? 0,
-      // Pengurang meringankan:
-      // tambahkan mapping jika ada field lain yg perlu
     });
     try {
       const blob = new Blob([html], { type: 'text/html' });
-      const clipboardItem = new window.ClipboardItem({ 'text/html': blob });
-      await navigator.clipboard.write([clipboardItem]);
-      alert('✅ Tabel berhasil disalin dalam format tabel (HTML) ke clipboard!');
-    } catch (err) {
-      alert('❌ Gagal menyalin. Coba gunakan browser terbaru (Chrome/Edge).');
+      await navigator.clipboard.write([new window.ClipboardItem({ 'text/html': blob })]);
+      setPesanSalin('Tabel berhasil disalin. Tempel di Word atau Excel.');
+    } catch {
+      setPesanSalin('Gagal menyalin. Coba gunakan Chrome atau Edge versi terbaru.');
     }
   };
-  // ------------------------------------------
+
+  const hitungUlang = () => {
+    resetMPJHD();
+    navigate('/step/1');
+  };
 
   return (
-    <PageWrapper>
-      <Card>
-        <div className="flex justify-between items-center mb-6">
-          <BackButton label="Kembali ke Step 6" />
-          <ResetButton />
+    <StepLayout step={7} title="Hasil Penentuan Hukuman Disiplin" hideNext>
+      {peringatan.length > 0 && (
+        <div className="mb-4 rounded-xl border border-amber-400 bg-amber-50 p-3 text-sm text-amber-900 dark:border-amber-500 dark:bg-amber-950/40 dark:text-amber-200">
+          {peringatan.map((p) => (
+            <p key={p}>{p}</p>
+          ))}
         </div>
+      )}
 
-        <h2 className="text-xl font-bold mb-6 text-center">Debug: Perhitungan Nilai</h2>
+      {/* Hasil utama */}
+      <div className="rounded-2xl border border-gray-200 p-4 text-center dark:border-gray-700">
+        {tingkat && (
+          <span className={`inline-block rounded-full px-3 py-1 text-xs font-bold ${WARNA_TINGKAT[tingkat] || ''}`}>
+            Hukuman Disiplin {tingkat}
+          </span>
+        )}
+        <p className="mt-3 text-sm text-gray-600 dark:text-gray-300">Nilai Akhir</p>
+        <p className="text-4xl font-bold tabular-nums">{formatNilai(nilaiAkhir)}</p>
+        <p className="mt-1 text-sm font-semibold text-blue-700 dark:text-blue-300">{hasilGrade.grade}</p>
+        <p className="mt-2 text-base font-semibold">{hasilGrade.hukuman}</p>
+        {disesuaikan && (
+          <p className="mt-2 text-xs text-gray-600 dark:text-gray-300">
+            Hasil hitungan {formatNilai(nilaiSebelumKunci)} disesuaikan ke batas tingkat hukuman sesuai nilai pokok.
+          </p>
+        )}
+      </div>
 
+      {/* Rincian */}
+      <h3 className="mt-6 mb-1 text-sm font-semibold">Rincian perhitungan</h3>
+      <table className="w-full text-sm">
+        <tbody>
+          <Baris label="Nilai pokok" nilai={formatNilai(nilaiPokok)} />
+          {kelompok === 'I' ? (
+            <Baris label="Jumlah hari tidak masuk kerja" nilai={`${state.jumlahHariTidakMasuk} hari`} indent />
+          ) : (
+            <>
+              {adaFaktorUtama && <Baris label={labelUtama} nilai={`+${formatNilai(nilaiUtama)}`} />}
+              <Baris label="Faktor pembobotan tambahan" nilai={`+${formatNilai(nilaiTambahan)}`} />
+              {Object.entries(rincianTambahan).map(([k, v]) => (
+                <Baris key={k} label={LABEL_FAKTOR[k] || k} nilai={formatNilai(v)} indent />
+              ))}
+              <Baris label="Faktor meringankan" nilai={`−${formatNilai(pengurangMeringankan)}`} />
+              {meringankan.kooperatif && <Baris label="Kooperatif" nilai={`−${NILAI_KOOPERATIF}`} indent />}
+              {meringankan.inisiator && <Baris label="Inisiator pengungkapan" nilai={`−${NILAI_INISIATOR}`} indent />}
+            </>
+          )}
+          <Baris label="Nilai akhir" nilai={formatNilai(nilaiAkhir)} tebal />
+        </tbody>
+      </table>
+
+      <div className="mt-6 space-y-2">
         {kelompok !== 'I' && (
-          <div className="flex justify-end mb-4">
-            <Button onClick={handleCopyTable} className="!w-auto">Salin Tabel ke Clipboard</Button>
-          </div>
-        )}
-
-        {peringatan.length > 0 && (
-          <div className="mb-4 rounded-xl border border-amber-400 bg-amber-50 p-3 text-sm text-amber-900">
-            {peringatan.map((p) => (
-              <p key={p}>{p}</p>
-            ))}
-          </div>
-        )}
-
-        <table className="w-full text-sm border border-gray-300 dark:border-gray-600 mb-6">
-          <thead className="bg-gray-100 dark:bg-gray-700">
-            <tr>
-              <th className="border px-2 py-1">Nama</th>
-              <th className="border px-2 py-1">Isi</th>
-            </tr>
-          </thead>
-          <tbody>
-            {Object.entries(hasil).map(([key, val]) => (
-              <tr key={key}>
-                <td className="border px-2 py-1 font-mono">{key}</td>
-                <td className="border px-2 py-1">{renderValue(val)}</td>
-              </tr>
-            ))}
-          </tbody>
-        </table>
-
-        {tampilkanTabelRincian && (
           <>
-            <h3 className="text-lg font-semibold mb-2">
-              Rincian Faktor Tambahan
-              {kelompok === 'III' && tipeKelompokIII
-                ? ` (Kelompok III - ${capitalize(tipeKelompokIII)})`
-                : kelompok !== 'I'
-                  ? ` (Kelompok ${kelompok})`
-                  : ''}
-            </h3>
-
-            <table className="w-full text-sm border border-gray-300 dark:border-gray-600 mb-6">
-              <thead className="bg-gray-100 dark:bg-gray-700">
-                <tr>
-                  <th className="border px-2 py-1">Faktor</th>
-                  <th className="border px-2 py-1">Nilai</th>
-                </tr>
-              </thead>
-              <tbody>
-                {Object.entries(rincianTambahan).map(([label, nilai]) => (
-                  <tr key={label}>
-                    <td className="border px-2 py-1">
-                      {label.replace(/([A-Z])/g, ' $1')}
-                    </td>
-                    <td className="border px-2 py-1">{nilai}</td>
-                  </tr>
-                ))}
-              </tbody>
-            </table>
+            <Button onClick={handleCopyTable}>Salin tabel ke clipboard</Button>
+            {pesanSalin && (
+              <p role="status" className="text-center text-xs text-gray-600 dark:text-gray-300">
+                {pesanSalin}
+              </p>
+            )}
           </>
         )}
-
-        {rincianMeringankan.length > 0 && (
-          <>
-            <h3 className="text-lg font-semibold mb-2">Rincian Faktor Meringankan</h3>
-            <table className="w-full text-sm border border-gray-300 dark:border-gray-600 mb-6">
-              <thead className="bg-gray-100 dark:bg-gray-700">
-                <tr>
-                  <th className="border px-2 py-1">Faktor</th>
-                  <th className="border px-2 py-1">Nilai</th>
-                </tr>
-              </thead>
-              <tbody>
-                {rincianMeringankan.map((item) => (
-                  <tr key={item.label}>
-                    <td className="border px-2 py-1">{item.label}</td>
-                    <td className="border px-2 py-1">{item.nilai}</td>
-                  </tr>
-                ))}
-              </tbody>
-            </table>
-          </>
-        )}
-
-        <div className="mt-8">
-          <Stepper currentStep={7} totalSteps={7} />
-          <Button className="mt-4" onClick={() => navigate('/step/6')}>
-            Kembali
-          </Button>
-        </div>
-      </Card>
-    </PageWrapper>
+        <Button onClick={hitungUlang} className="!bg-gray-100 !text-gray-800 hover:!bg-gray-200 dark:!bg-gray-700 dark:!text-gray-100 dark:hover:!bg-gray-600">
+          Hitung kasus baru
+        </Button>
+      </div>
+    </StepLayout>
   );
 }

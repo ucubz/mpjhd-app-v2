@@ -1,83 +1,65 @@
 import { useEffect, useState } from 'react';
-import { Dialog, Transition, RadioGroup } from '@headlessui/react';
-import { CheckCircleIcon } from '@heroicons/react/24/solid';
+import { Dialog, Transition } from '@headlessui/react';
 import { useNavigate } from 'react-router-dom';
-import { useMPJHD, useResetMPJHD } from '../context/MPJHDContext';
-import PageWrapper from '../components/PageWrapper';
-import Card from '../components/Card';
-import Stepper from '../components/Stepper';
-import BackButton from '../components/BackButton';
-import ResetButton from '../components/ResetButton';
+import { useMPJHD } from '../context/MPJHDContext';
+import useRequireStep from '../hooks/useRequireStep';
+import StepLayout from '../components/StepLayout';
+import OptionList from '../components/OptionList';
 import { pasalBelumDiatur } from '../utils_v2/tentukanNilaiPokok';
 
-// --- CUSTOM HOOK: cek state step sebelumnya ---
-function useRequireStep(requiredFields = [], redirectTo = '/step/1') {
-  const { state } = useMPJHD();
-  const resetMPJHD = useResetMPJHD();
-  const navigate = useNavigate();
-
-  useEffect(() => {
-    const missing = requiredFields.some((field) => !state[field]);
-    if (missing) {
-      resetMPJHD();
-      navigate(redirectTo, { replace: true });
-    }
-  }, [state, requiredFields, navigate, redirectTo, resetMPJHD]);
-}
-
-// --- END CUSTOM HOOK ---
+const dampakOptions = ['Unit Kerja', 'Instansi', 'Negara'].map((v) => ({ value: v, label: v }));
+const reputasiOptions = [
+  { value: 'Tidak Berdampak', label: 'Tidak berdampak' },
+  { value: 'Unit Kerja', label: 'Berdampak pada unit kerja' },
+  { value: 'Instansi/Tersangka', label: 'Berdampak pada instansi / menjadi tersangka' },
+];
+const jabatanOptions = [
+  'Pejabat Administrator',
+  'Pejabat Fungsional',
+  'Pejabat Pimpinan Tinggi',
+  'Pejabat lainnya',
+].map((v) => ({ value: v, label: v }));
+const kerugianOptions = [
+  { value: true, label: 'Ya' },
+  { value: false, label: 'Tidak' },
+];
 
 export default function Step3_KondisiAwal() {
-  // Cek: harus sudah pilih pasalUtama & kelompok
   useRequireStep(['pasalUtama', 'kelompok'], '/step/1');
 
+  const { state, dispatch } = useMPJHD();
+  const navigate = useNavigate();
 
-  const { state, dispatch } = useMPJHD(); // Mengambil state global dan fungsi dispatch untuk mengubah state
-  const navigate = useNavigate(); // Fungsi navigasi untuk berpindah halaman
+  const [isDialogOpen, setIsDialogOpen] = useState(false);
+  const [dialogMessage, setDialogMessage] = useState('');
 
-  const [isDialogOpen, setIsDialogOpen] = useState(false); // State untuk mengatur apakah dialog terbuka
-  const [dialogMessage, setDialogMessage] = useState(''); // State untuk pesan yang ditampilkan di dialog
+  const kelompok = state.kelompok || '';
 
-  const kelompok = state.kelompok || 'Tidak Diketahui'; // Nilai kelompok dari state global, default 'Tidak Diketahui'
-  const isKelompokIII = kelompok === 'III'; // Boolean untuk mengecek apakah kelompok adalah 'III'
-  const isKelompokV = kelompok === 'V'; // Boolean untuk mengecek apakah kelompok adalah 'V'
-  const isKelompokVI = kelompok === 'VI'; // Boolean untuk mengecek apakah kelompok adalah 'VI'
+  const set = (field) => (value) => dispatch({ type: 'SET', field, value });
 
-  const dampakOptions = ['Unit Kerja', 'Instansi', 'Negara']; // Opsi untuk dampak pelanggaran
-  const reputasiOptions = ['Tidak Berdampak', 'Unit Kerja', 'Instansi/Tersangka']; // Opsi untuk dampak terhadap reputasi
-  const jabatanOptions = [
-    'Pejabat Administrator',
-    'Pejabat Fungsional',
-    'Pejabat Pimpinan Tinggi',
-    'Pejabat lainnya',
-  ]; // Opsi untuk jabatan pelaku
+  // Kelompok -> pertanyaan yang ditampilkan
+  const pertanyaan = {
+    II: { label: 'Dampak pelanggaran', options: dampakOptions, value: state.dampak, field: 'dampak' },
+    III: { label: 'Apakah terdapat kerugian negara/pihak lain?', options: kerugianOptions, value: state.adaKerugian, field: 'adaKerugian' },
+    V: { label: 'Jabatan pelaku', options: jabatanOptions, value: state.jabatan, field: 'jabatan' },
+    VI: { label: 'Dampak terhadap reputasi atau pelaksanaan tugas', options: reputasiOptions, value: state.reputasi, field: 'reputasi' },
+  }[kelompok];
 
-  const handleOptionChange = (val, field) => {
-    dispatch({ type: 'SET', field, value: val });
-  };
+  const sudahDipilih = pertanyaan && pertanyaan.value !== null && pertanyaan.value !== undefined && pertanyaan.value !== '';
 
   const handleNextStep = () => {
     if (kelompok === 'III') {
-      const adaKerugian = state.adaKerugian;
-  
-      if (adaKerugian === true) {
-        dispatch({ type: 'SET', field: 'tipeKelompokIII', value: '' }); // kosong dulu
+      if (state.adaKerugian === true) {
+        dispatch({ type: 'SET', field: 'tipeKelompokIII', value: '' }); // dipilih di Step 4
         navigate('/step/4');
-      } else if (adaKerugian === false) {
+      } else {
         dispatch({ type: 'SET', field: 'tipeKelompokIII', value: 'umum' });
         navigate('/step/5');
       }
       return;
     }
-  
-    if (['II', 'V', 'VI'].includes(kelompok)) {
-      navigate('/step/5');
-    } else {
-      navigate('/step/4');
-    }
+    navigate('/step/5'); // II, V, VI
   };
-  
-  
 
   useEffect(() => {
     // replace: supaya tombol Kembali dari Step 4/6 tidak memantul kembali ke halaman ini
@@ -96,196 +78,74 @@ export default function Step3_KondisiAwal() {
   }, [kelompok, state.pasalUtama, navigate]);
 
   return (
-    <PageWrapper>
+    <StepLayout
+      step={3}
+      title="Kondisi Awal"
+      subtitle={`Kelompok ${kelompok}`}
+      onNext={handleNextStep}
+      nextDisabled={!sudahDipilih}
+      outside={
       <Transition appear show={isDialogOpen} as="div">
-        <Dialog as="div" className="relative z-10" onClose={() => setIsDialogOpen(false)}>
-          <Transition.Child
-            as="div"
-            enter="ease-out duration-300"
-            enterFrom="opacity-0"
-            enterTo="opacity-100"
-            leave="ease-in duration-200"
-            leaveFrom="opacity-100"
-            leaveTo="opacity-0"
-          >
-            <div className="fixed inset-0 bg-black bg-opacity-25" />
-          </Transition.Child>
-          <div className="fixed inset-0 overflow-y-auto">
-            <div className="flex min-h-full items-center justify-center p-4 text-center">
-              <Transition.Child
-                as="div"
-                enter="ease-out duration-300"
-                enterFrom="opacity-0 scale-95"
-                enterTo="opacity-100 scale-100"
-                leave="ease-in duration-200"
-                leaveFrom="opacity-100 scale-100"
-                leaveTo="opacity-0 scale-95"
-              >
-                <Dialog.Panel className="w-full max-w-md transform overflow-hidden rounded-2xl bg-white p-6 text-left align-middle shadow-xl transition-all dark:bg-gray-800 dark:text-gray-100">
-                  <Dialog.Title className="text-lg font-medium">Informasi Kelompok</Dialog.Title>
-                  <div className="mt-2 text-sm">{dialogMessage}</div>
-                  <div className="mt-4 text-right">
-                    <button
-                      className="bg-blue-100 hover:bg-blue-200 text-blue-900 font-medium px-4 py-2 rounded-md"
-                      onClick={() => setIsDialogOpen(false)}
-                    >
-                      Mengerti
-                    </button>
-                  </div>
-                </Dialog.Panel>
-              </Transition.Child>
+          <Dialog as="div" className="relative z-10" onClose={() => setIsDialogOpen(false)}>
+            <Transition.Child
+              as="div"
+              enter="ease-out duration-300"
+              enterFrom="opacity-0"
+              enterTo="opacity-100"
+              leave="ease-in duration-200"
+              leaveFrom="opacity-100"
+              leaveTo="opacity-0"
+            >
+              <div className="fixed inset-0 bg-black bg-opacity-25" />
+            </Transition.Child>
+            <div className="fixed inset-0 overflow-y-auto">
+              <div className="flex min-h-full items-center justify-center p-4 text-center">
+                <Transition.Child
+                  as="div"
+                  enter="ease-out duration-300"
+                  enterFrom="opacity-0 scale-95"
+                  enterTo="opacity-100 scale-100"
+                  leave="ease-in duration-200"
+                  leaveFrom="opacity-100 scale-100"
+                  leaveTo="opacity-0 scale-95"
+                >
+                  <Dialog.Panel className="w-full max-w-md transform overflow-hidden rounded-2xl bg-white p-6 text-left align-middle shadow-xl transition-all dark:bg-gray-800 dark:text-gray-100">
+                    <Dialog.Title className="text-lg font-medium">Informasi Kelompok</Dialog.Title>
+                    <div className="mt-2 text-sm">{dialogMessage}</div>
+                    <div className="mt-4 text-right">
+                      <button
+                        className="bg-blue-100 hover:bg-blue-200 text-blue-900 font-medium px-4 py-2 rounded-md"
+                        onClick={() => setIsDialogOpen(false)}
+                      >
+                        Mengerti
+                      </button>
+                    </div>
+                  </Dialog.Panel>
+                </Transition.Child>
+              </div>
             </div>
-          </div>
-        </Dialog>
-      </Transition>
-
-      <Card>
-        <div className="flex justify-between items-center mb-6">
-          <BackButton label="Kembali ke Step 2" />
-          <ResetButton />
+          </Dialog>
+        </Transition>
+      }
+    >
+      {pasalBelumDiatur(state.pasalUtama) && (
+        <div className="mb-4 rounded-xl border border-amber-400 bg-amber-50 p-3 text-sm text-amber-900 dark:border-amber-500 dark:bg-amber-950/40 dark:text-amber-200">
+          {state.pasalUtama} tidak diatur dalam tabel PMK 123/2023. Dimasukkan ke Kelompok V dengan nilai pokok 30
+          (angka terendah Kelompok V); mohon verifikasi hasil akhir secara manual.
         </div>
+      )}
 
-        <h2 className="text-xl font-bold mb-6 text-center">Kondisi Awal</h2>
-
-        {pasalBelumDiatur(state.pasalUtama) && (
-          <div className="mb-4 rounded-xl border border-amber-400 bg-amber-50 p-3 text-sm text-amber-900">
-            {state.pasalUtama} tidak diatur dalam tabel PMK 123/2023. Dimasukkan ke Kelompok V dengan nilai pokok 30
-            (angka terendah Kelompok V); mohon verifikasi hasil akhir secara manual.
-          </div>
-        )}
-
-        {/* Kelompok II */}
-        {kelompok === 'II' && (
-          <>
-            <p className="font-semibold mb-2">Dampak pelanggaran:</p>
-            <RadioGroup value={state.dampak} onChange={(val) => handleOptionChange(val, 'dampak')}>
-              <div className="space-y-2">
-                {dampakOptions.map((val) => (
-                  <RadioGroup.Option key={val} value={val} className={({ checked }) =>
-                    `p-3 border rounded-xl ${checked ? 'bg-blue-100 border-blue-500' : 'border-gray-300'}`
-                  }>
-                    {({ checked }) => (
-                      <div className="flex items-center gap-2">
-                        {checked && <CheckCircleIcon className="h-5 w-5 text-blue-600" />}
-                        <span>{val}</span>
-                      </div>
-                    )}
-                  </RadioGroup.Option>
-                ))}
-              </div>
-            </RadioGroup>
-            <button
-              onClick={handleNextStep}
-              disabled={!state.dampak}
-              className={`mt-4 w-full py-2 px-4 rounded-md ${
-                state.dampak ? 'bg-blue-600 text-white hover:bg-blue-700' : 'bg-gray-300 text-gray-600 cursor-not-allowed'
-              }`}
-            >
-              Lanjut
-            </button>
-          </>
-        )}
-
-        {/* Kelompok III */}
-        {isKelompokIII && (
-          <>
-            <p className="font-semibold mb-2">Apakah terdapat kerugian negara/pihak lain?</p>
-            <RadioGroup value={state.adaKerugian} onChange={(val) => handleOptionChange(val, 'adaKerugian')}>
-              <div className="space-y-2">
-                {['Ya', 'Tidak'].map((label, idx) => (
-                  <RadioGroup.Option key={label} value={idx === 0} className={({ checked }) =>
-                    `p-3 border rounded-xl ${checked ? 'bg-blue-100 border-blue-500' : 'border-gray-300'}`
-                  }>
-                    {({ checked }) => (
-                      <div className="flex items-center gap-2">
-                        {checked && <CheckCircleIcon className="h-5 w-5 text-blue-600" />}
-                        <span>{label}</span>
-                      </div>
-                    )}
-                  </RadioGroup.Option>
-                ))}
-              </div>
-            </RadioGroup>
-            <button
-              onClick={handleNextStep}
-              disabled={state.adaKerugian === null}
-              className={`mt-4 w-full py-2 px-4 rounded-md ${
-                state.adaKerugian !== null ? 'bg-blue-600 text-white hover:bg-blue-700' : 'bg-gray-300 text-gray-600 cursor-not-allowed'
-              }`}
-            >
-              Lanjut
-            </button>
-          </>
-        )}
-
-        {/* Kelompok V */}
-        {isKelompokV && (
-          <>
-            <p className="font-semibold mb-2">Jabatan Pelaku:</p>
-            <RadioGroup value={state.jabatan} onChange={(val) => handleOptionChange(val, 'jabatan')}>
-              <div className="space-y-2">
-                {jabatanOptions.map((val) => (
-                  <RadioGroup.Option key={val} value={val} className={({ checked }) =>
-                    `p-3 border rounded-xl ${checked ? 'bg-blue-100 border-blue-500' : 'border-gray-300'}`
-                  }>
-                    {({ checked }) => (
-                      <div className="flex items-center gap-2">
-                        {checked && <CheckCircleIcon className="h-5 w-5 text-blue-600" />}
-                        <span>{val}</span>
-                      </div>
-                    )}
-                  </RadioGroup.Option>
-                ))}
-              </div>
-            </RadioGroup>
-            <button
-              onClick={handleNextStep}
-              disabled={!state.jabatan}
-              className={`mt-4 w-full py-2 px-4 rounded-md ${
-                state.jabatan ? 'bg-blue-600 text-white hover:bg-blue-700' : 'bg-gray-300 text-gray-600 cursor-not-allowed'
-              }`}
-            >
-              Lanjut
-            </button>
-          </>
-        )}
-
-        {/* Kelompok VI */}
-        {isKelompokVI && (
-          <>
-            <p className="font-semibold mb-2">Dampak terhadap reputasi atau pelaksanaan tugas:</p>
-            <RadioGroup value={state.reputasi} onChange={(val) => handleOptionChange(val, 'reputasi')}>
-              <div className="space-y-2">
-                {reputasiOptions.map((val) => (
-                  <RadioGroup.Option key={val} value={val} className={({ checked }) =>
-                    `p-3 border rounded-xl ${checked ? 'bg-blue-100 border-blue-500' : 'border-gray-300'}`
-                  }>
-                    {({ checked }) => (
-                      <div className="flex items-center gap-2">
-                        {checked && <CheckCircleIcon className="h-5 w-5 text-blue-600" />}
-                        <span>{val}</span>
-                      </div>
-                    )}
-                  </RadioGroup.Option>
-                ))}
-              </div>
-            </RadioGroup>
-            <button
-              onClick={handleNextStep}
-              disabled={!state.reputasi}
-              className={`mt-4 w-full py-2 px-4 rounded-md ${
-                state.reputasi ? 'bg-blue-600 text-white hover:bg-blue-700' : 'bg-gray-300 text-gray-600 cursor-not-allowed'
-              }`}
-            >
-              Lanjut
-            </button>
-          </>
-        )}
-
-        <div className="mt-12">
-          <Stepper currentStep={3} totalSteps={7} />
-        </div>
-      </Card>
-    </PageWrapper>
+      {pertanyaan && (
+        <>
+          <p className="mb-2 font-semibold">{pertanyaan.label}</p>
+          <OptionList
+            value={pertanyaan.value}
+            onChange={set(pertanyaan.field)}
+            options={pertanyaan.options}
+            label={pertanyaan.label}
+          />
+        </>
+      )}
+    </StepLayout>
   );
 }

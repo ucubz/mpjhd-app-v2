@@ -1,32 +1,11 @@
 // Step 2 - Pilih pasal
-import { RadioGroup } from '@headlessui/react';
-import { CheckCircleIcon } from '@heroicons/react/24/solid';
+import { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
-import { useMPJHD, useResetMPJHD } from '../context/MPJHDContext'; // <-- tambahkan useResetMPJHD
-import PageWrapper from '../components/PageWrapper';
-import Card from '../components/Card';
-import Stepper from '../components/Stepper';
-import BackButton from '../components/BackButton';
-import ResetButton from '../components/ResetButton';
+import { useMPJHD } from '../context/MPJHDContext';
+import useRequireStep from '../hooks/useRequireStep';
+import StepLayout from '../components/StepLayout';
+import OptionList from '../components/OptionList';
 import { tentukanKelompok } from '../utils_v2/tentukanKelompok';
-import { useEffect } from 'react';
-
-// --- CUSTOM HOOK: cek state step sebelumnya ---
-function useRequireStep(requiredFields = [], redirectTo = '/step/1') {
-  const { state } = useMPJHD();
-  const resetMPJHD = useResetMPJHD();
-  const navigate = useNavigate();
-
-  useEffect(() => {
-    const missing = requiredFields.some((field) => !state[field]);
-    if (missing) {
-      resetMPJHD();
-      navigate(redirectTo, { replace: true });
-    }
-  }, [state, requiredFields, navigate, redirectTo, resetMPJHD]);
-}
-
-// --- END CUSTOM HOOK ---
 
 const daftarPasal = {
   pasal3: [
@@ -79,69 +58,43 @@ const daftarPasal = {
 };
 
 export default function Step2_PilihPasal() {
-  // --- Tambahkan ini di awal komponen: cek jenisPilihanUtama wajib ada ---
   useRequireStep(['jenisPilihanUtama'], '/step/1');
-  // ------------------------------------------------------
 
   const { state, dispatch } = useMPJHD();
   const navigate = useNavigate();
 
-  const handleSelect = (pasal) => {
-    const kelompok = tentukanKelompok(pasal);
-    dispatch({ type: 'PILIH_PASAL', pasal, kelompok });
+  const pasalList = daftarPasal[state.jenisPilihanUtama] || [];
+  const adaDiDaftar = pasalList.some((p) => p.kode === state.pasalUtama);
+  const [dipilih, setDipilih] = useState(adaDiDaftar ? state.pasalUtama : null);
+
+  const handleNext = () => {
+    // Pasal sama dengan sebelumnya: jangan hapus isian yang sudah ada
+    if (dipilih !== state.pasalUtama) {
+      dispatch({ type: 'PILIH_PASAL', pasal: dipilih, kelompok: tentukanKelompok(dipilih) });
+    }
     navigate('/step/3');
   };
 
-  const pasalList = daftarPasal[state.jenisPilihanUtama] || [];
+  const options = pasalList
+    .filter((p) => p.kode !== 'Pasal 5 huruf n') // induk dari angka 1-7, bukan pilihan sendiri
+    .map((p) => ({
+      value: p.kode,
+      label: p.kode,
+      description:
+        p.kode === 'Pasal 5 huruf n angka 1' || p.kode.startsWith('Pasal 5 huruf n angka')
+          ? `Dukungan kepada calon peserta pemilu: ${p.deskripsi}`
+          : p.deskripsi,
+    }));
 
   return (
-    <PageWrapper>
-      <Card>
-        <div className="flex justify-between items-center mb-6">
-          <BackButton label="Kembali ke Step 1" />
-          <ResetButton />
-        </div>
-
-        <h2 className="text-xl font-bold mb-6 text-center">Pilih Pasal yang Dilanggar</h2>
-        <RadioGroup onChange={handleSelect}>
-          <div className="space-y-3">
-            {pasalList.map((item) => item.kode === 'Pasal 5 huruf n' ? (
-              // Induk dari angka 1-7: bukan pilihan sendiri, hanya judul
-              <p key={item.kode} className="px-1 pt-2 text-sm font-semibold text-gray-700 dark:text-gray-200">
-                {item.kode}: {item.deskripsi}
-              </p>
-            ) : (
-              <RadioGroup.Option
-                key={item.kode}
-                value={item.kode}
-                className={({ checked }) =>
-                  `p-4 rounded-xl border cursor-pointer transition-all ${
-                    checked
-                      ? 'bg-blue-50 border-blue-500 text-blue-600'
-                      : 'bg-white border-gray-300 text-gray-900 dark:bg-gray-800 dark:text-gray-100'
-                  }`
-                }
-              >
-                {({ checked }) => (
-                  <div className="flex items-start gap-3">
-                    {checked && (
-                      <CheckCircleIcon className="h-5 w-5 text-blue-600 mt-1" />
-                    )}
-                    <div>
-                      <p className="font-semibold">{item.kode}</p>
-                      <p className="text-sm">{item.deskripsi}</p>
-                    </div>
-                  </div>
-                )}
-              </RadioGroup.Option>
-            ))}
-          </div>
-        </RadioGroup>
-
-        <div className="mt-12">
-          <Stepper currentStep={2} totalSteps={7} />
-        </div>
-      </Card>
-    </PageWrapper>
+    <StepLayout
+      step={2}
+      title="Pilih Pasal yang Dilanggar"
+      subtitle="Pilih satu pasal, lalu tekan Lanjut."
+      onNext={handleNext}
+      nextDisabled={!dipilih}
+    >
+      <OptionList value={dipilih} onChange={setDipilih} options={options} label="Pasal yang dilanggar" />
+    </StepLayout>
   );
 }

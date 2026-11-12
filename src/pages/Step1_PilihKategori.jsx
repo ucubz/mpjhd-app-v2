@@ -1,12 +1,9 @@
 // Step 1 - Pilih kategori
-import { RadioGroup } from '@headlessui/react';
-import { CheckCircleIcon } from '@heroicons/react/24/solid';
+import { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { useMPJHD } from '../context/MPJHDContext';
-import PageWrapper from '../components/PageWrapper';
-import Card from '../components/Card';
-import BackButton from '../components/BackButton';
-import ResetButton from '../components/ResetButton';
+import StepLayout from '../components/StepLayout';
+import OptionList from '../components/OptionList';
 
 const pilihan = [
   { label: 'Pasal 3 - Kewajiban', value: 'pasal3' },
@@ -17,54 +14,34 @@ const pilihan = [
 
 export default function Step1_PilihKategori() {
   const navigate = useNavigate();
-  const { dispatch } = useMPJHD();
+  const { state, dispatch } = useMPJHD();
+  const [dipilih, setDipilih] = useState(state.jenisPilihanUtama || null);
 
- const handleSelect = (val) => {
-  if (val === 'izin') {
-    dispatch({ type: 'PILIH_KATEGORI', value: val, kelompok: 'VI', pasalUtama: 'terkait Perkawinan/Perceraian' });
-    navigate('/step/3');
-  } else {
-    dispatch({ type: 'PILIH_KATEGORI', value: val });
-    navigate('/step/2');
-  }
-};
+  const handleNext = () => {
+    // Pilihan sama dengan sebelumnya: jangan hapus isian yang sudah ada
+    if (dipilih === state.jenisPilihanUtama) {
+      navigate(dipilih === 'izin' ? '/step/3' : '/step/2');
+      return;
+    }
+    if (dipilih === 'izin') {
+      dispatch({ type: 'PILIH_KATEGORI', value: dipilih, kelompok: 'VI', pasalUtama: 'terkait Perkawinan/Perceraian' });
+      navigate('/step/3');
+    } else {
+      dispatch({ type: 'PILIH_KATEGORI', value: dipilih });
+      navigate('/step/2');
+    }
+  };
 
   return (
-    <PageWrapper>
-      <Card>
-        <div className="flex justify-between items-center mb-6">
-          <BackButton label="Kembali" />
-          <ResetButton className="ml-auto" />
-        </div>
-
-        <h2 className="text-xl font-bold mb-6 text-center">Pilih Jenis Pelanggaran</h2>
-        <RadioGroup onChange={handleSelect}>
-          <div className="space-y-3">
-            {pilihan.map((item) => (
-              <RadioGroup.Option
-                key={item.value}
-                value={item.value}
-                className={({ checked }) =>
-                  `p-4 rounded-xl border cursor-pointer transition-all ${
-                    checked
-                      ? 'bg-blue-50 border-blue-500 text-blue-600'
-                      : 'bg-white border-gray-300 text-gray-900 dark:bg-gray-800 dark:text-gray-100'
-                  }`
-                }
-              >
-                {({ checked }) => (
-                  <div className="flex items-center gap-3">
-                    {checked && (
-                      <CheckCircleIcon className="h-5 w-5 text-blue-600" />
-                    )}
-                    <span>{item.label}</span>
-                  </div>
-                )}
-              </RadioGroup.Option>
-            ))}
-          </div>
-        </RadioGroup>
-      </Card>
-    </PageWrapper>
+    <StepLayout
+      step={1}
+      title="Pilih Jenis Pelanggaran"
+      subtitle="Pilih salah satu, lalu tekan Lanjut."
+      hideBack
+      onNext={handleNext}
+      nextDisabled={!dipilih}
+    >
+      <OptionList value={dipilih} onChange={setDipilih} options={pilihan} label="Jenis pelanggaran" />
+    </StepLayout>
   );
 }
