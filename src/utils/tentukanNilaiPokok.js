@@ -1,6 +1,6 @@
 // src/utils/tentukanNilaiPokok.js
 
-export function tentukanNilaiPokok({ pasal, kelompok, dampak, jabatan, tipeKelompokIII }) {
+export function tentukanNilaiPokok({ pasal, kelompok, dampak, jabatan }) {
     if (!pasal || !kelompok) return 0;
   
     if (kelompok === 'II') {

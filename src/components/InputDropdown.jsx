@@ -32,7 +32,7 @@ export default function InputDropdown({ label, value, onChange, options }) {
               <ListboxOption
                 key={opt.value}
                 value={opt}
-                className={({ active, selected }) =>
+                className={({ active }) =>
                   `cursor-pointer select-none flex items-center gap-2 px-3 py-2 ${
                     active
                       ? 'bg-blue-100 text-blue-900 dark:bg-blue-900 dark:text-white'

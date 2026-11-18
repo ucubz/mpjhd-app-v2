@@ -4,7 +4,8 @@ import reactHooks from 'eslint-plugin-react-hooks'
 import reactRefresh from 'eslint-plugin-react-refresh'
 
 export default [
-  { ignores: ['dist'] },
+  // docs/ berisi salinan arsip, dan file "tidak dipakai" memang tidak diimpor di mana pun.
+  { ignores: ['dist', 'docs', 'src/pages/tidak dipakai*'] },
   {
     files: ['**/*.{js,jsx}'],
     languageOptions: {
