@@ -52,11 +52,11 @@ export function determineNilaiPokok(pasalUtama, kelompok, dampak = '', jenisJaba
 // Format hasil tabel menjadi teks untuk clipboard
 export function formatClipboard(state) {
   const pembobotan = Object.entries(state.pembobotan || {})
-    .filter(([_, v]) => v)
+    .filter(([, v]) => v)
     .map(([k]) => k)
     .join(', ') || 'Tidak ada'
   const meringankan = Object.entries(state.meringankan || {})
-    .filter(([_, v]) => v)
+    .filter(([, v]) => v)
     .map(([k]) => k)
     .join(', ') || 'Tidak ada'
 
